@@ -1,0 +1,6 @@
+# Linux JDK tarball (для песочницы Claude, не нужен в репозитории)
+*.tar.gz
+
+# IntelliJ output
+out/
+target/
