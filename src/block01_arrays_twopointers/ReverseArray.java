@@ -2,35 +2,29 @@ package block01_arrays_twopointers;
 
 import java.util.Arrays;
 
-/*
- * Задача: развернуть массив на месте (in-place).
+/**
+ * Reverse Array — базовое упражнение на паттерн «два указателя»
+ * (аналог LeetCode 344 Reverse String, но для массива чисел).
+ * <p>
+ * Развернуть массив на месте (in-place), с памятью O(1). Указатели слева и
+ * справа идут навстречу и меняют элементы местами через временную переменную,
+ * пока не встретятся в середине. Время O(n), память O(1).
+ * <p>
+ * Полное условие, примеры и ограничения:
+ * {@code docs/problems/block01_arrays_twopointers/ReverseArray.md}
  *
- * Что значит in-place: критерий — дополнительная память O(1). Разрешено
- * держать несколько скалярных переменных (индексы, временная переменная
- * tmp для обмена), но НЕЛЬЗЯ выделять новую структуру размером со вход
- * (второй массив или список на n элементов). Модифицируем сам входной массив.
- *
- * Пример:
- *   вход:  [1, 2, 3, 4, 5]
- *   выход: [5, 4, 3, 2, 1]
- *
- * Идея (паттерн "два указателя"):
- *   Один указатель слева (l), другой справа (r).
- *   Меняем местами nums[l] и nums[r], затем сдвигаем l вправо, r влево.
- *   Останавливаемся, когда указатели встретились.
- *
- * Сложность: время O(n), память O(1) — разворачиваем без доп. массива.
+ * @see <a href="../../docs/problems/block01_arrays_twopointers/ReverseArray.md">ReverseArray.md</a>
  */
 public class ReverseArray {
 
     public static void reverse(int[] nums) {
-        int l = 0, r = nums.length - 1;
-        while (l < r) {
-            int tmp = nums[l];
-            nums[l] = nums[r];
-            nums[r] = tmp;
-            l++;
-            r--;
+        int leftIndex = 0, rightIndex = nums.length - 1;
+        while (leftIndex < rightIndex) {
+            int temp = nums[leftIndex];
+            nums[leftIndex] = nums[rightIndex];
+            nums[rightIndex] = temp;
+            leftIndex++;
+            rightIndex--;
         }
     }
 

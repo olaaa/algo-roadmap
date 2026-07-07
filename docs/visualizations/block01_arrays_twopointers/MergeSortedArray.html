@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Merge Sorted Array — слияние с конца (два указателя)</title>
+<style>
+  :root{
+    --bg:#0f1117; --panel:#171a23; --cell:#232733; --line:#2e3342;
+    --txt:#e6e8ee; --muted:#8b90a0; --accent:#4f8cff; --l:#38bdf8; --r:#fb7185;
+    --w:#fbbf24; --ok:#34d399; --code:#c7d0e0;
+    --mono:"JetBrains Mono",Consolas,Menlo,monospace;
+    --sans:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--txt);font-family:var(--sans);
+       display:flex;flex-direction:column;align-items:center;min-height:100vh;padding:24px}
+  h1{font-size:18px;font-weight:600;margin:0 0 2px}
+  .sub{color:var(--muted);font-size:13px;margin-bottom:20px;max-width:760px;text-align:center}
+  .stage{width:min(920px,100%);background:var(--panel);border:1px solid var(--line);
+         border-radius:14px;padding:26px 22px}
+  .setup{display:flex;gap:16px;flex-wrap:wrap;align-items:flex-end;margin-bottom:10px}
+  .setup label{display:flex;flex-direction:column;gap:5px;font-size:12px;color:var(--muted)}
+  .setup input{font-family:var(--mono);font-size:14px;background:var(--cell);
+       border:1px solid var(--line);color:var(--txt);border-radius:8px;padding:8px 10px}
+  .setup input[type=text]{width:210px}
+  .btn{font-family:var(--sans);font-size:13px;font-weight:500;cursor:pointer;
+       background:var(--cell);border:1px solid var(--line);color:var(--txt);
+       border-radius:8px;padding:9px 14px;transition:.15s}
+  .btn:hover{border-color:var(--accent)}
+  .btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+  .btn:disabled{opacity:.4;cursor:not-allowed}
+
+  .arrLabel{font-family:var(--mono);font-size:12px;color:var(--muted);margin:18px 0 2px}
+  .array{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:20px 0 6px}
+  .col{display:flex;flex-direction:column;align-items:center;gap:6px;position:relative}
+  .cell{width:56px;height:56px;border-radius:10px;background:var(--cell);
+        border:2px solid var(--line);display:flex;align-items:center;justify-content:center;
+        font-family:var(--mono);font-size:20px;transition:.25s}
+  .cell.reserved{border-style:dashed;color:var(--muted)}
+  .cell.read{border-color:var(--l);box-shadow:0 0 0 3px rgba(56,189,248,.15)}
+  .cell.jread{border-color:var(--r);box-shadow:0 0 0 3px rgba(251,113,133,.15)}
+  .cell.write{border-color:var(--w);box-shadow:0 0 0 3px rgba(251,191,36,.18)}
+  .cell.wrote{border-color:var(--ok);background:rgba(52,211,153,.16)}
+  .cell.done{opacity:.4}
+  .idx{font-family:var(--mono);font-size:11px;color:var(--muted)}
+  .ptr{height:18px;font-family:var(--mono);font-size:11px;font-weight:700;white-space:nowrap}
+  .ptr.read{color:var(--l)} .ptr.write{color:var(--w)} .ptr.jread{color:var(--r)}
+
+  .status{min-height:26px;text-align:center;font-family:var(--mono);font-size:14px;margin:16px 0 6px}
+  .status .op{color:var(--code)}
+  .status .good{color:var(--ok)}
+  .controls{display:flex;gap:10px;justify-content:center;align-items:center;margin-top:14px;flex-wrap:wrap}
+  .step-info{color:var(--muted);font-size:12px;font-family:var(--mono);min-width:90px;text-align:center}
+  .legend{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;font-family:var(--mono);
+          font-size:11px;color:var(--muted);margin-top:6px}
+  .legend b{font-weight:700}
+  .legend .cl{color:var(--l)} .legend .cr{color:var(--r)} .legend .cw{color:var(--w)}
+
+  .codebox{margin-top:22px;background:#0b0d13;border:1px solid var(--line);border-radius:10px;
+           padding:14px 16px;font-family:var(--mono);font-size:13px;line-height:1.7;overflow:auto}
+  .codebox .ln{display:block;padding:0 6px;border-radius:4px;color:var(--code);white-space:pre}
+  .codebox .ln.active{background:rgba(79,140,255,.18)}
+  .kw{color:#c792ea}.num{color:#f78c6c}.cm{color:#5c6370}
+</style>
+</head>
+<body>
+  <h1>Merge Sorted Array — слияние с конца</h1>
+  <div class="sub">Два отсортированных массива сливаем в первый (nums1). У nums1 в хвосте зарезервировано место под nums2. Заполняем С КОНЦА, чтобы не затереть ещё не использованные элементы nums1 (LeetCode 88).</div>
+
+  <div class="stage">
+    <div class="setup">
+      <label>nums1 (значимая часть, через запятую)
+        <input id="a1In" type="text" value="1, 2, 3">
+      </label>
+      <label>nums2 (через запятую)
+        <input id="a2In" type="text" value="2, 5, 6">
+      </label>
+      <button class="btn primary" id="build">Построить</button>
+    </div>
+
+    <div class="arrLabel">nums1 (длина nums1Count + nums2Count; хвост — зарезервированное место)</div>
+    <div class="array" id="array1"></div>
+
+    <div class="arrLabel">nums2</div>
+    <div class="array" id="array2"></div>
+
+    <div class="status" id="status"></div>
+
+    <div class="controls">
+      <button class="btn" id="prev">◀ Назад</button>
+      <span class="step-info" id="stepInfo">шаг 0 / 0</span>
+      <button class="btn" id="next">Вперёд ▶</button>
+      <button class="btn" id="play">▶ Авто</button>
+      <button class="btn" id="reset">⟲ Сброс</button>
+    </div>
+
+    <div class="legend">
+      <span><b class="cl">firstIndex</b> — читаем из nums1</span>
+      <span><b class="cr">secondIndex</b> — читаем из nums2</span>
+      <span><b class="cw">writeIndex</b> — куда пишем в nums1</span>
+    </div>
+
+    <div class="codebox" id="code"></div>
+  </div>
+
+<script>
+const $ = id => document.getElementById(id);
+let arr1=[], arr2=[], m=0, n=0, steps=[], cur=0, timer=null;
+
+const CODE = [
+  {t:`<span class="kw">int</span> firstIndex  = nums1Count - <span class="num">1</span>;`, line:'i'},
+  {t:`<span class="kw">int</span> secondIndex = nums2Count - <span class="num">1</span>;`, line:'j'},
+  {t:`<span class="kw">int</span> writeIndex  = nums1Count + nums2Count - <span class="num">1</span>;`, line:'k'},
+  {t:`<span class="kw">while</span> (secondIndex &gt;= <span class="num">0</span>) {`, line:'while'},
+  {t:`    <span class="kw">if</span> (firstIndex &gt;= <span class="num">0</span> && nums1[firstIndex] &gt; nums2[secondIndex]) {`, line:'if'},
+  {t:`        nums1[writeIndex--] = nums1[firstIndex--];`, line:'a'},
+  {t:`    } <span class="kw">else</span> {`, line:'else'},
+  {t:`        nums1[writeIndex--] = nums2[secondIndex--];`, line:'b'},
+  {t:`    }`, line:'endif'},
+  {t:`}`, line:'end'},
+];
+
+function snap(a1,i,j,k,line,msg,extra){
+  return Object.assign({a1:a1.slice(),i,j,k,line,msg}, extra||{});
+}
+
+function buildSteps(){
+  steps=[];
+  const a1=arr1.slice();               // рабочая копия nums1 (мутируем)
+  let i=m-1, j=n-1, k=m+n-1;
+  steps.push(snap(a1,i,j,k,'i',`firstIndex = nums1Count - 1 = ${i} (последний значимый в nums1)`));
+  steps.push(snap(a1,i,j,k,'j',`secondIndex = nums2Count - 1 = ${j} (последний в nums2)`));
+  steps.push(snap(a1,i,j,k,'k',`writeIndex = ${m} + ${n} - 1 = ${k} (позиция записи — конец nums1)`));
+  while(j>=0){
+    steps.push(snap(a1,i,j,k,'while',`secondIndex (${j}) >= 0? — да, ещё есть что переносить`));
+    const takeFirst = (i>=0 && a1[i] > arr2[j]);
+    if(i>=0){
+      steps.push(snap(a1,i,j,k,'if',
+        `nums1[${i}]=${a1[i]} > nums2[${j}]=${arr2[j]}? — ${takeFirst?'да':'нет'}`));
+    } else {
+      steps.push(snap(a1,i,j,k,'if',
+        `firstIndex (${i}) < 0 → в nums1 значимых не осталось, берём из nums2`));
+    }
+    if(takeFirst){
+      a1[k]=a1[i];
+      steps.push(snap(a1,i,j,k,'a',
+        `nums1 больше → пишем ${a1[k]} в nums1[${k}], сдвигаем firstIndex и writeIndex влево`,
+        {wrote:k,src:'1'}));
+      i--; k--;
+    } else {
+      a1[k]=arr2[j];
+      steps.push(snap(a1,i,j,k,'b',
+        `nums2 больше или nums1 кончился → пишем ${a1[k]} в nums1[${k}], сдвигаем secondIndex и writeIndex влево`,
+        {wrote:k,src:'2'}));
+      j--; k--;
+    }
+  }
+  steps.push(snap(a1,i,j,k,'end',`secondIndex < 0 — nums2 перенесён полностью, готово`,{finished:true}));
+}
+
+function renderArrays(s){
+  const w1=$('array1'); w1.innerHTML='';
+  s.a1.forEach((v,idx)=>{
+    const col=document.createElement('div'); col.className='col';
+    const top=document.createElement('div'); top.className='ptr read';
+    top.textContent = idx===s.i ? 'firstIndex' : '';
+    const cell=document.createElement('div'); cell.className='cell'; cell.textContent=v;
+    if(idx>=m && idx>s.k) cell.classList.add('reserved');   // ещё не заполненный хвост
+    if(idx===s.k && !s.finished) cell.classList.add('write');
+    if(idx===s.i) cell.classList.add('read');
+    if(s.wrote===idx) cell.classList.add('wrote');
+    if(s.finished) cell.classList.add('done');
+    const bot=document.createElement('div'); bot.className='ptr write';
+    bot.textContent = (idx===s.k && !s.finished) ? 'writeIndex' : '';
+    const ix=document.createElement('div'); ix.className='idx'; ix.textContent=idx;
+    col.append(top,cell,bot,ix); w1.append(col);
+  });
+
+  const w2=$('array2'); w2.innerHTML='';
+  arr2.forEach((v,idx)=>{
+    const col=document.createElement('div'); col.className='col';
+    const top=document.createElement('div'); top.className='ptr jread';
+    top.textContent = idx===s.j ? 'secondIndex' : '';
+    const cell=document.createElement('div'); cell.className='cell'; cell.textContent=v;
+    if(idx===s.j && s.j>=0) cell.classList.add('jread');
+    if(idx>s.j) cell.classList.add('done');                 // уже перенесённые из nums2
+    const bot=document.createElement('div'); bot.className='ptr';
+    const ix=document.createElement('div'); ix.className='idx'; ix.textContent=idx;
+    col.append(top,cell,bot,ix); w2.append(col);
+  });
+}
+
+function renderCode(active){
+  $('code').innerHTML = CODE.map(c=>
+    `<span class="ln ${c.line===active?'active':''}">${c.t}</span>`).join('');
+}
+
+function show(idx){
+  cur=Math.max(0,Math.min(idx,steps.length-1));
+  const s=steps[cur];
+  renderArrays(s); renderCode(s.line);
+  $('status').innerHTML = s.finished
+      ? `<span class="good">✓ ${s.msg}</span>`
+      : `<span class="op">${s.msg}</span>`;
+  $('stepInfo').textContent=`шаг ${cur+1} / ${steps.length}`;
+  $('prev').disabled=cur===0; $('next').disabled=cur===steps.length-1;
+}
+
+function build(){
+  stopPlay();
+  arr2 = $('a2In').value.split(',').map(x=>parseInt(x.trim(),10)).filter(x=>!isNaN(x));
+  const sig = $('a1In').value.split(',').map(x=>parseInt(x.trim(),10)).filter(x=>!isNaN(x));
+  m=sig.length; n=arr2.length;
+  arr1 = sig.concat(new Array(n).fill(0));   // хвост-заглушки под nums2
+  if(m+n===0){$('status').textContent='Введите хотя бы один массив';return;}
+  buildSteps(); show(0);
+}
+function stopPlay(){ if(timer){clearInterval(timer);timer=null;$('play').textContent='▶ Авто';} }
+function togglePlay(){
+  if(timer){stopPlay();return;}
+  if(cur>=steps.length-1) show(0);
+  $('play').textContent='⏸ Пауза';
+  timer=setInterval(()=>{ if(cur>=steps.length-1){stopPlay();return;} show(cur+1); },1000);
+}
+
+$('build').onclick=build;
+$('next').onclick=()=>{stopPlay();show(cur+1);};
+$('prev').onclick=()=>{stopPlay();show(cur-1);};
+$('play').onclick=togglePlay;
+$('reset').onclick=()=>{stopPlay();show(0);};
+document.addEventListener('keydown',e=>{
+  if(e.key==='ArrowRight'){stopPlay();show(cur+1);}
+  if(e.key==='ArrowLeft'){stopPlay();show(cur-1);}
+  if(e.key===' '){e.preventDefault();togglePlay();}
+});
+build();
+</script>
+</body>
+</html>

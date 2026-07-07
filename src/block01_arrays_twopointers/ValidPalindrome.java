@@ -1,32 +1,34 @@
 package block01_arrays_twopointers;
 
-/*
- * Задача: проверить, является ли строка палиндромом.
- * Учитываем только буквы и цифры, регистр игнорируем.
- * (LeetCode 125 — Valid Palindrome)
+/**
+ * LeetCode 125 — Valid Palindrome (Easy). Паттерн «два указателя».
+ * <p>
+ * Проверить, читается ли строка одинаково в обе стороны, если учитывать только
+ * буквы и цифры и игнорировать регистр. Указатели слева и справа идут навстречу,
+ * пропуская не-буквенно-цифровые символы и сравнивая остальные в нижнем регистре.
+ * Строку не копируем. Время O(n), память O(1).
+ * <p>
+ * Полное условие, примеры и ограничения:
+ * {@code docs/problems/block01_arrays_twopointers/ValidPalindrome.md}
  *
- * Пример:
- *   "A man, a plan, a canal: Panama" -> true
- *   "race a car"                     -> false
- *
- * Идея (паттерн "два указателя"):
- *   Указатель слева и справа. Пропускаем всё, что не буква/цифра.
- *   Сравниваем символы в нижнем регистре. Не совпали — не палиндром.
- *
- * Сложность: время O(n), память O(1).
+ * @see <a href="../../docs/problems/block01_arrays_twopointers/ValidPalindrome.md">ValidPalindrome.md</a>
  */
 public class ValidPalindrome {
 
     public static boolean isPalindrome(String s) {
-        int l = 0, r = s.length() - 1;
-        while (l < r) {
-            while (l < r && !Character.isLetterOrDigit(s.charAt(l))) l++;
-            while (l < r && !Character.isLetterOrDigit(s.charAt(r))) r--;
-            if (Character.toLowerCase(s.charAt(l)) != Character.toLowerCase(s.charAt(r))) {
+        int leftIndex = 0, rightIndex = s.length() - 1;
+        while (leftIndex < rightIndex) {
+            while (leftIndex < rightIndex && !Character.isLetterOrDigit(s.charAt(leftIndex))) {
+                leftIndex++;
+            }
+            while (leftIndex < rightIndex && !Character.isLetterOrDigit(s.charAt(rightIndex))) {
+                rightIndex--;
+            }
+            if (Character.toLowerCase(s.charAt(leftIndex)) != Character.toLowerCase(s.charAt(rightIndex))) {
                 return false;
             }
-            l++;
-            r--;
+            leftIndex++;
+            rightIndex--;
         }
         return true;
     }
