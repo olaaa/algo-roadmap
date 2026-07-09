@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Two Sum (HashMap) — визуализация прохода за один раз</title>
+<style>
+  :root{
+    --bg:#0f1117; --panel:#171a23; --cell:#232733; --line:#2e3342;
+    --txt:#e6e8ee; --muted:#8b90a0; --accent:#4f8cff; --cur:#38bdf8; --comp:#fbbf24;
+    --ok:#34d399; --miss:#fb7185; --code:#c7d0e0;
+    --mono:"JetBrains Mono",Consolas,Menlo,monospace;
+    --sans:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--txt);font-family:var(--sans);
+       display:flex;flex-direction:column;align-items:center;min-height:100vh;padding:24px}
+  h1{font-size:18px;font-weight:600;margin:0 0 2px}
+  .sub{color:var(--muted);font-size:13px;margin-bottom:20px;max-width:760px;text-align:center}
+  .stage{width:min(880px,100%);background:var(--panel);border:1px solid var(--line);
+         border-radius:14px;padding:26px 22px}
+  .setup{display:flex;gap:16px;flex-wrap:wrap;align-items:flex-end;margin-bottom:22px}
+  .setup label{display:flex;flex-direction:column;gap:5px;font-size:12px;color:var(--muted)}
+  .setup input{font-family:var(--mono);font-size:14px;background:var(--cell);
+       border:1px solid var(--line);color:var(--txt);border-radius:8px;padding:8px 10px}
+  .setup input[type=text]{width:230px}
+  .setup input[type=number]{width:90px}
+  .btn{font-family:var(--sans);font-size:13px;font-weight:500;cursor:pointer;
+       background:var(--cell);border:1px solid var(--line);color:var(--txt);
+       border-radius:8px;padding:9px 14px;transition:.15s}
+  .btn:hover{border-color:var(--accent)}
+  .btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+  .btn:disabled{opacity:.4;cursor:not-allowed}
+
+  .main{display:flex;gap:22px;flex-wrap:wrap;align-items:flex-start;margin:30px 0 8px}
+  .arraywrap{flex:1;min-width:300px}
+  .array{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+  .col{display:flex;flex-direction:column;align-items:center;gap:6px;position:relative}
+  .cell{width:56px;height:56px;border-radius:10px;background:var(--cell);
+        border:2px solid var(--line);display:flex;align-items:center;justify-content:center;
+        font-family:var(--mono);font-size:19px;transition:.25s}
+  .cell.cur{border-color:var(--cur);box-shadow:0 0 0 3px rgba(56,189,248,.15)}
+  .cell.seen{opacity:.65}
+  .cell.hit{border-color:var(--ok);background:rgba(52,211,153,.15);opacity:1}
+  .idx{font-family:var(--mono);font-size:11px;color:var(--muted)}
+  .ptr{height:20px;font-family:var(--mono);font-size:12px;font-weight:700;color:var(--cur)}
+
+  .maptable{width:210px;background:#0b0d13;border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+  .maptable .cap{font-size:11px;color:var(--muted);margin-bottom:8px;font-family:var(--mono)}
+  .row{display:flex;justify-content:space-between;font-family:var(--mono);font-size:13px;
+       padding:4px 8px;border-radius:6px;margin-bottom:3px;background:var(--cell);color:var(--code)}
+  .row.fresh{background:rgba(56,189,248,.18)}
+  .row.match{background:rgba(52,211,153,.2);border:1px solid var(--ok)}
+  .row .k{color:var(--txt)} .row .v{color:var(--muted)}
+  .empty{color:var(--muted);font-size:12px;font-family:var(--mono);font-style:italic}
+
+  .status{min-height:26px;text-align:center;font-family:var(--mono);font-size:14px;margin:16px 0 6px}
+  .status .op{color:var(--code)}
+  .status .good{color:var(--ok)} .status .comp{color:var(--comp)} .status .miss{color:var(--miss)}
+  .controls{display:flex;gap:10px;justify-content:center;align-items:center;margin-top:14px;flex-wrap:wrap}
+  .step-info{color:var(--muted);font-size:12px;font-family:var(--mono);min-width:90px;text-align:center}
+
+  .codebox{margin-top:22px;background:#0b0d13;border:1px solid var(--line);border-radius:10px;
+           padding:14px 16px;font-family:var(--mono);font-size:13px;line-height:1.7;overflow:auto}
+  .codebox .ln{display:block;padding:0 6px;border-radius:4px;color:var(--code);white-space:pre}
+  .codebox .ln.active{background:rgba(79,140,255,.18)}
+  .kw{color:#c792ea}.num{color:#f78c6c}.cm{color:#5c6370}
+</style>
+</head>
+<body>
+  <h1>Two Sum — хеш-таблица за один проход</h1>
+  <div class="sub">Неотсортированный массив, ищем пару элементов с суммой target. Индексы 0-based. Для каждого элемента считаем дополнение <b>complement = target − nums[i]</b> и проверяем, не встречалось ли оно раньше (LeetCode 1).</div>
+
+  <div class="stage">
+    <div class="setup">
+      <label>Массив (через запятую)
+        <input id="arrIn" type="text" value="3, 2, 4, 7">
+      </label>
+      <label>target
+        <input id="tgtIn" type="number" value="6">
+      </label>
+      <button class="btn primary" id="build">Построить</button>
+    </div>
+
+    <div class="main">
+      <div class="arraywrap">
+        <div class="array" id="array"></div>
+      </div>
+      <div class="maptable">
+        <div class="cap">HashMap: число → индекс</div>
+        <div id="mapRows"></div>
+      </div>
+    </div>
+
+    <div class="status" id="status"></div>
+
+    <div class="controls">
+      <button class="btn" id="prev">◀ Назад</button>
+      <span class="step-info" id="stepInfo">шаг 0 / 0</span>
+      <button class="btn" id="next">Вперёд ▶</button>
+      <button class="btn" id="play">▶ Авто</button>
+      <button class="btn" id="reset">⟲ Сброс</button>
+    </div>
+
+    <div class="codebox" id="code"></div>
+  </div>
+
+<script>
+const $ = id => document.getElementById(id);
+let nums=[], target=0, steps=[], cur=0, timer=null;
+
+const CODE = [
+  {t:`Map&lt;Integer,Integer&gt; seen = <span class="kw">new</span> HashMap&lt;&gt;();`, line:'init'},
+  {t:`<span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; nums.length; i++) {`, line:'for'},
+  {t:`    <span class="kw">int</span> complement = target - nums[i];`, line:'comp'},
+  {t:`    <span class="kw">if</span> (seen.containsKey(complement)) {`, line:'check'},
+  {t:`        <span class="kw">return</span> {seen.get(complement), i};`, line:'hit'},
+  {t:`    }`, line:'endif'},
+  {t:`    seen.put(nums[i], i);`, line:'put'},
+  {t:`}`, line:'end'},
+];
+
+function buildSteps(){
+  steps=[];
+  const seen = new Map();
+  steps.push({i:-1, line:'init', map:snapshot(seen), msg:`создаём пустую HashMap`});
+  for(let i=0;i<nums.length;i++){
+    steps.push({i, line:'for', map:snapshot(seen), msg:`i = ${i}, смотрим nums[${i}] = ${nums[i]}`});
+    const complement = target - nums[i];
+    steps.push({i, complement, line:'comp', map:snapshot(seen),
+                msg:`complement = ${target} − ${nums[i]} = ${complement}`});
+    if(seen.has(complement)){
+      const j = seen.get(complement);
+      steps.push({i, complement, line:'check', map:snapshot(seen), matchKey:complement, matchVal:j,
+                  msg:`complement ${complement} уже в map (индекс ${j}) → пара найдена`});
+      steps.push({i, complement, line:'hit', map:snapshot(seen), hit:true, hitPair:[j,i], matchKey:complement, matchVal:j,
+                  msg:`возвращаем [${j}, ${i}] → nums[${j}] + nums[${i}] = ${nums[j]} + ${nums[i]} = ${target}`});
+      return;
+    }
+    steps.push({i, complement, line:'check', map:snapshot(seen),
+                msg:`complement ${complement} в map нет`});
+    seen.set(nums[i], i);
+    steps.push({i, complement, line:'put', map:snapshot(seen), freshKey:nums[i],
+                msg:`кладём nums[${i}] = ${nums[i]} → индекс ${i}`});
+  }
+  steps.push({i:nums.length, line:'end', map:snapshot(seen), msg:`проход закончен — пара не найдена`});
+}
+
+function snapshot(map){ return Array.from(map.entries()); }
+
+function renderArray(s){
+  const wrap=$('array'); wrap.innerHTML='';
+  nums.forEach((v,i)=>{
+    const col=document.createElement('div'); col.className='col';
+    const ptr=document.createElement('div');
+    ptr.className='ptr'; ptr.textContent=(i===s.i?'i':'');
+    const cell=document.createElement('div'); cell.className='cell'; cell.textContent=v;
+    if(s.hit && s.hitPair && (i===s.hitPair[0]||i===s.hitPair[1])){
+      cell.classList.add('hit');
+    } else if(i===s.i){
+      cell.classList.add('cur');
+    } else if(i<s.i){
+      cell.classList.add('seen');
+    }
+    const idx=document.createElement('div'); idx.className='idx'; idx.textContent=i;
+    col.append(ptr,cell,idx); wrap.append(col);
+  });
+}
+
+function renderMap(s){
+  const box=$('mapRows'); box.innerHTML='';
+  if(!s.map || s.map.length===0){
+    box.innerHTML='<div class="empty">пусто</div>'; return;
+  }
+  s.map.forEach(([k,v])=>{
+    const row=document.createElement('div'); row.className='row';
+    if(s.matchKey===k){ row.classList.add('match'); }
+    else if(s.freshKey===k){ row.classList.add('fresh'); }
+    row.innerHTML=`<span class="k">${k}</span><span class="v">→ ${v}</span>`;
+    box.append(row);
+  });
+}
+
+function renderCode(active){
+  $('code').innerHTML = CODE.map(c=>
+    `<span class="ln ${c.line===active?'active':''}">${c.t}</span>`).join('');
+}
+
+function show(idx){
+  cur=Math.max(0,Math.min(idx,steps.length-1));
+  const s=steps[cur];
+  renderArray(s); renderMap(s); renderCode(s.line);
+  $('status').innerHTML = s.hit
+      ? `<span class="good">✓ ${s.msg}</span>`
+      : s.matchKey!==undefined && s.line==='check'
+        ? `<span class="comp">${s.msg}</span>`
+        : `<span class="op">${s.msg}</span>`;
+  $('stepInfo').textContent=`шаг ${cur+1} / ${steps.length}`;
+  $('prev').disabled=cur===0; $('next').disabled=cur===steps.length-1;
+}
+
+function build(){
+  stopPlay();
+  nums = $('arrIn').value.split(',').map(x=>parseInt(x.trim(),10)).filter(x=>!isNaN(x));
+  target = parseInt($('tgtIn').value,10);
+  if(nums.length<2){$('status').textContent='Нужно минимум 2 числа';return;}
+  buildSteps(); show(0);
+}
+function stopPlay(){ if(timer){clearInterval(timer);timer=null;$('play').textContent='▶ Авто';} }
+function togglePlay(){
+  if(timer){stopPlay();return;}
+  if(cur>=steps.length-1) show(0);
+  $('play').textContent='⏸ Пауза';
+  timer=setInterval(()=>{ if(cur>=steps.length-1){stopPlay();return;} show(cur+1); },900);
+}
+
+$('build').onclick=build;
+$('next').onclick=()=>{stopPlay();show(cur+1);};
+$('prev').onclick=()=>{stopPlay();show(cur-1);};
+$('play').onclick=togglePlay;
+$('reset').onclick=()=>{stopPlay();show(0);};
+document.addEventListener('keydown',e=>{
+  if(e.key==='ArrowRight'){stopPlay();show(cur+1);}
+  if(e.key==='ArrowLeft'){stopPlay();show(cur-1);}
+  if(e.key===' '){e.preventDefault();togglePlay();}
+});
+build();
+</script>
+</body>
+</html>

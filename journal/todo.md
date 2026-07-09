@@ -5,7 +5,8 @@
 ## Реализация блоков (по ядру из algo-prep-plan.md)
 - [x] Блок 1. Массивы, два указателя (4 класса, проверено 16/16 PASS)
 - [ ] Блок 2. Строки + стек (ValidParentheses, ValidAnagram, ReverseString, FirstUniqueChar)
-- [ ] Блок 3. Хеш-таблицы (TwoSum, ContainsDuplicate, GroupAnagrams, MajorityElement)
+- [~] Блок 3. Хеш-таблицы: TwoSum [x] (7/7 PASS, +Pattern_HashMap.md +виз.),
+      ContainsDuplicate [ ], GroupAnagrams [ ], MajorityElement [ ]
 - [ ] Блок 4. Скользящее окно (LongestSubstringNoRepeat, MaxAverageSubarray)
 - [ ] Блок 5. Бинарный поиск (BinarySearch, SearchInsertPosition)
 - [ ] Блок 6. Деревья и базовые графы (MaxDepth, SymmetricTree, BFS)

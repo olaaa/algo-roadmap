@@ -78,3 +78,22 @@
 - Визуализация MergeSortedArray.html готова по рецепту (два массива, указатели
   firstIndex/secondIndex/writeIndex, слияние с конца, подсветка записи). Логика
   прогнана тестами. Осталась визуализация ValidPalindrome.
+
+## 2026-07-10
+- В отдельном чате разобрали Two Sum «в лоб» (вложенный цикл O(n²), «цикл по парам
+  элементов»), затем HashMap за один проход и trade-off время↔память. Тот Клод не смог
+  создать файлы — перенесли работу сюда.
+- ЗАВЕДЁН БЛОК 3 «Хеш-таблицы» — первая задача:
+  * src/block03_hashtables/TwoSum.java — LeetCode 1. Эталон twoSum() через HashMap
+    (complement = target - nums[i], put ПОСЛЕ проверки), + baseline twoSumBruteForce()
+    O(n²) как отправная точка для собеса. Javadoc + @see, тесты в main().
+  * docs/problems/block03_hashtables/TwoSum.md — условие 0-based, примеры, ограничения,
+    заметка про переполнение int на сумме (diapазон до 1e9), сравнение HashMap vs BruteForce.
+  * docs/problems/block03_hashtables/Pattern_HashMap.md — обзор паттерна (аналог
+    Pattern_TwoPointers.md): формы complement/частоты/seen-set/группировка, сигналы,
+    trade-off, амортизированное O(1).
+  * docs/visualizations/block03_hashtables/TwoSum.html — пошаговая анимация one-pass:
+    массив + бегущий указатель i, справа растущая HashMap, подсветка complement/находки.
+  * Скомпилировано JDK 25 в песочнице — 7/7 PASS.
+  Осталось по блоку 3: ContainsDuplicate, GroupAnagrams, MajorityElement.
+  Примечание: имя файла визуализации — <Класс>.html (как в CLAUDE.md и block01), не .viz.html.
