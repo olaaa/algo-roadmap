@@ -32,9 +32,7 @@
   .btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
   .btn:disabled{opacity:.4;cursor:not-allowed}
 
-  .main{display:flex;gap:22px;flex-wrap:wrap;align-items:flex-start;margin:30px 0 8px}
-  .arraywrap{flex:1;min-width:300px}
-  .array{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+  .array{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:30px 0 8px}
   .col{display:flex;flex-direction:column;align-items:center;gap:6px;position:relative}
   .cell{width:56px;height:56px;border-radius:10px;background:var(--cell);
         border:2px solid var(--line);display:flex;align-items:center;justify-content:center;
@@ -45,14 +43,24 @@
   .idx{font-family:var(--mono);font-size:11px;color:var(--muted)}
   .ptr{height:20px;font-family:var(--mono);font-size:12px;font-weight:700;color:var(--cur)}
 
-  .maptable{width:210px;background:#0b0d13;border:1px solid var(--line);border-radius:10px;padding:12px 14px}
-  .maptable .cap{font-size:11px;color:var(--muted);margin-bottom:8px;font-family:var(--mono)}
-  .row{display:flex;justify-content:space-between;font-family:var(--mono);font-size:13px;
-       padding:4px 8px;border-radius:6px;margin-bottom:3px;background:var(--cell);color:var(--code)}
-  .row.fresh{background:rgba(56,189,248,.18)}
-  .row.match{background:rgba(52,211,153,.2);border:1px solid var(--ok)}
-  .row .k{color:var(--txt)} .row .v{color:var(--muted)}
-  .empty{color:var(--muted);font-size:12px;font-family:var(--mono);font-style:italic}
+  .maptable{margin-top:26px;background:#0b0d13;border:1px solid var(--line);border-radius:10px;padding:16px 18px}
+  .maptable .cap{font-size:12px;color:var(--muted);margin-bottom:14px;font-family:var(--mono);line-height:1.6}
+  .maptable .cap b{color:var(--code);font-weight:600}
+  .buckets{display:flex;flex-direction:column;gap:7px}
+  .bucket{display:flex;align-items:center;font-family:var(--mono);font-size:13px}
+  .slot{width:78px;min-width:78px;height:36px;display:flex;align-items:center;justify-content:center;
+        background:var(--cell);border:1px solid var(--line);border-radius:7px;color:var(--muted)}
+  .slot .bi{color:var(--txt);font-weight:700}
+  .slot.activeSlot{border-color:var(--cur);box-shadow:0 0 0 2px rgba(56,189,248,.15)}
+  .arrow{color:var(--accent);padding:0 9px;font-size:15px;font-weight:700}
+  .nullref{color:#4b5163;font-style:italic;padding-left:13px}
+  .node{display:flex;align-items:baseline;gap:6px;height:36px;padding:0 12px;border-radius:7px;
+        background:var(--panel);border:1px solid var(--line);color:var(--code)}
+  .node .nlab{color:var(--muted);font-size:10px;letter-spacing:.4px}
+  .node .nk{color:var(--txt);font-weight:700;font-size:15px;margin-right:9px}
+  .node .nv{color:var(--txt);font-weight:700;font-size:15px}
+  .node.fresh{border-color:var(--cur);background:rgba(56,189,248,.15)}
+  .node.match{border-color:var(--ok);background:rgba(52,211,153,.18)}
 
   .status{min-height:26px;text-align:center;font-family:var(--mono);font-size:14px;margin:16px 0 6px}
   .status .op{color:var(--code)}
@@ -65,6 +73,15 @@
   .codebox .ln{display:block;padding:0 6px;border-radius:4px;color:var(--code);white-space:pre}
   .codebox .ln.active{background:rgba(79,140,255,.18)}
   .kw{color:#c792ea}.num{color:#f78c6c}.cm{color:#5c6370}
+
+  .cols{display:flex;gap:18px;align-items:flex-start;margin-top:18px;flex-wrap:wrap}
+  .cols .maptable{flex:1 1 460px;min-width:0;margin-top:0}
+  .cols .codebox{flex:0 1 330px;min-width:260px;margin-top:0}
+
+  .note{width:min(880px,100%);background:var(--panel);border:1px solid var(--line);border-radius:14px;
+        padding:18px 22px;margin-top:16px;font-family:var(--mono);font-size:12.5px;color:var(--muted);line-height:1.85}
+  .note .note-h{font-family:var(--sans);font-size:13px;font-weight:600;color:var(--txt);margin-bottom:9px}
+  .note b{color:var(--code);font-weight:600}
 </style>
 </head>
 <body>
@@ -73,26 +90,26 @@
 
   <div class="stage">
     <div class="setup">
-      <label>Массив (через запятую)
-        <input id="arrIn" type="text" value="3, 2, 4, 7">
+      <label>Массив nums (через запятую)
+        <input id="arrIn" type="text" value="1, 9, 3, 5">
       </label>
       <label>target
-        <input id="tgtIn" type="number" value="6">
+        <input id="tgtIn" type="number" value="12">
       </label>
       <button class="btn primary" id="build">Построить</button>
     </div>
 
-    <div class="main">
-      <div class="arraywrap">
-        <div class="array" id="array"></div>
-      </div>
-      <div class="maptable">
-        <div class="cap">HashMap: число → индекс</div>
-        <div id="mapRows"></div>
-      </div>
-    </div>
+    <div class="array" id="array"></div>
 
     <div class="status" id="status"></div>
+
+    <div class="cols">
+      <div class="maptable">
+        <div class="buckets" id="buckets"></div>
+      </div>
+
+      <div class="codebox" id="code"></div>
+    </div>
 
     <div class="controls">
       <button class="btn" id="prev">◀ Назад</button>
@@ -101,8 +118,13 @@
       <button class="btn" id="play">▶ Авто</button>
       <button class="btn" id="reset">⟲ Сброс</button>
     </div>
+  </div>
 
-    <div class="codebox" id="code"></div>
+  <div class="note">
+    <div class="note-h">Как устроена HashMap</div>
+    <b>table</b> — внутренняя таблица HashMap из 8 ячеек-бакетов (это не массив <b>nums</b> из задачи).<br>
+    <b>table[i]</b> — бакет №i. Номер бакета для ключа — это остаток от деления hash на длину таблицы; длина у HashMap всегда положительная и степень двойки, поэтому остаток считают быстрым <b>hash&nbsp;&amp;&nbsp;7</b> (для длины 8 — то же самое).<br>
+    <b>узел</b> — это <b>Node</b> с полями <b>key</b> (число из nums) и <b>value</b> (его позиция i в nums). При коллизии узлы одного бакета связаны через поле <b>next</b> в цепочку (стрелка&nbsp;→).
   </div>
 
 <script>
@@ -114,7 +136,7 @@ const CODE = [
   {t:`<span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; nums.length; i++) {`, line:'for'},
   {t:`    <span class="kw">int</span> complement = target - nums[i];`, line:'comp'},
   {t:`    <span class="kw">if</span> (seen.containsKey(complement)) {`, line:'check'},
-  {t:`        <span class="kw">return</span> {seen.get(complement), i};`, line:'hit'},
+  {t:`        <span class="kw">return</span> <span class="kw">new</span> <span class="kw">int</span>[]{seen.get(complement), i};`, line:'hit'},
   {t:`    }`, line:'endif'},
   {t:`    seen.put(nums[i], i);`, line:'put'},
   {t:`}`, line:'end'},
@@ -167,18 +189,43 @@ function renderArray(s){
   });
 }
 
+const CAP = 8;
+/*
+ * Номер бакета как в java.util.HashMap для Integer-ключа: hashCode() числа —
+ * это само число, дальше «размешивание» h ^ (h >>> 16) и & (ёмкость − 1).
+ */
+function bucketIndex(value){ return (value ^ (value >>> 16)) & (CAP - 1); }
+
 function renderMap(s){
-  const box=$('mapRows'); box.innerHTML='';
-  if(!s.map || s.map.length===0){
-    box.innerHTML='<div class="empty">пусто</div>'; return;
-  }
-  s.map.forEach(([k,v])=>{
-    const row=document.createElement('div'); row.className='row';
-    if(s.matchKey===k){ row.classList.add('match'); }
-    else if(s.freshKey===k){ row.classList.add('fresh'); }
-    row.innerHTML=`<span class="k">${k}</span><span class="v">→ ${v}</span>`;
+  const box=$('buckets'); box.innerHTML='';
+  const buckets=Array.from({length:CAP},()=>[]);
+  (s.map||[]).forEach(([k,v])=>{ buckets[bucketIndex(k)].push([k,v]); });
+
+  for(let bi=0; bi<CAP; bi++){
+    const chain=buckets[bi];
+    const row=document.createElement('div'); row.className='bucket';
+
+    const slot=document.createElement('div'); slot.className='slot';
+    slot.innerHTML=`table<span class="bi">[${bi}]</span>`;
+    if(chain.some(([k])=>k===s.freshKey||k===s.matchKey)){ slot.classList.add('activeSlot'); }
+    row.append(slot);
+
+    if(chain.length===0){
+      const nul=document.createElement('span'); nul.className='nullref'; nul.textContent='→ null';
+      row.append(nul);
+    } else {
+      chain.forEach(([k,v])=>{
+        const arr=document.createElement('span'); arr.className='arrow'; arr.textContent='→';
+        row.append(arr);
+        const node=document.createElement('div'); node.className='node';
+        if(k===s.matchKey){ node.classList.add('match'); }
+        else if(k===s.freshKey){ node.classList.add('fresh'); }
+        node.innerHTML=`<span class="nlab">key</span> <span class="nk">${k}</span><span class="nlab">value</span> <span class="nv">${v}</span>`;
+        row.append(node);
+      });
+    }
     box.append(row);
-  });
+  }
 }
 
 function renderCode(active){
