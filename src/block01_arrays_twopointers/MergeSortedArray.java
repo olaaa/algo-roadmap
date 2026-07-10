@@ -18,15 +18,22 @@ import java.util.Arrays;
 public class MergeSortedArray {
 
     public static void merge(int[] nums1, int nums1Count, int[] nums2, int nums2Count) {
+//  указывает на самое большое число в первом массиве (т.к. оно в конце)
         int firstIndex = nums1Count - 1;                // последний значимый в nums1
+//  самое большое число во втором массиве  (т.к. оно в конце)
         int secondIndex = nums2Count - 1;               // последний в nums2
         int writeIndex = nums1Count + nums2Count - 1;   // позиция записи (конец nums1)
         while (secondIndex >= 0) {
+// сравниваем самые большие числа в nums1 и nums2
             if (firstIndex >= 0 && nums1[firstIndex] > nums2[secondIndex]) {
+// в конец результирующего массива попадает самое большое число из nums1
                 nums1[writeIndex--] = nums1[firstIndex--];
+// обработали элемент из nums1, поэтому индекс firstIndex смещается влево (-1)
             } else {
+// в конец результирующего массива попадает самое большое число из nums2
                 nums1[writeIndex--] = nums2[secondIndex--];
             }
+// позиция записи всегда смещается вправо (-1)
         }
     }
 
