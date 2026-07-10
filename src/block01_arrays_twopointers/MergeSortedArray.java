@@ -25,6 +25,7 @@ public class MergeSortedArray {
         int writeIndex = nums1Count + nums2Count - 1;   // позиция записи (конец nums1)
 
 // еще есть, что переносить?
+//        итерация по длине nums2
         while (secondIndex >= 0) {
 // сравниваем самые большие числа в nums1 и nums2
             if (firstIndex >= 0 && nums1[firstIndex] > nums2[secondIndex]) {
@@ -52,6 +53,15 @@ public class MergeSortedArray {
         int[] c = {1};
         merge(c, 1, new int[]{}, 0);
         check(Arrays.equals(c, new int[]{1}), "nums2 пустой");
+
+        /*
+         * Значимые элементы nums1 кончаются раньше nums2: firstIndex доходит до -1,
+         * пока цикл ещё идёт, и защита firstIndex >= 0 не даёт прочитать nums1[-1].
+         * Минимум всех чисел (1) лежит в nums2, поэтому первым исчерпывается nums1.
+         */
+        int[] d = {5, 6, 0, 0};
+        merge(d, 2, new int[]{1, 2}, 2);
+        check(Arrays.equals(d, new int[]{1, 2, 5, 6}), "nums1 исчерпан раньше nums2 (firstIndex доходит до -1)");
     }
 
     private static void check(boolean ok, String name) {
