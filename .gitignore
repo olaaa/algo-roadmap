@@ -4,3 +4,4 @@
 # IntelliJ output
 out/
 target/
+/.idea/db-forest-config.xml

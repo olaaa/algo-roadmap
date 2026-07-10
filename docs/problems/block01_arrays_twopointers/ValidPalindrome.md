@@ -51,6 +51,50 @@
 
 Строку не копируем и отдельно не чистим — лишние символы игнорируем прямо на ходу.
 
+### Вложенный while или if + continue
+
+Пропуск мусорных символов в решении оформлен вложенным `while`:
+
+```java
+while (leftIndex < rightIndex) {
+    while (leftIndex < rightIndex && !Character.isLetterOrDigit(s.charAt(leftIndex))) {
+        leftIndex++;
+    }
+    ...
+}
+```
+
+Условие `leftIndex < rightIndex` во внутреннем цикле — не повтор рабочего условия, а защитная проверка (guard): на строке из одних знаков препинания промотка без неё убежала бы за встречный указатель и за пределы строки.
+
+Тот же пропуск можно записать через `if` + `continue` — досрочное завершение одного прохода внешнего цикла:
+
+```java
+while (leftIndex < rightIndex) {
+    if (!Character.isLetterOrDigit(s.charAt(leftIndex))) {
+        leftIndex++;
+        continue;   // заново на начало внешнего цикла
+    }
+    if (!Character.isLetterOrDigit(s.charAt(rightIndex))) {
+        rightIndex--;
+        continue;
+    }
+    ...сравнение...
+}
+```
+
+Повтор пропуска здесь обеспечивает сам внешний цикл, а защита границ достаётся бесплатно — после `continue` условие `leftIndex < rightIndex` проверяется заново. Оба варианта корректны и равноценны; вложенный `while` компактнее выражает намерение «промотай весь мусор», вариант с `continue` избавляет от дублирования условия.
+
+Аналогия для цикла `for` — `continue`-guard первой строкой тела, отсеивающий неподходящие элементы до основной обработки:
+
+```java
+for (int index = 0; index < items.length; index++) {
+    if (!isRelevant(items[index])) {
+        continue;
+    }
+    /* Обработка без вложенности */
+}
+```
+
 ## Сложность
 
 - **Время:** `O(n)` — каждый символ смотрим не больше одного раза.
@@ -58,5 +102,5 @@
 
 ## См. также
 
-- Визуализация: _в работе_ (`docs/visualizations/block01_arrays_twopointers/ValidPalindrome.html`)
+- Визуализация: [`docs/visualizations/block01_arrays_twopointers/ValidPalindrome.html`](../../visualizations/block01_arrays_twopointers/ValidPalindrome.html)
 - LeetCode: <https://leetcode.com/problems/valid-palindrome/>

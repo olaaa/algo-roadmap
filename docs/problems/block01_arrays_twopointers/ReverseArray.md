@@ -55,4 +55,5 @@
 
 ## См. также
 
+- Визуализация: [`docs/visualizations/block01_arrays_twopointers/ReverseArray.html`](../../visualizations/block01_arrays_twopointers/ReverseArray.html)
 - LeetCode (аналог): <https://leetcode.com/problems/reverse-string/>

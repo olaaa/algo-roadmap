@@ -16,8 +16,10 @@ package block01_arrays_twopointers;
 public class ValidPalindrome {
 
     public static boolean isPalindrome(String s) {
-        int leftIndex = 0, rightIndex = s.length() - 1;
+        int leftIndex = 0;
+        int rightIndex = s.length() - 1;
         while (leftIndex < rightIndex) {
+//  проматываем, а не удаляемые, несравниваемые символы
             while (leftIndex < rightIndex && !Character.isLetterOrDigit(s.charAt(leftIndex))) {
                 leftIndex++;
             }
@@ -27,6 +29,8 @@ public class ValidPalindrome {
             if (Character.toLowerCase(s.charAt(leftIndex)) != Character.toLowerCase(s.charAt(rightIndex))) {
                 return false;
             }
+
+//  пара проверена. двигаем указатели.
             leftIndex++;
             rightIndex--;
         }
