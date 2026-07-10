@@ -1,4 +1,5 @@
 # 167. Two Sum II — Input Array Is Sorted
+*Сумма двух чисел II — входной массив отсортирован*
 
 **Сложность:** Medium · **Паттерн:** два указателя · **Класс:** `block01_arrays_twopointers.TwoSumSorted`
 

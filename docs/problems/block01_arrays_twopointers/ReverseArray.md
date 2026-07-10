@@ -1,4 +1,5 @@
 # Reverse Array (аналог 344. Reverse String)
+*Разворот массива (дословно: развернуть массив; аналог задачи 344 Reverse String — разворот строки)*
 
 **Сложность:** Easy · **Паттерн:** два указателя · **Класс:** `block01_arrays_twopointers.ReverseArray`
 

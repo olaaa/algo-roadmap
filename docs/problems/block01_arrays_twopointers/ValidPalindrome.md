@@ -1,4 +1,5 @@
 # 125. Valid Palindrome
+*Проверка на палиндром (дословно: корректный палиндром)*
 
 **Сложность:** Easy · **Паттерн:** два указателя · **Класс:** `block01_arrays_twopointers.ValidPalindrome`
 
