@@ -37,6 +37,8 @@ public class TwoSumSorted {
         check(Arrays.equals(twoSum(new int[]{2, 7, 11, 15}, 9), new int[]{1, 2}), "начало массива");
         check(Arrays.equals(twoSum(new int[]{2, 3, 4}, 6), new int[]{1, 3}), "края массива");
         check(Arrays.equals(twoSum(new int[]{-1, 0}, -1), new int[]{1, 2}), "отрицательные числа");
+        check(Arrays.equals(twoSum(new int[]{1, 2, 3, 4}, 7), new int[]{3, 4}), "сумма мала → сдвигаем левый (ветка sum < target)");
+        check(Arrays.equals(twoSum(new int[]{1, 2, 3}, 100), new int[]{-1, -1}), "пары нет → {-1,-1} (цикл завершается)");
     }
 
     private static void check(boolean ok, String name) {

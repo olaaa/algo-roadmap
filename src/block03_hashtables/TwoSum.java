@@ -58,16 +58,28 @@ public class TwoSum {
     }
 
     public static void main(String[] args) {
-        /* Эталонное решение через HashMap. */
-        check(Arrays.equals(twoSum(new int[]{2, 7, 11, 15}, 9), new int[]{0, 1}), "HashMap: пара в начале массива");
-        check(Arrays.equals(twoSum(new int[]{3, 2, 4}, 6), new int[]{1, 2}), "HashMap: неотсортированный массив");
-        check(Arrays.equals(twoSum(new int[]{3, 3}, 6), new int[]{0, 1}), "HashMap: два одинаковых числа");
-        check(Arrays.equals(twoSum(new int[]{-1, -2, -3, -4}, -6), new int[]{1, 3}), "HashMap: отрицательные числа");
+        /*
+         * Тестовые случаи заданы ОДИН раз (у каждого единственное решение) и
+         * прогоняются по обеим реализациям — без дублирования входов и сообщений.
+         * Случаи покрывают все ветви: найдено сразу / после вставок, два одинаковых
+         * числа, отрицательные, и «пары нет» (возврат {-1, -1}).
+         */
+        record TestCase(int[] nums, int target, int[] expected, String name) {}
 
-        /* Решение в лоб — должно давать те же пары на этих входах. */
-        check(Arrays.equals(twoSumBruteForce(new int[]{2, 7, 11, 15}, 9), new int[]{0, 1}), "BruteForce: пара в начале массива");
-        check(Arrays.equals(twoSumBruteForce(new int[]{3, 2, 4}, 6), new int[]{1, 2}), "BruteForce: неотсортированный массив");
-        check(Arrays.equals(twoSumBruteForce(new int[]{3, 3}, 6), new int[]{0, 1}), "BruteForce: два одинаковых числа");
+        TestCase[] testCases = {
+            new TestCase(new int[]{2, 7, 11, 15}, 9, new int[]{0, 1}, "пара в начале массива"),
+            new TestCase(new int[]{3, 2, 4}, 6, new int[]{1, 2}, "неотсортированный массив"),
+            new TestCase(new int[]{3, 3}, 6, new int[]{0, 1}, "два одинаковых числа"),
+            new TestCase(new int[]{-1, -2, -3, -4}, -6, new int[]{1, 3}, "отрицательные числа"),
+            new TestCase(new int[]{1, 2, 3}, 100, new int[]{-1, -1}, "пары нет (возврат {-1,-1})"),
+        };
+
+        for (TestCase testCase : testCases) {
+            check(Arrays.equals(twoSum(testCase.nums(), testCase.target()), testCase.expected()),
+                  "HashMap: " + testCase.name());
+            check(Arrays.equals(twoSumBruteForce(testCase.nums(), testCase.target()), testCase.expected()),
+                  "BruteForce: " + testCase.name());
+        }
     }
 
     private static void check(boolean ok, String name) {
