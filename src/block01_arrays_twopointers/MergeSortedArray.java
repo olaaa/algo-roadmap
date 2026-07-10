@@ -23,6 +23,8 @@ public class MergeSortedArray {
 //  самое большое число во втором массиве  (т.к. оно в конце)
         int secondIndex = nums2Count - 1;               // последний в nums2
         int writeIndex = nums1Count + nums2Count - 1;   // позиция записи (конец nums1)
+
+// еще есть, что переносить?
         while (secondIndex >= 0) {
 // сравниваем самые большие числа в nums1 и nums2
             if (firstIndex >= 0 && nums1[firstIndex] > nums2[secondIndex]) {
