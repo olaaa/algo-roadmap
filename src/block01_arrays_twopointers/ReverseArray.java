@@ -24,7 +24,7 @@ public class ReverseArray {
             nums[leftIndex] = nums[rightIndex];
             nums[rightIndex] = temp;
 
-//  для нечетной длины указатели сойдутся на середине
+//  Для нечётной длины указатели сойдутся на середине
             leftIndex++;
             rightIndex--;
         }
