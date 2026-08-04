@@ -30,6 +30,15 @@
   («это приём N из heuristics.md»); (2) дописывать новую задачу как пример
   к существующему приёму; (3) если всплыл новый общий приём — добавлять его
   отдельным пунктом.
+- `docs/datastructures/` — справочники по структурам данных стандартной библиотеки
+  (`Queue.md`, `Deque.md`, …) в объёме собеседования. Это НЕ разбор задач: здесь
+  инструменты, в `docs/problems/` — задачи. Правила: факты о поведении проверять
+  запуском на локальной JDK и приводить фактический вывод; детали внутреннего
+  устройства сверять с исходниками из `src.zip` (лежит в `lib/` у JDK), а не по
+  памяти — часть общеизвестных фактов устарела. Иллюстрации — отдельными файлами
+  `.svg` в `docs/datastructures/img/`, вставка через `![подпись](img/файл.svg)`
+  (инлайновый SVG внутри markdown на GitHub не рендерится). Каждый справочник
+  заканчивается разделом «Типичные вопросы на собеседовании».
 - `docs/visualizations/block NN_<тема>/` — визуализации и вспомогательные
   материалы (HTML, схемы). Зеркалит структуру `src/` по блокам; имя файла =
   имя задачи (напр. `docs/visualizations/block01_arrays_twopointers/TwoSumSorted.html`).
@@ -76,19 +85,32 @@
 - Проект — простой IntelliJ-модуль (algo-roadmap.iml), без Maven/Gradle.
   `src` зарегистрирован как Sources Root в .iml.
 
-## Сборка в песочнице Claude (для самопроверки)
-- Песочница — отдельный одноразовый Linux x64, сеть сильно ограничена
-  (доступны PyPI, npm, github.com; ассеты GitHub-релизов и Adoptium заблокированы).
-- Системный java — только JRE 11, без javac.
-- Решение: пользователь положил в папку Linux-JDK тарбол
-  `OpenJDK25U-jdk_x64_linux_hotspot_25.0.3_9.tar.gz`. Распаковка и компиляция:
-  ```
-  mkdir -p /tmp/jdk && tar -xzf <путь>/OpenJDK25U-jdk_x64_linux_hotspot_25.0.3_9.tar.gz -C /tmp/jdk
-  JH=/tmp/jdk/jdk-25.0.3+9
-  $JH/bin/javac -d /tmp/out src/blockNN_xxx/*.java
-  $JH/bin/java -cp /tmp/out blockNN_xxx.ClassName
-  ```
-  (Путь к папке в песочнице: /sessions/.../mnt/algo-roadmap)
+## Сборка Клодом для самопроверки — ЛОКАЛЬНО, не в песочнице
+Компилировать и прогонять тесты нужно на машине пользователя, через терминал
+desktop-commander (`start_process`, оболочка PowerShell). Там уже стоит JDK 25
+(JetBrains Runtime), `javac` и `java` доступны в PATH — то есть та же самая JDK,
+которой собирает IntelliJ IDEA. Отдельный тарбол и распаковка не нужны.
+
+Рабочая последовательность (пример для блока 2):
+```
+cd C:\Users\Ola\IdeaProjects\interview\algo-roadmap
+javac -encoding UTF-8 -d out\claudecheck src\block02_strings_stack\*.java
+[Console]::OutputEncoding=[System.Text.Encoding]::UTF8
+java "-Dfile.encoding=UTF-8" "-Dstdout.encoding=UTF-8" -cp out\claudecheck block02_strings_stack.ValidParentheses
+```
+Каталог `out\` уже в .gitignore, поэтому `out\claudecheck` можно смело удалять
+после прогона.
+
+Две грабли PowerShell, обе проверены на практике:
+- флаги вида `-Dfile.encoding=UTF-8` ОБЯЗАТЕЛЬНО брать в кавычки, иначе PowerShell
+  разрезает строку и получается `Could not find or load main class .encoding=UTF-8`;
+- без `[Console]::OutputEncoding=...UTF8` русские сообщения тестов выводятся
+  кракозябрами.
+
+Про Linux-песочницу: она остаётся полезной для вспомогательных проверок, не
+требующих Java, — например, прогнать логику визуализации через Node и сверить её
+с Java-решением. Но JDK там нет (системный java — JRE 11 без javac), тарбол из
+проекта убран, так что Java-код в песочнице НЕ собираем.
 
 ## ADR
 Не ведём (учебный проект). Можно включить по запросу пользователя.

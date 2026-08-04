@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 300" width="760" height="300" font-family="system-ui, -apple-system, Segoe UI, sans-serif">
+  <rect width="760" height="300" fill="#fbfcfe"/>
+  <defs>
+    <marker id="ar" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto">
+      <path d="M0,0 L10,4 L0,8 z" fill="#4f8cff"/>
+    </marker>
+    <marker id="arOut" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto">
+      <path d="M0,0 L10,4 L0,8 z" fill="#e0567a"/>
+    </marker>
+  </defs>
+
+  <text x="380" y="36" text-anchor="middle" font-size="17" font-weight="600" fill="#1c2333">Queue — FIFO: первым вошёл, первым вышел</text>
+  <text x="380" y="58" text-anchor="middle" font-size="13" fill="#6b7280">Вход и выход на разных концах</text>
+
+  <!-- cells -->
+  <g>
+    <rect x="200" y="120" width="76" height="64" rx="9" fill="#e8f0ff" stroke="#4f8cff" stroke-width="2"/>
+    <text x="238" y="159" text-anchor="middle" font-size="21" font-family="Consolas, monospace" fill="#1c2333">A</text>
+
+    <rect x="286" y="120" width="76" height="64" rx="9" fill="#eef2f9" stroke="#b9c2d4" stroke-width="2"/>
+    <text x="324" y="159" text-anchor="middle" font-size="21" font-family="Consolas, monospace" fill="#1c2333">B</text>
+
+    <rect x="372" y="120" width="76" height="64" rx="9" fill="#eef2f9" stroke="#b9c2d4" stroke-width="2"/>
+    <text x="410" y="159" text-anchor="middle" font-size="21" font-family="Consolas, monospace" fill="#1c2333">C</text>
+
+    <rect x="458" y="120" width="76" height="64" rx="9" fill="#eef2f9" stroke="#b9c2d4" stroke-width="2"/>
+    <text x="496" y="159" text-anchor="middle" font-size="21" font-family="Consolas, monospace" fill="#1c2333">D</text>
+  </g>
+
+  <!-- head side -->
+  <line x1="196" y1="152" x2="96" y2="152" stroke="#e0567a" stroke-width="2.5" marker-end="url(#arOut)"/>
+  <text x="146" y="140" text-anchor="middle" font-size="13" font-family="Consolas, monospace" fill="#e0567a">poll()</text>
+  <text x="146" y="176" text-anchor="middle" font-size="12" fill="#6b7280">выход</text>
+  <text x="238" y="207" text-anchor="middle" font-size="12.5" font-weight="600" fill="#e0567a">голова (head)</text>
+  <text x="238" y="226" text-anchor="middle" font-size="11.5" fill="#6b7280">сюда смотрит peek()</text>
+
+  <!-- tail side -->
+  <line x1="664" y1="152" x2="540" y2="152" stroke="#4f8cff" stroke-width="2.5" marker-end="url(#ar)"/>
+  <text x="606" y="140" text-anchor="middle" font-size="13" font-family="Consolas, monospace" fill="#4f8cff">offer(E)</text>
+  <text x="606" y="176" text-anchor="middle" font-size="12" fill="#6b7280">вход</text>
+  <text x="496" y="207" text-anchor="middle" font-size="12.5" font-weight="600" fill="#4f8cff">хвост (tail)</text>
+
+  <text x="380" y="266" text-anchor="middle" font-size="12.5" fill="#6b7280">Порядок выхода: A → B → C → D — тот же, в каком элементы входили</text>
+</svg>

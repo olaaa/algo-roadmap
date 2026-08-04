@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 340" width="760" height="340" font-family="system-ui, -apple-system, Segoe UI, sans-serif">
+  <rect width="760" height="340" fill="#fbfcfe"/>
+  <defs>
+    <marker id="bIn" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto">
+      <path d="M0,0 L10,4 L0,8 z" fill="#4f8cff"/>
+    </marker>
+    <marker id="rOut" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto">
+      <path d="M0,0 L10,4 L0,8 z" fill="#e0567a"/>
+    </marker>
+  </defs>
+
+  <text x="380" y="34" text-anchor="middle" font-size="17" font-weight="600" fill="#1c2333">Deque — двусторонняя очередь</text>
+  <text x="380" y="56" text-anchor="middle" font-size="13" fill="#6b7280">Вставка и удаление доступны с обоих концов</text>
+
+  <!-- cells -->
+  <g>
+    <rect x="248" y="146" width="76" height="64" rx="9" fill="#e8f0ff" stroke="#4f8cff" stroke-width="2"/>
+    <text x="286" y="185" text-anchor="middle" font-size="21" font-family="Consolas, monospace" fill="#1c2333">A</text>
+
+    <rect x="334" y="146" width="76" height="64" rx="9" fill="#eef2f9" stroke="#b9c2d4" stroke-width="2"/>
+    <text x="372" y="185" text-anchor="middle" font-size="21" font-family="Consolas, monospace" fill="#1c2333">B</text>
+
+    <rect x="420" y="146" width="76" height="64" rx="9" fill="#e8f0ff" stroke="#4f8cff" stroke-width="2"/>
+    <text x="458" y="185" text-anchor="middle" font-size="21" font-family="Consolas, monospace" fill="#1c2333">C</text>
+  </g>
+
+  <text x="286" y="234" text-anchor="middle" font-size="12.5" font-weight="600" fill="#4f8cff">first (head)</text>
+  <text x="458" y="234" text-anchor="middle" font-size="12.5" font-weight="600" fill="#4f8cff">last (tail)</text>
+
+  <!-- left in -->
+  <line x1="96" y1="130" x2="240" y2="152" stroke="#4f8cff" stroke-width="2.5" marker-end="url(#bIn)"/>
+  <text x="140" y="118" font-size="13" font-family="Consolas, monospace" fill="#4f8cff">addFirst(E)</text>
+  <!-- left out -->
+  <line x1="240" y1="196" x2="96" y2="220" stroke="#e0567a" stroke-width="2.5" marker-end="url(#rOut)"/>
+  <text x="130" y="248" font-size="13" font-family="Consolas, monospace" fill="#e0567a">pollFirst()</text>
+
+  <!-- right in -->
+  <line x1="664" y1="130" x2="504" y2="152" stroke="#4f8cff" stroke-width="2.5" marker-end="url(#bIn)"/>
+  <text x="556" y="118" font-size="13" font-family="Consolas, monospace" fill="#4f8cff">addLast(E)</text>
+  <!-- right out -->
+  <line x1="504" y1="196" x2="664" y2="220" stroke="#e0567a" stroke-width="2.5" marker-end="url(#rOut)"/>
+  <text x="566" y="248" font-size="13" font-family="Consolas, monospace" fill="#e0567a">pollLast()</text>
+
+  <text x="380" y="288" text-anchor="middle" font-size="12.5" fill="#6b7280">Синие стрелки — вставка, розовые — извлечение. Обе операции есть с каждой стороны.</text>
+  <text x="380" y="310" text-anchor="middle" font-size="12.5" fill="#6b7280">Заглянуть, не снимая: peekFirst() и peekLast(). Все шесть операций — O(1).</text>
+</svg>

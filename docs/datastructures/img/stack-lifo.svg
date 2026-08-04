@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 360" width="760" height="360" font-family="system-ui, -apple-system, Segoe UI, sans-serif">
+  <rect width="760" height="360" fill="#fbfcfe"/>
+  <defs>
+    <marker id="inArr" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto">
+      <path d="M0,0 L10,4 L0,8 z" fill="#4f8cff"/>
+    </marker>
+    <marker id="outArr" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto">
+      <path d="M0,0 L10,4 L0,8 z" fill="#e0567a"/>
+    </marker>
+    <marker id="peekArr" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto">
+      <path d="M0,0 L10,4 L0,8 z" fill="#c08a2e"/>
+    </marker>
+  </defs>
+
+  <text x="380" y="34" text-anchor="middle" font-size="17" font-weight="600" fill="#1c2333">Стек — LIFO: последним вошёл, первым вышел</text>
+  <text x="380" y="56" text-anchor="middle" font-size="13" fill="#6b7280">Вход и выход — на одном и том же конце</text>
+
+  <!-- stack column -->
+  <g font-family="Consolas, monospace">
+    <rect x="310" y="100" width="150" height="50" rx="9" fill="#e8f0ff" stroke="#4f8cff" stroke-width="2.4"/>
+    <text x="385" y="131" text-anchor="middle" font-size="19" fill="#1c2333">C</text>
+
+    <rect x="310" y="158" width="150" height="50" rx="9" fill="#eef2f9" stroke="#b9c2d4" stroke-width="1.8"/>
+    <text x="385" y="189" text-anchor="middle" font-size="19" fill="#1c2333">B</text>
+
+    <rect x="310" y="216" width="150" height="50" rx="9" fill="#eef2f9" stroke="#b9c2d4" stroke-width="1.8"/>
+    <text x="385" y="247" text-anchor="middle" font-size="19" fill="#1c2333">A</text>
+  </g>
+
+  <!-- base line -->
+  <line x1="300" y1="274" x2="470" y2="274" stroke="#8b93a5" stroke-width="3"/>
+  <text x="484" y="252" font-size="12" fill="#6b7280">дно — вошло первым,</text>
+  <text x="484" y="269" font-size="12" fill="#6b7280">выйдет последним</text>
+
+  <!-- push -->
+  <line x1="150" y1="82" x2="302" y2="112" stroke="#4f8cff" stroke-width="2.5" marker-end="url(#inArr)"/>
+  <text x="66" y="74" font-size="14" font-family="Consolas, monospace" fill="#4f8cff">push(x)</text>
+  <text x="66" y="92" font-size="11.5" fill="#6b7280">кладём НА вершину</text>
+
+  <!-- pop -->
+  <line x1="302" y1="138" x2="150" y2="168" stroke="#e0567a" stroke-width="2.5" marker-end="url(#outArr)"/>
+  <text x="66" y="190" font-size="14" font-family="Consolas, monospace" fill="#e0567a">pop()</text>
+  <text x="66" y="208" font-size="11.5" fill="#6b7280">снимаем С вершины</text>
+
+  <!-- peek -->
+  <line x1="608" y1="108" x2="470" y2="122" stroke="#c08a2e" stroke-width="2.2" stroke-dasharray="6 4" marker-end="url(#peekArr)"/>
+  <text x="618" y="100" font-size="14" font-family="Consolas, monospace" fill="#c08a2e">peek()</text>
+  <text x="618" y="118" font-size="11.5" fill="#6b7280">смотрим, не снимая</text>
+
+  <text x="385" y="90" text-anchor="middle" font-size="12" font-weight="600" fill="#4f8cff">вершина (top)</text>
+
+  <text x="380" y="312" text-anchor="middle" font-size="12.5" fill="#6b7280">Порядок выхода: C → B → A, обратный порядку входа.</text>
+  <text x="380" y="334" text-anchor="middle" font-size="12.5" fill="#6b7280">Заглянуть в середину или достать A, не сняв C и B, нельзя — и это не недостаток, а суть.</text>
+</svg>
