@@ -27,6 +27,11 @@
 - [x] Queue — интерфейс, шесть методов, PriorityQueue, блокирующие очереди
 - [x] Deque — отличия от Queue, ArrayDeque изнутри, стек вместо java.util.Stack
 - [x] Stack — абстрактный тип данных, рекурсия ↔ явный стек, монотонный стек
+- [ ] Решить судьбу ASCII-графики: в Deque.md схемы переведены с SVG на ASCII
+      (кроме кольцевого массива). Если приживётся — перевести Queue.md и Stack.md
+      и поправить соглашение про иллюстрации в CLAUDE.md.
+      До этого решения НИЧЕГО из docs/datastructures/img/ не удалять, даже
+      неиспользуемые файлы (deque-both-ends.svg).
 - [ ] HashMap / HashSet — хеширование, коллизии, treeify, equals+hashCode
 - [ ] ArrayList vs LinkedList — рост массива, когда что брать
 - [ ] TreeMap / TreeSet — красно-чёрное дерево, навигационные методы
