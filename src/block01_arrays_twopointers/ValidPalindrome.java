@@ -19,7 +19,7 @@ public class ValidPalindrome {
         int leftIndex = 0;
         int rightIndex = s.length() - 1;
         while (leftIndex < rightIndex) {
-//  проматываем, а не удаляемые, несравниваемые символы
+//  проматываем, а не удаляем несравниваемые символы
             while (leftIndex < rightIndex && !Character.isLetterOrDigit(s.charAt(leftIndex))) {
                 leftIndex++;
             }
