@@ -242,19 +242,15 @@ function renderArray(s){
   }
 }
 
+/*
+ * Контейнер #stack имеет flex-direction: column-reverse, поэтому ПЕРВЫЙ
+ * добавленный элемент оказывается внизу, а последний — наверху. Значит порядок
+ * добавления обязан совпадать с порядком «дно -> вершина»: сначала cells[0],
+ * потом остальные, и в самом конце снятая скобка, которая рисуется над стеком.
+ */
 function renderStack(s){
   const box=$('stack'); box.innerHTML='';
   const cells=s.stack||[];
-
-  if(s.popped!==undefined){
-    const row=document.createElement('div'); row.className='srow';
-    const cell=document.createElement('div');
-    cell.className='scell ' + (s.matched?'matched':s.mismatch?'mismatched':'popped');
-    cell.textContent=s.popped;
-    const lab=document.createElement('span');
-    lab.textContent = s.matched ? 'снята, пара сошлась' : s.mismatch ? 'снята, тип не тот' : 'снята со стека';
-    row.append(cell,lab); box.append(row);
-  }
 
   if(cells.length===0 && s.popped===undefined){
     const nul=document.createElement('div'); nul.className='stack-empty';
@@ -267,13 +263,27 @@ function renderStack(s){
     const row=document.createElement('div'); row.className='srow';
     const cell=document.createElement('div'); cell.className='scell';
     cell.textContent=ch;
-    if(pos===cells.length-1){
+    /* Вершину подсвечиваем только когда над стеком не висит снятая скобка. */
+    const isTop = pos===cells.length-1 && s.popped===undefined;
+    if(isTop){
       cell.classList.add(s.pushed?'pushed':'top');
     }
     const lab=document.createElement('span');
-    lab.textContent = pos===cells.length-1 ? 'вершина' : '';
+    lab.textContent = isTop ? 'вершина' : '';
     row.append(cell,lab); box.append(row);
   });
+
+  if(s.popped!==undefined){
+    const row=document.createElement('div'); row.className='srow';
+    const cell=document.createElement('div');
+    cell.className='scell ' + (s.matched?'matched':s.mismatch?'mismatched':'popped');
+    cell.textContent=s.popped;
+    const lab=document.createElement('span');
+    lab.textContent = s.matched ? 'снята с вершины, пара сошлась'
+                    : s.mismatch ? 'снята с вершины, тип не тот'
+                    : 'снята с вершины';
+    row.append(cell,lab); box.append(row);
+  }
 }
 
 function renderCode(active){
