@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Move Zeroes — чтение и запись по одному массиву (два указателя)</title>
+<style>
+  :root{
+    --bg:#0f1117; --panel:#171a23; --cell:#232733; --line:#2e3342;
+    --txt:#e6e8ee; --muted:#8b90a0; --accent:#4f8cff; --l:#38bdf8; --r:#fb7185;
+    --w:#fbbf24; --ok:#34d399; --code:#c7d0e0;
+    --mono:"JetBrains Mono",Consolas,Menlo,monospace;
+    --sans:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--txt);font-family:var(--sans);
+       display:flex;flex-direction:column;align-items:center;min-height:100vh;padding:24px}
+  h1{font-size:18px;font-weight:600;margin:0 0 2px}
+  .sub{color:var(--muted);font-size:13px;margin-bottom:20px;max-width:760px;text-align:center}
+  .stage{width:min(920px,100%);background:var(--panel);border:1px solid var(--line);
+         border-radius:14px;padding:26px 22px}
+  .setup{display:flex;gap:16px;flex-wrap:wrap;align-items:flex-end;margin-bottom:10px}
+  .setup label{display:flex;flex-direction:column;gap:5px;font-size:12px;color:var(--muted)}
+  .setup input{font-family:var(--mono);font-size:14px;background:var(--cell);
+       border:1px solid var(--line);color:var(--txt);border-radius:8px;padding:8px 10px}
+  .setup input[type=text]{width:260px}
+  .btn{font-family:var(--sans);font-size:13px;font-weight:500;cursor:pointer;
+       background:var(--cell);border:1px solid var(--line);color:var(--txt);
+       border-radius:8px;padding:9px 14px;transition:.15s}
+  .btn:hover{border-color:var(--accent)}
+  .btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+  .btn:disabled{opacity:.4;cursor:not-allowed}
+  .presets{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:2px 0 4px}
+  .presets span{font-size:12px;color:var(--muted)}
+  .btn.small{font-family:var(--mono);font-size:12px;padding:6px 10px}
+
+  .phase{font-family:var(--mono);font-size:12px;color:var(--muted);margin:18px 0 2px;text-align:center}
+  .phase b{color:var(--accent);font-weight:700}
+  .array{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:14px 0 6px}
+  .col{display:flex;flex-direction:column;align-items:center;gap:6px;position:relative}
+  .cell{width:56px;height:56px;border-radius:10px;background:var(--cell);
+        border:2px solid var(--line);display:flex;align-items:center;justify-content:center;
+        font-family:var(--mono);font-size:20px;transition:.25s}
+  .cell.read{border-color:var(--l);box-shadow:0 0 0 3px rgba(56,189,248,.15)}
+  .cell.write{border-color:var(--w);box-shadow:0 0 0 3px rgba(251,191,36,.18)}
+  .cell.wrote{border-color:var(--ok);background:rgba(52,211,153,.16)}
+  .cell.zeroed{border-color:var(--r);background:rgba(251,113,133,.14);color:var(--r)}
+  .cell.settled{opacity:.55}
+  .cell.done{opacity:.4}
+  .idx{font-family:var(--mono);font-size:11px;color:var(--muted)}
+  .ptr{height:18px;font-family:var(--mono);font-size:11px;font-weight:700;white-space:nowrap}
+  .ptr.read{color:var(--l)} .ptr.write{color:var(--w)}
+
+  .status{min-height:26px;text-align:center;font-family:var(--mono);font-size:14px;margin:16px 0 6px}
+  .status .op{color:var(--code)}
+  .status .good{color:var(--ok)}
+  .controls{display:flex;gap:10px;justify-content:center;align-items:center;margin-top:14px;flex-wrap:wrap}
+  .step-info{color:var(--muted);font-size:12px;font-family:var(--mono);min-width:90px;text-align:center}
+  .legend{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;font-family:var(--mono);
+          font-size:11px;color:var(--muted);margin-top:6px}
+  .legend b{font-weight:700}
+  .legend .cl{color:var(--l)} .legend .cw{color:var(--w)} .legend .cr{color:var(--r)}
+
+  .invariant{margin-top:14px;text-align:center;font-family:var(--mono);font-size:12px;color:var(--muted)}
+  .invariant b{color:var(--ok);font-weight:700}
+  .invariant.debt b{color:var(--w)}
+
+  .codebox{margin-top:22px;background:#0b0d13;border:1px solid var(--line);border-radius:10px;
+           padding:14px 16px;font-family:var(--mono);font-size:13px;line-height:1.7;overflow:auto}
+  .codebox .ln{display:block;padding:0 6px;border-radius:4px;color:var(--code);white-space:pre}
+  .codebox .ln.active{background:rgba(79,140,255,.18)}
+  .kw{color:#c792ea}.num{color:#f78c6c}.cm{color:#5c6370}
+</style>
+</head>
+<body>
+  <h1>Move Zeroes — чтение и запись по одному массиву</h1>
+  <div class="sub">Все нули переезжают в конец, порядок остальных элементов сохраняется. readIndex просматривает каждый элемент, writeIndex отмечает место для следующего ненулевого. Писатель никогда не обгоняет читателя, поэтому запись на месте безопасна (LeetCode 283).</div>
+
+  <div class="stage">
+    <div class="setup">
+      <label>nums (через запятую)
+        <input id="numsIn" type="text" value="0, 1, 0, 3, 12">
+      </label>
+      <button class="btn primary" id="build">Построить</button>
+    </div>
+
+    <div class="presets">
+      <span>Пресеты:</span>
+      <button class="btn small" data-preset="0, 1, 0, 3, 12">обычный</button>
+      <button class="btn small" data-preset="1, 2, 3">нулей нет</button>
+      <button class="btn small" data-preset="0, 0, 0">все нули</button>
+      <button class="btn small" data-preset="0, 7, 0, 0, 3, 1">порядок сохраняется</button>
+      <button class="btn small" data-preset="1, 0">ноль уже в конце</button>
+      <button class="btn small" data-preset="0">один элемент</button>
+    </div>
+
+    <div class="phase" id="phase"></div>
+    <div class="array" id="array"></div>
+
+    <div class="status" id="status"></div>
+    <div class="invariant" id="invariant"></div>
+
+    <div class="controls">
+      <button class="btn" id="prev">◀ Назад</button>
+      <span class="step-info" id="stepInfo">шаг 0 / 0</span>
+      <button class="btn" id="next">Вперёд ▶</button>
+      <button class="btn" id="play">▶ Авто</button>
+      <button class="btn" id="reset">⟲ Сброс</button>
+    </div>
+
+    <div class="legend">
+      <span><b class="cl">readIndex</b> — просматриваем каждый элемент</span>
+      <span><b class="cw">writeIndex</b> — куда ляжет следующий ненулевой</span>
+      <span><b class="cr">розовое</b> — нули, досыпанные во втором проходе</span>
+    </div>
+
+    <div class="codebox" id="code"></div>
+  </div>
+
+<script>
+const $ = id => document.getElementById(id);
+let nums=[], steps=[], cur=0, timer=null;
+
+const CODE = [
+  {t:`<span class="kw">int</span> writeIndex = <span class="num">0</span>;`, line:'w0'},
+  {t:``, line:'gap1'},
+  {t:`<span class="cm">/* Первый проход: сдвигаем ненулевые влево. */</span>`, line:'cm1'},
+  {t:`<span class="kw">for</span> (<span class="kw">int</span> readIndex = <span class="num">0</span>; readIndex &lt; nums.length; readIndex++) {`, line:'for'},
+  {t:`    <span class="kw">if</span> (nums[readIndex] != <span class="num">0</span>) {`, line:'if'},
+  {t:`        nums[writeIndex] = nums[readIndex];`, line:'copy'},
+  {t:`        writeIndex++;`, line:'inc'},
+  {t:`    }`, line:'endif'},
+  {t:`}`, line:'endfor'},
+  {t:``, line:'gap2'},
+  {t:`<span class="cm">/* Второй проход: хвост забиваем нулями. */</span>`, line:'cm2'},
+  {t:`<span class="kw">while</span> (writeIndex &lt; nums.length) {`, line:'while'},
+  {t:`    nums[writeIndex] = <span class="num">0</span>;`, line:'zero'},
+  {t:`    writeIndex++;`, line:'incw'},
+  {t:`}`, line:'end'},
+];
+
+function snap(a,readIndex,writeIndex,line,msg,extra){
+  return Object.assign({a:a.slice(),r:readIndex,w:writeIndex,line,msg}, extra||{});
+}
+
+function buildSteps(){
+  steps=[];
+  const a=nums.slice();                 // рабочая копия массива (мутируем)
+  const length=a.length;
+  let writeIndex=0;
+
+  steps.push(snap(a,-1,writeIndex,'w0',
+    `writeIndex = 0 — сюда ляжет первый ненулевой элемент`,{phase:1}));
+
+  for(let readIndex=0; readIndex<length; readIndex++){
+    steps.push(snap(a,readIndex,writeIndex,'for',
+      `readIndex = ${readIndex} < ${length}? — да, смотрим следующий элемент`,{phase:1}));
+    const isNonZero = a[readIndex] !== 0;
+    steps.push(snap(a,readIndex,writeIndex,'if',
+      `nums[${readIndex}] = ${a[readIndex]} != 0? — ${isNonZero?'да, элемент нужен':'нет, это ноль — пропускаем'}`,{phase:1}));
+    if(isNonZero){
+      a[writeIndex]=a[readIndex];
+      const selfCopy = (writeIndex===readIndex);
+      steps.push(snap(a,readIndex,writeIndex,'copy',
+        selfCopy
+          ? `nums[${writeIndex}] = nums[${readIndex}] — указатели совпали, элемент копируется сам в себя`
+          : `nums[${writeIndex}] = ${a[writeIndex]} — переносим элемент влево, на место пропущенного нуля`,
+        {phase:1,wrote:writeIndex}));
+      writeIndex++;
+      steps.push(snap(a,readIndex,writeIndex,'inc',
+        `writeIndex стал ${writeIndex} — место занято, ждём следующий ненулевой`,{phase:1}));
+    }
+  }
+
+  steps.push(snap(a,length,writeIndex,'endfor',
+    `readIndex дошёл до ${length} — массив просмотрен целиком`,{phase:1}));
+
+  if(writeIndex<length){
+    steps.push(snap(a,length,writeIndex,'while',
+      `writeIndex (${writeIndex}) < ${length}? — да, хвост из ${length-writeIndex} позиц. надо занулить`,{phase:2}));
+  }
+  const zeroed=[];
+  while(writeIndex<length){
+    a[writeIndex]=0;
+    zeroed.push(writeIndex);
+    steps.push(snap(a,length,writeIndex,'zero',
+      `nums[${writeIndex}] = 0`,{phase:2,zeroed:zeroed.slice(),wrote:writeIndex}));
+    writeIndex++;
+    steps.push(snap(a,length,writeIndex,'incw',
+      writeIndex<length
+        ? `writeIndex стал ${writeIndex} — ещё есть что занулить`
+        : `writeIndex стал ${writeIndex} — дошли до конца массива`,
+      {phase:2,zeroed:zeroed.slice()}));
+  }
+
+  steps.push(snap(a,length,writeIndex,'end',
+    zeroed.length===0
+      ? `нулей в массиве не было — второй цикл не выполнился ни разу, массив не изменился`
+      : `готово: ненулевые слева в исходном порядке, ${zeroed.length} нол. в конце`,
+    {phase:2,zeroed:zeroed.slice(),finished:true}));
+}
+
+function renderArray(s){
+  const box=$('array'); box.innerHTML='';
+  s.a.forEach((value,idx)=>{
+    const col=document.createElement('div'); col.className='col';
+
+    const top=document.createElement('div'); top.className='ptr read';
+    top.textContent = idx===s.r ? 'readIndex' : '';
+
+    const cell=document.createElement('div'); cell.className='cell'; cell.textContent=value;
+    if(s.zeroed && s.zeroed.includes(idx)){
+      cell.classList.add('zeroed');
+    } else if(idx < s.w){
+      cell.classList.add('settled');            // уже уложенные ненулевые элементы
+    }
+    if(idx===s.w && !s.finished) cell.classList.add('write');
+    if(idx===s.r) cell.classList.add('read');
+    if(s.wrote===idx) cell.classList.add('wrote');
+    if(s.finished) cell.classList.add('done');
+
+    const bot=document.createElement('div'); bot.className='ptr write';
+    bot.textContent = (idx===s.w && !s.finished) ? 'writeIndex' : '';
+
+    const ix=document.createElement('div'); ix.className='idx'; ix.textContent=idx;
+    col.append(top,cell,bot,ix); box.append(col);
+  });
+}
+
+function renderCode(active){
+  $('code').innerHTML = CODE.map(c=>
+    `<span class="ln ${c.line===active?'active':''}">${c.t||' '}</span>`).join('');
+}
+
+function renderInvariant(s){
+  const box=$('invariant');
+  if(s.phase===2){
+    box.className='invariant';
+    box.innerHTML=`Второй проход: читать больше нечего, writeIndex досыпает нули до конца массива`;
+    return;
+  }
+  const seen = s.r<0 ? 0 : s.r+1;               // сколько элементов уже просмотрено
+  const debt = seen - s.w;                      // просмотрено минус записано = пропущенные нули
+  box.className = debt>0 ? 'invariant debt' : 'invariant';
+  box.innerHTML = `Инвариант: в момент записи writeIndex (${s.w}) &le; readIndex (${s.r<0?'—':s.r}) · `
+    + `<b>долг = ${debt}</b> — столько нулей пропущено и столько же придётся досыпать в конец`;
+}
+
+function show(idx){
+  cur=Math.max(0,Math.min(idx,steps.length-1));
+  const s=steps[cur];
+  renderArray(s); renderCode(s.line); renderInvariant(s);
+  $('phase').innerHTML = s.phase===1
+      ? `Проход <b>1</b> из 2 — сдвигаем ненулевые элементы влево`
+      : `Проход <b>2</b> из 2 — забиваем хвост нулями`;
+  $('status').innerHTML = s.finished
+      ? `<span class="good">✓ ${s.msg}</span>`
+      : `<span class="op">${s.msg}</span>`;
+  $('stepInfo').textContent=`шаг ${cur+1} / ${steps.length}`;
+  $('prev').disabled=cur===0; $('next').disabled=cur===steps.length-1;
+}
+
+function build(){
+  stopPlay();
+  nums = $('numsIn').value.split(',').map(x=>parseInt(x.trim(),10)).filter(x=>!isNaN(x));
+  if(nums.length===0){$('status').textContent='Введите хотя бы одно число';return;}
+  buildSteps(); show(0);
+}
+function stopPlay(){ if(timer){clearInterval(timer);timer=null;$('play').textContent='▶ Авто';} }
+function togglePlay(){
+  if(timer){stopPlay();return;}
+  if(cur>=steps.length-1) show(0);
+  $('play').textContent='⏸ Пауза';
+  timer=setInterval(()=>{ if(cur>=steps.length-1){stopPlay();return;} show(cur+1); },900);
+}
+
+$('build').onclick=build;
+$('next').onclick=()=>{stopPlay();show(cur+1);};
+$('prev').onclick=()=>{stopPlay();show(cur-1);};
+$('play').onclick=togglePlay;
+$('reset').onclick=()=>{stopPlay();show(0);};
+document.querySelectorAll('[data-preset]').forEach(button=>{
+  button.onclick=()=>{ $('numsIn').value=button.dataset.preset; build(); };
+});
+document.addEventListener('keydown',e=>{
+  if(e.key==='ArrowRight'){stopPlay();show(cur+1);}
+  if(e.key==='ArrowLeft'){stopPlay();show(cur-1);}
+  if(e.key===' '){e.preventDefault();togglePlay();}
+});
+build();
+</script>
+</body>
+</html>

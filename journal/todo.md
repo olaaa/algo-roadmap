@@ -3,7 +3,8 @@
 Легенда: [ ] не начато · [~] в работе · [x] сделано
 
 ## Реализация блоков (по ядру из algo-prep-plan.md)
-- [x] Блок 1. Массивы, два указателя (4 класса, проверено 16/16 PASS)
+- [x] Блок 1. Массивы, два указателя (5 классов: TwoSumSorted, ReverseArray,
+      ValidPalindrome, MergeSortedArray — 16/16 PASS; MoveZeroes — 9/9 PASS)
 - [~] Блок 2. Строки + стек: ValidParentheses [x] (32/32 PASS, +виз.),
       ValidAnagram [x] (40/40 PASS, +виз.), ReverseString [ ], FirstUniqueChar [ ]
 - [~] Блок 3. Хеш-таблицы: TwoSum [x] (7/7 PASS, +Pattern_HashMap.md +виз.),
@@ -34,7 +35,8 @@
       из главы «C и C++».
 
 - [~] Визуализации для остальных задач блока 1: MergeSortedArray [x],
-      ValidPalindrome [ ] (шаблон и рецепт — в progress.md, запись 2026-07-06).
+      ValidPalindrome [ ], MoveZeroes [x] (шаблон и рецепт — в progress.md,
+      запись 2026-07-06).
       Имя файла — <Класс>.html в docs/visualizations/blockNN_<тема>/
       (старое «.viz.html» из записи 2026-07-06 отменено 2026-07-10).
 
