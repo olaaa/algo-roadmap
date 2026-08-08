@@ -1,5 +1,7 @@
 # 20. Valid Parentheses
 
+parentheses [pəˈrenθəsiːz] — множественное число; единственное parenthesis [pəˈrenθəsɪs]
+
 *Корректная скобочная последовательность*
 
 **Сложность:** Easy · **Паттерн:** стек · **Класс:** `block02_strings_stack.ValidParentheses`

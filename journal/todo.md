@@ -5,7 +5,7 @@
 ## Реализация блоков (по ядру из algo-prep-plan.md)
 - [x] Блок 1. Массивы, два указателя (4 класса, проверено 16/16 PASS)
 - [~] Блок 2. Строки + стек: ValidParentheses [x] (32/32 PASS, +виз.),
-      ValidAnagram [ ], ReverseString [ ], FirstUniqueChar [ ]
+      ValidAnagram [x] (40/40 PASS, +виз.), ReverseString [ ], FirstUniqueChar [ ]
 - [~] Блок 3. Хеш-таблицы: TwoSum [x] (7/7 PASS, +Pattern_HashMap.md +виз.),
       ContainsDuplicate [ ], GroupAnagrams [ ], MajorityElement [ ]
 - [ ] Блок 4. Скользящее окно (LongestSubstringNoRepeat, MaxAverageSubarray)
@@ -30,7 +30,8 @@
 - [~] Собрать Блок 2 «Строки + стек» — ПО ОДНОЙ ЗАДАЧЕ за подход, а не все четыре
       сразу. Для каждой: класс + docs/problems/.md + тесты в main() + компиляция
       и прогон, потом визуализация. Порядок — по договорённости с Lela.
-      Следующая по блоку 2: ValidAnagram (242), опора в книге — задача 1.2.
+      Следующая по блоку 2: ReverseString (344), опора в книге — задача 12.2
+      из главы «C и C++».
 
 - [~] Визуализации для остальных задач блока 1: MergeSortedArray [x],
       ValidPalindrome [ ] (шаблон и рецепт — в progress.md, запись 2026-07-06).
