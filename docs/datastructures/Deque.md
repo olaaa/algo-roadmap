@@ -70,8 +70,8 @@ public class PriorityQueue<E> extends AbstractQueue<E> implements Serializable
 
 Практическая разница:
 
-| | `Queue` | `Deque` |
-|---|---------|---------|
+| Свойство | `Queue` | `Deque` |
+|----------|---------|---------|
 | Вставка | только в хвост | в оба конца |
 | Извлечение | только из головы | из обоих концов |
 | Дисциплина | FIFO | FIFO **и** LIFO — как захочешь |

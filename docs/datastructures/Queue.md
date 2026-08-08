@@ -104,22 +104,7 @@ poll-поток  -> 1 2 3 4 5             // а вот это уже по воз
 
 ## Где очередь нужна в алгоритмах
 
-Главное применение в задачах на собеседовании — **обход в ширину (BFS)**. Очередь хранит фронт волны: снимаем вершину с головы, кладём её непосещённых соседей в хвост. Именно FIFO гарантирует, что вершины обрабатываются по слоям и первый найденный путь оказывается кратчайшим по числу рёбер.
-
-```java
-Queue<Node> frontier = new ArrayDeque<>();
-frontier.offer(start);
-while (!frontier.isEmpty()) {
-    Node current = frontier.poll();
-    for (Node next : current.neighbours()) {
-        if (visited.add(next)) {
-            frontier.offer(next);
-        }
-    }
-}
-```
-
-Замени очередь на стек — и тот же код превратится в обход в глубину.
+Главное применение в задачах на собеседовании — **обход в ширину (breadth-first search, BFS)**. Очередь хранит фронт волны: снимаем вершину с головы, кладём её непосещённых соседей в хвост. Именно FIFO гарантирует, что вершины обрабатываются по слоям и первый найденный путь оказывается кратчайшим по числу рёбер — на стеке это свойство теряется. Код и разбор — в [`Pattern_GraphTraversal.md`](../problems/block06_trees_graphs/Pattern_GraphTraversal.md).
 
 Второе применение — скользящее окно и обработка потока задач, где важен порядок поступления.
 
@@ -143,5 +128,6 @@ while (!frontier.isEmpty()) {
 ## См. также
 
 - [`Deque.md`](Deque.md) — двусторонняя очередь, `ArrayDeque` изнутри, сравнение с `Queue`
+- [`Pattern_GraphTraversal.md`](../problems/block06_trees_graphs/Pattern_GraphTraversal.md) — обходы графа DFS и BFS: код, кратчайший путь, `visited`
 - Задача с использованием стека: [`docs/problems/block02_strings_stack/ValidParentheses.md`](../problems/block02_strings_stack/ValidParentheses.md)
 - Официальная документация: <https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/Queue.html>
