@@ -37,7 +37,9 @@ public class ValidParentheses {
             if (isOpening(currentBracket)) {
                 openBrackets.push(currentBracket);
             } else {
+   // закрывающая скобка
                 if (openBrackets.isEmpty()) {
+// открывающих не было -- выходим
                     return false;
                 }
                 char lastOpened = openBrackets.pop();
@@ -46,6 +48,8 @@ public class ValidParentheses {
                 }
             }
         }
+// работа считается сделанной, только если стек пуст, то
+// есть каждая открытая скобка нашла свою пару
         return openBrackets.isEmpty();
     }
 
@@ -64,12 +68,15 @@ public class ValidParentheses {
                 expectedClosing.push(']');
             } else if (currentBracket == '{') {
                 expectedClosing.push('}');
+//  пришла закрывающая
             } else {
-                if (expectedClosing.isEmpty() || expectedClosing.pop() != currentBracket) {
+                if (expectedClosing.isEmpty() || (expectedClosing.pop() != currentBracket)) {
                     return false;
                 }
             }
         }
+
+// остались закрывающие скобки, которые ожидались, но которых не подали на вход
         return expectedClosing.isEmpty();
     }
 
