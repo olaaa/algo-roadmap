@@ -33,7 +33,15 @@ public class MoveZeroes {
         /* Первый проход: сдвигаем все ненулевые элементы влево, сохраняя их порядок. */
         for (int readIndex = 0; readIndex < nums.length; readIndex++) {
             if (nums[readIndex] != 0) {
-                nums[writeIndex] = nums[readIndex];
+                /*
+                 * Пока ни одного нуля не встретилось, writeIndex идёт вровень
+                 * с readIndex, и запись означала бы «положить элемент туда, где
+                 * он и так лежит». Условие отсекает эти холостые записи: на
+                 * массиве без нулей первый проход не пишет в память ни разу.
+                 */
+                if (writeIndex != readIndex) {
+                    nums[writeIndex] = nums[readIndex];
+                }
                 writeIndex++;
             }
             /*
