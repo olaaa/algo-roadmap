@@ -10,9 +10,10 @@ import java.util.Arrays;
  * элементов. Работаем на месте (in-place): readIndex просматривает все элементы,
  * writeIndex отмечает позицию для следующего ненулевого. Время O(n), память O(1).
  * <p>
- * Для сравнения тут же оставлен метод-baseline {@link #moveZeroesSwapping}
- * — наивный обмен с ближайшим ненулевым справа за O(n²), с которого на
- * собеседовании стартуют, а потом ускоряют до двух указателей.
+ * Рядом лежат ещё две реализации. {@link #moveZeroesOnePass} — тот же O(n),
+ * но в один проход через обмен элементов, без досыпки нулей в конце.
+ * {@link #moveZeroesSwapping} — наивный baseline за O(n²), обмен с ближайшим
+ * ненулевым справа: с него на собеседовании стартуют, а потом ускоряют.
  * <p>
  * Полное условие, примеры и ограничения:
  * {@code docs/problems/block01_arrays_twopointers/MoveZeroes.md}
@@ -61,6 +62,33 @@ public class MoveZeroes {
             writeIndex++;
         }
 
+    }
+
+    /*
+     * Тот же O(n), но в один проход: вместо копирования с последующей досыпкой
+     * нулей меняем элементы местами. В момент обмена в nums[writeIndex] заведомо
+     * лежит ноль — все позиции между writeIndex и readIndex это пропущенные нули,
+     * — поэтому обмен ставит ненулевой элемент на своё место, а ноль уезжает
+     * туда, откуда элемент забрали. Второй цикл не нужен.
+     * Условие writeIndex != readIndex здесь тоже обязательно: без него элемент
+     * менялся бы сам с собой, а это три лишние операции вместо нуля.
+     * Плата за отказ от второго цикла — число записей: обмен пишет ДВЕ ячейки
+     * на каждый ненулевой элемент, тогда как основной вариант пишет одну на
+     * элемент плюс по одной на каждый ноль.
+     */
+    public static void moveZeroesOnePass(int[] nums) {
+//  writeIndex указывает на начало зоны с нулями
+        int writeIndex = 0;
+        for (int readIndex = 0; readIndex < nums.length; readIndex++) {
+            if (nums[readIndex] != 0) {
+                if (writeIndex != readIndex) {
+                    int temp = nums[writeIndex];
+                    nums[writeIndex] = nums[readIndex];
+                    nums[readIndex] = temp;
+                }
+                writeIndex++;
+            }
+        }
     }
 
     /*
@@ -117,25 +145,30 @@ public class MoveZeroes {
          * Обе реализации прогоняются по одному и тому же набору. Массив каждый
          * раз копируется, потому что обе меняют его на месте.
          */
-        record TestCase(int[] input, int[] expected, String name) {}
+        record TestCase(int[] input, int[] expected, String name) {
+        }
 
         TestCase[] testCases = {
-            new TestCase(new int[]{0, 1, 0, 3, 12}, new int[]{1, 3, 12, 0, 0}, "обычный случай: нули вперемешку"),
-            new TestCase(new int[]{1, 2, 3}, new int[]{1, 2, 3}, "нулей нет — массив не меняется"),
-            new TestCase(new int[]{0, 0, 0}, new int[]{0, 0, 0}, "все элементы нулевые"),
-            new TestCase(new int[]{}, new int[]{}, "пустой массив"),
-            new TestCase(new int[]{0}, new int[]{0}, "один элемент — ноль"),
-            new TestCase(new int[]{5}, new int[]{5}, "один элемент — не ноль"),
-            new TestCase(new int[]{1, 0}, new int[]{1, 0}, "ноль уже в конце"),
-            new TestCase(new int[]{0, 7, 0, 0, 3, 1}, new int[]{7, 3, 1, 0, 0, 0}, "относительный порядок сохранён"),
-            new TestCase(new int[]{-1, 0, -2}, new int[]{-1, -2, 0}, "отрицательные числа не считаются нулями"),
-            new TestCase(new int[]{0, 0, 1}, new int[]{1, 0, 0}, "нули подряд в начале"),
+                new TestCase(new int[]{0, 1, 0, 3, 12}, new int[]{1, 3, 12, 0, 0}, "обычный случай: нули вперемешку"),
+                new TestCase(new int[]{1, 2, 3}, new int[]{1, 2, 3}, "нулей нет — массив не меняется"),
+                new TestCase(new int[]{0, 0, 0}, new int[]{0, 0, 0}, "все элементы нулевые"),
+                new TestCase(new int[]{}, new int[]{}, "пустой массив"),
+                new TestCase(new int[]{0}, new int[]{0}, "один элемент — ноль"),
+                new TestCase(new int[]{5}, new int[]{5}, "один элемент — не ноль"),
+                new TestCase(new int[]{1, 0}, new int[]{1, 0}, "ноль уже в конце"),
+                new TestCase(new int[]{0, 7, 0, 0, 3, 1}, new int[]{7, 3, 1, 0, 0, 0}, "относительный порядок сохранён"),
+                new TestCase(new int[]{-1, 0, -2}, new int[]{-1, -2, 0}, "отрицательные числа не считаются нулями"),
+                new TestCase(new int[]{0, 0, 1}, new int[]{1, 0, 0}, "нули подряд в начале"),
         };
 
         for (TestCase testCase : testCases) {
             int[] swapped = testCase.input().clone();
             moveZeroesSwapping(swapped);
             check(Arrays.equals(swapped, testCase.expected()), "Swapping: " + testCase.name());
+
+            int[] onePass = testCase.input().clone();
+            moveZeroesOnePass(onePass);
+            check(Arrays.equals(onePass, testCase.expected()), "OnePass: " + testCase.name());
 
             int[] twoPointers = testCase.input().clone();
             moveZeroes(twoPointers);
