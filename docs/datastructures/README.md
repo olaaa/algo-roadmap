@@ -11,6 +11,7 @@
 | [`Queue.md`](Queue.md) | Интерфейс `Queue`, шесть методов в двух вариантах, `PriorityQueue`, блокирующие очереди, роль в BFS |
 | [`Deque.md`](Deque.md) | Интерфейс `Deque`, отличия от `Queue`, три группы методов, `ArrayDeque` изнутри, почему `Stack` не нужен |
 | [`Stack.md`](Stack.md) | Стек как абстрактный тип данных, соотношение со стеком/очередью/деком, чем плох `java.util.Stack`, рекурсия ↔ явный стек, монотонный стек |
+| [`String.md`](String.md) | Неизменяемость и compact strings, `char` как кодовая единица UTF-16, суррогатные пары, `length()` против `codePointCount()`, безопасная нарезка через `offsetByCodePoints`, `equals` против `==` |
 
 ## Соглашения
 
