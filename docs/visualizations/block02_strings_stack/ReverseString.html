@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reverse String — визуализация встречных указателей</title>
+<style>
+  :root{
+    --bg:#0f1117; --panel:#171a23; --cell:#232733; --line:#2e3342;
+    --txt:#e6e8ee; --muted:#8b90a0; --accent:#4f8cff; --cur:#38bdf8; --comp:#fbbf24;
+    --ok:#34d399; --miss:#fb7185; --code:#c7d0e0;
+    --mono:"JetBrains Mono",Consolas,Menlo,monospace;
+    --sans:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--txt);font-family:var(--sans);
+       display:flex;flex-direction:column;align-items:center;min-height:100vh;padding:24px}
+  h1{font-size:18px;font-weight:600;margin:0 0 2px}
+  .sub{color:var(--muted);font-size:13px;margin-bottom:20px;max-width:780px;text-align:center}
+  .stage{width:min(900px,100%);background:var(--panel);border:1px solid var(--line);
+         border-radius:14px;padding:26px 22px}
+  .setup{display:flex;gap:16px;flex-wrap:wrap;align-items:flex-end;margin-bottom:18px}
+  .setup label{display:flex;flex-direction:column;gap:5px;font-size:12px;color:var(--muted)}
+  .setup input{font-family:var(--mono);font-size:14px;background:var(--cell);
+       border:1px solid var(--line);color:var(--txt);border-radius:8px;padding:8px 10px;width:260px}
+  .btn{font-family:var(--sans);font-size:13px;font-weight:500;cursor:pointer;
+       background:var(--cell);border:1px solid var(--line);color:var(--txt);
+       border-radius:8px;padding:9px 14px;transition:.15s}
+  .btn:hover{border-color:var(--accent)}
+  .btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+  .btn:disabled{opacity:.4;cursor:not-allowed}
+  .preset{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:20px}
+  .preset .btn{padding:6px 11px;font-family:var(--mono);font-size:12px}
+
+  .array{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:26px 0 8px;min-height:110px}
+  .col{display:flex;flex-direction:column;align-items:center;gap:6px}
+  .ptr{height:20px;font-family:var(--mono);font-size:12px;font-weight:700;color:var(--cur)}
+  .cell{width:52px;height:52px;border-radius:10px;background:var(--cell);
+        border:2px solid var(--line);display:flex;align-items:center;justify-content:center;
+        font-family:var(--mono);font-size:22px;transition:.25s}
+  .cell.active{border-color:var(--cur);box-shadow:0 0 0 3px rgba(56,189,248,.15)}
+  .cell.swapped{border-color:var(--ok);background:rgba(52,211,153,.15)}
+  .cell.done{opacity:.5}
+  .cell.middle{border-color:var(--comp);background:rgba(251,191,36,.15)}
+  .idx{font-family:var(--mono);font-size:11px;color:var(--muted)}
+
+  .status{min-height:26px;text-align:center;font-family:var(--mono);font-size:14px;margin:16px 0 6px}
+  .status .op{color:var(--code)}
+  .status .good{color:var(--ok)} .status .comp{color:var(--comp)}
+
+  .controls{position:sticky;top:8px;z-index:5;display:flex;gap:10px;justify-content:center;
+            align-items:center;flex-wrap:wrap;margin:10px 0 4px;padding:9px 10px;
+            background:rgba(23,26,35,.94);border:1px solid var(--line);border-radius:10px}
+  .step-info{color:var(--muted);font-size:12px;font-family:var(--mono);min-width:96px;text-align:center}
+
+  .codebox{background:#0b0d13;border:1px solid var(--line);border-radius:10px;
+           padding:14px 16px;font-family:var(--mono);font-size:12.5px;line-height:1.7;overflow:auto;margin-top:18px}
+  .codebox .ln{display:block;padding:0 6px;border-radius:4px;color:var(--code);white-space:pre}
+  .codebox .ln.active{background:rgba(79,140,255,.18)}
+  .kw{color:#c792ea}.num{color:#f78c6c}
+
+  .note{width:min(900px,100%);background:var(--panel);border:1px solid var(--line);border-radius:14px;
+        padding:18px 22px;margin-top:16px;font-family:var(--mono);font-size:12.5px;color:var(--muted);line-height:1.85}
+  .note .note-h{font-family:var(--sans);font-size:13px;font-weight:600;color:var(--txt);margin-bottom:9px}
+  .note b{color:var(--code);font-weight:600}
+</style>
+</head>
+<body>
+  <h1>Reverse String — два указателя навстречу</h1>
+  <div class="sub">Указатели идут с концов и на каждом шаге меняют символы местами. Итераций ровно <b>n/2</b>: каждый обмен ставит на места сразу два символа (LeetCode 344).</div>
+
+  <div class="stage">
+    <div class="setup">
+      <label>Строка
+        <input id="strIn" type="text" value="hello">
+      </label>
+      <button class="btn primary" id="build">Построить</button>
+    </div>
+
+    <div class="preset">
+      <button class="btn" data-s="hello">hello — нечётная</button>
+      <button class="btn" data-s="Hannah">Hannah — чётная</button>
+      <button class="btn" data-s="abc">abc</button>
+      <button class="btn" data-s="ab">ab — одна итерация</button>
+      <button class="btn" data-s="a">a — цикл не начнётся</button>
+      <button class="btn" data-s="aba">aba — палиндром</button>
+    </div>
+
+    <div class="array" id="array"></div>
+
+    <div class="status" id="status"></div>
+
+    <div class="controls">
+      <button class="btn" id="prev">◀ Назад</button>
+      <span class="step-info" id="stepInfo">шаг 0 / 0</span>
+      <button class="btn" id="next">Вперёд ▶</button>
+      <button class="btn" id="play">▶ Авто</button>
+      <button class="btn" id="reset">⟲ Сброс</button>
+    </div>
+
+    <div class="codebox" id="code"></div>
+  </div>
+
+  <div class="note">
+    <div class="note-h">На что смотреть</div>
+    <b>Условие цикла строгое:</b> <b>leftIndex &lt; rightIndex</b>, а не <b>&le;</b>. На нечётной длине указатели сходятся в одной точке — центральный символ менять сам с собой не нужно, он подсвечен жёлтым.<br>
+    <b>На чётной длине</b> указатели никогда не совпадают: они перескакивают друг через друга сразу после последнего обмена.<br>
+    <b>Временная переменная обязательна.</b> Без неё первое присваивание затрёт значение, которое ещё понадобится второму.
+  </div>
+
+<script>
+const $ = id => document.getElementById(id);
+let chars=[], steps=[], cur=0, timer=null;
+
+const CODE = [
+  {t:`<span class="kw">int</span> leftIndex = <span class="num">0</span>;`, line:'init'},
+  {t:`<span class="kw">int</span> rightIndex = s.length - <span class="num">1</span>;`, line:'init'},
+  {t:`<span class="kw">while</span> (leftIndex &lt; rightIndex) {`, line:'cond'},
+  {t:`    <span class="kw">char</span> temp = s[leftIndex];`, line:'swap'},
+  {t:`    s[leftIndex] = s[rightIndex];`, line:'swap'},
+  {t:`    s[rightIndex] = temp;`, line:'swap'},
+  {t:`    leftIndex++;`, line:'move'},
+  {t:`    rightIndex--;`, line:'move'},
+  {t:`}`, line:'end'},
+];
+
+function buildSteps(){
+  steps=[];
+  const working = [...chars];
+  let leftIndex = 0;
+  let rightIndex = working.length - 1;
+
+  steps.push({state:[...working], leftIndex, rightIndex, line:'init',
+              msg:`leftIndex = ${leftIndex}, rightIndex = ${rightIndex}`});
+
+  while (leftIndex < rightIndex) {
+    steps.push({state:[...working], leftIndex, rightIndex, line:'cond', active:true,
+                msg:`${leftIndex} < ${rightIndex} — меняем '${working[leftIndex]}' и '${working[rightIndex]}'`});
+    const temp = working[leftIndex];
+    working[leftIndex] = working[rightIndex];
+    working[rightIndex] = temp;
+    steps.push({state:[...working], leftIndex, rightIndex, line:'swap', swapped:true,
+                msg:`обмен выполнен: теперь [${leftIndex}] = '${working[leftIndex]}', [${rightIndex}] = '${working[rightIndex]}'`});
+    leftIndex++;
+    rightIndex--;
+    steps.push({state:[...working], leftIndex, rightIndex, line:'move',
+                msg:`сдвигаем оба: leftIndex = ${leftIndex}, rightIndex = ${rightIndex}`});
+  }
+
+  const middle = (leftIndex === rightIndex) ? leftIndex : -1;
+  steps.push({state:[...working], leftIndex, rightIndex, line:'end', done:true, middle,
+              msg: middle >= 0
+                ? `✓ ${leftIndex} = ${rightIndex} — указатели сошлись, центральный символ '${working[middle]}' менять не с чем`
+                : `✓ ${leftIndex} > ${rightIndex} — указатели перескочили друг через друга, разворот закончен`});
+}
+
+function renderArray(s){
+  const wrap=$('array'); wrap.innerHTML='';
+  if(s.state.length===0){
+    const box=document.createElement('div');
+    box.style.cssText='font-family:var(--mono);font-size:13px;color:var(--muted);padding:38px 0';
+    box.textContent='пустой массив — цикл не начнётся';
+    wrap.append(box);
+    return;
+  }
+  s.state.forEach((ch,i)=>{
+    const col=document.createElement('div'); col.className='col';
+    const ptr=document.createElement('div'); ptr.className='ptr';
+    if(i===s.leftIndex && i===s.rightIndex){ ptr.textContent='L R'; }
+    else if(i===s.leftIndex){ ptr.textContent='L'; }
+    else if(i===s.rightIndex){ ptr.textContent='R'; }
+    const cell=document.createElement('div'); cell.className='cell';
+    cell.textContent = ch === ' ' ? '␣' : ch;
+    if(s.done && s.middle===i){
+      cell.classList.add('middle');
+    } else if(s.swapped && (i===s.leftIndex || i===s.rightIndex)){
+      cell.classList.add('swapped');
+    } else if(s.active && (i===s.leftIndex || i===s.rightIndex)){
+      cell.classList.add('active');
+    } else if(i<s.leftIndex || i>s.rightIndex){
+      cell.classList.add('done');
+    }
+    const idx=document.createElement('div'); idx.className='idx'; idx.textContent=i;
+    col.append(ptr,cell,idx); wrap.append(col);
+  });
+}
+
+function renderCode(active){
+  $('code').innerHTML = CODE.map(c=>
+    `<span class="ln ${c.line===active?'active':''}">${c.t}</span>`).join('');
+}
+
+function show(idx){
+  cur=Math.max(0,Math.min(idx,steps.length-1));
+  const s=steps[cur];
+  renderArray(s); renderCode(s.line);
+  const cls = s.done ? 'good' : s.swapped ? 'comp' : 'op';
+  $('status').innerHTML=`<span class="${cls}">${s.msg}</span>`;
+  $('stepInfo').textContent=`шаг ${cur+1} / ${steps.length}`;
+  $('prev').disabled=cur===0; $('next').disabled=cur===steps.length-1;
+}
+
+function build(){
+  stopPlay();
+  chars=[...$('strIn').value];
+  buildSteps(); show(0);
+}
+function stopPlay(){ if(timer){clearInterval(timer);timer=null;$('play').textContent='▶ Авто';} }
+function togglePlay(){
+  if(timer){stopPlay();return;}
+  if(cur>=steps.length-1) show(0);
+  $('play').textContent='⏸ Пауза';
+  timer=setInterval(()=>{ if(cur>=steps.length-1){stopPlay();return;} show(cur+1); },800);
+}
+
+$('build').onclick=build;
+$('next').onclick=()=>{stopPlay();show(cur+1);};
+$('prev').onclick=()=>{stopPlay();show(cur-1);};
+$('play').onclick=togglePlay;
+$('reset').onclick=()=>{stopPlay();show(0);};
+document.querySelectorAll('.preset .btn').forEach(b=>{
+  b.onclick=()=>{ $('strIn').value=b.dataset.s; build(); };
+});
+document.addEventListener('keydown',e=>{
+  if(e.target.tagName==='INPUT') return;
+  if(e.key==='ArrowRight'){stopPlay();show(cur+1);}
+  if(e.key==='ArrowLeft'){stopPlay();show(cur-1);}
+  if(e.key===' '){e.preventDefault();togglePlay();}
+});
+build();
+</script>
+</body>
+</html>

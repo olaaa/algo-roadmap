@@ -6,7 +6,8 @@
 - [x] Блок 1. Массивы, два указателя (5 классов: TwoSumSorted, ReverseArray,
       ValidPalindrome, MergeSortedArray — 16/16 PASS; MoveZeroes — 9/9 PASS)
 - [~] Блок 2. Строки + стек: ValidParentheses [x] (32/32 PASS, +виз.),
-      ValidAnagram [x] (40/40 PASS, +виз.), ReverseString [ ], FirstUniqueChar [ ]
+      ValidAnagram [x] (40/40 PASS, +виз.), ReverseString [x] (10/10 PASS, +виз.),
+      FirstUniqueChar [ ]
 - [~] Блок 3. Хеш-таблицы: TwoSum [x] (7/7 PASS, +Pattern_HashMap.md +виз.),
       ContainsDuplicate [ ], GroupAnagrams [ ], MajorityElement [ ]
 - [ ] Блок 4. Скользящее окно (LongestSubstringNoRepeat, MaxAverageSubarray)
@@ -31,8 +32,7 @@
 - [~] Собрать Блок 2 «Строки + стек» — ПО ОДНОЙ ЗАДАЧЕ за подход, а не все четыре
       сразу. Для каждой: класс + docs/problems/.md + тесты в main() + компиляция
       и прогон, потом визуализация. Порядок — по договорённости с Lela.
-      Следующая по блоку 2: ReverseString (344), опора в книге — задача 12.2
-      из главы «C и C++».
+      Следующая по блоку 2: FirstUniqueChar (387) — последняя, после неё блок закрыт.
 
 - [~] Визуализации для остальных задач блока 1: MergeSortedArray [x],
       ValidPalindrome [ ], MoveZeroes [x] (шаблон и рецепт — в progress.md,
@@ -44,11 +44,10 @@
 - [x] Queue — интерфейс, шесть методов, PriorityQueue, блокирующие очереди
 - [x] Deque — отличия от Queue, ArrayDeque изнутри, стек вместо java.util.Stack
 - [x] Stack — абстрактный тип данных, рекурсия ↔ явный стек, монотонный стек
-- [ ] Решить судьбу ASCII-графики: в Deque.md схемы переведены с SVG на ASCII
-      (кроме кольцевого массива). Если приживётся — перевести Queue.md и Stack.md
-      и поправить соглашение про иллюстрации в CLAUDE.md.
-      До этого решения НИЧЕГО из docs/datastructures/img/ не удалять, даже
-      неиспользуемые файлы (deque-both-ends.svg).
+- [x] Судьба ASCII-графики РЕШЕНА: не распространяем. Deque.md остаётся
+      единственным файлом с ASCII-схемами, Queue.md и Stack.md живут на SVG.
+      Соглашение в CLAUDE.md («иллюстрации — отдельными .svg») не меняем.
+      Из docs/datastructures/img/ ничего не удаляем.
 - [ ] HashMap / HashSet — хеширование, коллизии, treeify, equals+hashCode
 - [ ] ArrayList vs LinkedList — рост массива, когда что брать
 - [ ] TreeMap / TreeSet — красно-чёрное дерево, навигационные методы
