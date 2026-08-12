@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 416" width="680" height="416" font-family="system-ui, -apple-system, Segoe UI, sans-serif">
+  <rect width="680" height="416" fill="#fbfcfe"/>
+  <defs>
+    <marker id="ah" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto">
+      <path d="M0,0 L10,4 L0,8 z" fill="#6b7280"/>
+    </marker>
+  </defs>
+
+  <text x="40" y="34" font-size="14" font-weight="600" fill="#1c2333">стек потока (thread stack)</text>
+  <text x="370" y="34" font-size="14" font-weight="600" fill="#1c2333">куча (heap)</text>
+
+  <rect x="40" y="52" width="280" height="270" rx="8" fill="#e8f0ff" stroke="#4f8cff" stroke-width="2"/>
+  <text x="56" y="78" font-size="14" font-weight="600" fill="#1c2333">кадр метода isAnagram (frame)</text>
+  <text x="56" y="104" font-size="13" fill="#1c2333">локальные переменные (locals)</text>
+  <text x="292" y="124" font-size="13" fill="#6b7280" text-anchor="end">значение</text>
+
+  <rect x="56" y="132" width="248" height="34" rx="8" fill="#ffffff" stroke="#b9c2d4" stroke-width="1.5"/>
+  <text x="72" y="154" font-size="13" fill="#1c2333">слот № 0</text>
+  <text x="144" y="154" font-size="13" fill="#1c2333">s</text>
+  <text x="292" y="154" font-size="13" fill="#1c2333" text-anchor="end">ссылка</text>
+
+  <rect x="56" y="172" width="248" height="34" rx="8" fill="#ffffff" stroke="#b9c2d4" stroke-width="1.5"/>
+  <text x="72" y="194" font-size="13" fill="#1c2333">слот № 1</text>
+  <text x="144" y="194" font-size="13" fill="#1c2333">letterCounts</text>
+  <text x="292" y="194" font-size="13" fill="#1c2333" text-anchor="end">ссылка</text>
+
+  <rect x="56" y="212" width="248" height="34" rx="8" fill="#ffffff" stroke="#b9c2d4" stroke-width="1.5"/>
+  <text x="72" y="234" font-size="13" fill="#1c2333">слот № 2</text>
+  <text x="144" y="234" font-size="13" fill="#1c2333">currentIndex</text>
+  <text x="292" y="234" font-size="13" fill="#1c2333" text-anchor="end">3</text>
+
+  <text x="56" y="272" font-size="13" fill="#1c2333">стек операндов (operand stack)</text>
+  <rect x="56" y="280" width="248" height="34" rx="8" fill="#ffffff" stroke="#b9c2d4" stroke-width="1.5"/>
+  <rect x="68" y="286" width="104" height="22" rx="6" fill="#eef2f9" stroke="#b9c2d4" stroke-width="1.2"/>
+  <text x="120" y="302" font-size="13" fill="#1c2333" text-anchor="middle">ссылка</text>
+  <rect x="180" y="286" width="104" height="22" rx="6" fill="#eef2f9" stroke="#b9c2d4" stroke-width="1.2"/>
+  <text x="232" y="302" font-size="13" fill="#1c2333" text-anchor="middle">1</text>
+
+  <rect x="40" y="340" width="280" height="56" rx="8" fill="#eef2f9" stroke="#b9c2d4" stroke-width="2"/>
+  <text x="56" y="374" font-size="14" font-weight="600" fill="#1c2333">кадр метода main (frame)</text>
+
+  <rect x="370" y="52" width="270" height="64" rx="8" fill="#e6f7ef" stroke="#34a97a" stroke-width="2"/>
+  <text x="386" y="78" font-size="14" font-weight="600" fill="#1c2333">String</text>
+  <text x="386" y="102" font-size="13" fill="#1c2333">"aab"</text>
+
+  <rect x="370" y="140" width="270" height="180" rx="8" fill="#fff4e5" stroke="#e0a458" stroke-width="2"/>
+  <text x="386" y="168" font-size="14" font-weight="600" fill="#1c2333">int[26]</text>
+
+  <rect x="386" y="190" width="36" height="40" rx="6" fill="#ffffff" stroke="#b9c2d4" stroke-width="1.5"/>
+  <text x="404" y="216" font-size="13" fill="#1c2333" text-anchor="middle">2</text>
+  <rect x="426" y="190" width="36" height="40" rx="6" fill="#ffffff" stroke="#b9c2d4" stroke-width="1.5"/>
+  <text x="444" y="216" font-size="13" fill="#1c2333" text-anchor="middle">1</text>
+  <rect x="466" y="190" width="36" height="40" rx="6" fill="#ffffff" stroke="#b9c2d4" stroke-width="1.5"/>
+  <text x="484" y="216" font-size="13" fill="#1c2333" text-anchor="middle">0</text>
+  <rect x="506" y="190" width="36" height="40" rx="6" fill="#ffffff" stroke="#b9c2d4" stroke-width="1.5"/>
+  <text x="524" y="216" font-size="13" fill="#1c2333" text-anchor="middle">0</text>
+  <rect x="546" y="190" width="36" height="40" rx="6" fill="#ffffff" stroke="#b9c2d4" stroke-width="1.5"/>
+  <text x="564" y="216" font-size="13" fill="#1c2333" text-anchor="middle">0</text>
+  <rect x="586" y="190" width="36" height="40" rx="6" fill="#ffffff" stroke="#b9c2d4" stroke-width="1.5"/>
+  <text x="604" y="216" font-size="13" fill="#1c2333" text-anchor="middle">0</text>
+
+  <text x="404" y="252" font-size="13" fill="#6b7280" text-anchor="middle">0</text>
+  <text x="444" y="252" font-size="13" fill="#6b7280" text-anchor="middle">1</text>
+  <text x="484" y="252" font-size="13" fill="#6b7280" text-anchor="middle">2</text>
+  <text x="524" y="252" font-size="13" fill="#6b7280" text-anchor="middle">3</text>
+  <text x="564" y="252" font-size="13" fill="#6b7280" text-anchor="middle">4</text>
+  <text x="604" y="252" font-size="13" fill="#6b7280" text-anchor="middle">5</text>
+  <text x="386" y="292" font-size="13" fill="#1c2333">индекс № (index)</text>
+
+  <path d="M326,153 L366,92" stroke="#6b7280" stroke-width="2.5" fill="none" marker-end="url(#ah)"/>
+  <path d="M326,193 L366,198" stroke="#6b7280" stroke-width="2.5" fill="none" marker-end="url(#ah)"/>
+</svg>
