@@ -42,7 +42,9 @@ public class ValidAnagram {
         int[] letterCounts = new int[LOWERCASE_LETTER_COUNT];
         for (int currentIndex = 0; currentIndex < s.length(); currentIndex++) {
             letterCounts[s.charAt(currentIndex) - 'a']++;
+//            letterCounts[s.charAt(currentIndex) - 'a'] = letterCounts[s.charAt(currentIndex) - 'a'] + 1;
             letterCounts[t.charAt(currentIndex) - 'a']--;
+//            letterCounts[t.charAt(currentIndex) - 'a'] = letterCounts[t.charAt(currentIndex) - 'a'] - 1;
         }
         for (int count : letterCounts) {
             if (count != 0) {
