@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contains Duplicate — визуализация множества виденного</title>
+<style>
+  :root{
+    --bg:#0f1117; --panel:#171a23; --cell:#232733; --line:#2e3342;
+    --txt:#e6e8ee; --muted:#8b90a0; --accent:#4f8cff; --cur:#38bdf8; --comp:#fbbf24;
+    --ok:#34d399; --miss:#fb7185; --code:#c7d0e0;
+    --mono:"JetBrains Mono",Consolas,Menlo,monospace;
+    --sans:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--txt);font-family:var(--sans);
+       display:flex;flex-direction:column;align-items:center;min-height:100vh;padding:24px}
+  h1{font-size:18px;font-weight:600;margin:0 0 2px}
+  .sub{color:var(--muted);font-size:13px;margin-bottom:20px;max-width:820px;text-align:center}
+  .stage{width:min(960px,100%);background:var(--panel);border:1px solid var(--line);
+         border-radius:14px;padding:26px 22px}
+  .setup{display:flex;gap:16px;flex-wrap:wrap;align-items:flex-end;margin-bottom:18px}
+  .setup label{display:flex;flex-direction:column;gap:5px;font-size:12px;color:var(--muted)}
+  .setup input{font-family:var(--mono);font-size:14px;background:var(--cell);
+       border:1px solid var(--line);color:var(--txt);border-radius:8px;padding:8px 10px;width:300px}
+  .btn{font-family:var(--sans);font-size:13px;font-weight:500;cursor:pointer;
+       background:var(--cell);border:1px solid var(--line);color:var(--txt);
+       border-radius:8px;padding:9px 14px;transition:.15s}
+  .btn:hover{border-color:var(--accent)}
+  .btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+  .btn:disabled{opacity:.4;cursor:not-allowed}
+  .preset{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:20px}
+  .preset .btn{padding:6px 11px;font-family:var(--mono);font-size:12px}
+
+  .strwrap{margin:18px 0 6px}
+  .strlab{font-family:var(--mono);font-size:12px;color:var(--muted);margin-bottom:8px;text-align:center}
+  .cells{display:flex;gap:7px;flex-wrap:wrap;justify-content:center}
+  .ccell{display:flex;flex-direction:column;align-items:center;gap:4px}
+  .cell{min-width:46px;height:42px;padding:0 8px;border-radius:8px;background:var(--cell);
+        border:2px solid var(--line);display:flex;align-items:center;justify-content:center;
+        font-family:var(--mono);font-size:15px;transition:.2s}
+  .cell.done{opacity:.4}
+  .cell.added{border-color:var(--ok);background:rgba(52,211,153,.18)}
+  .cell.hit{border-color:var(--miss);background:rgba(251,113,133,.3);box-shadow:0 0 0 3px rgba(251,113,133,.16)}
+  .cell.twin{border-color:var(--comp);background:rgba(251,191,36,.2)}
+  .idx{font-family:var(--mono);font-size:10.5px;color:var(--muted)}
+  .idx.on{color:var(--cur)}
+
+  .setbox{background:#0b0d13;border:1px solid var(--line);border-radius:10px;padding:16px 18px}
+  .setbox .cap{font-size:12px;color:var(--muted);margin-bottom:14px;font-family:var(--mono)}
+  .setbox .cap b{color:var(--code);font-weight:600}
+  .chips{display:flex;gap:6px;flex-wrap:wrap;min-height:32px}
+  .chip{padding:5px 10px;border-radius:999px;background:var(--cell);border:1px solid var(--line);
+        font-family:var(--mono);font-size:13px;color:var(--txt);transition:.2s}
+  .chip.fresh{border-color:var(--ok);background:rgba(52,211,153,.2)}
+  .chip.clash{border-color:var(--miss);background:rgba(251,113,133,.28);font-weight:700}
+  .empty{color:var(--muted);font-family:var(--mono);font-size:12.5px}
+
+  .status{min-height:26px;text-align:center;font-family:var(--mono);font-size:14px;margin:16px 0 6px}
+  .status .op{color:var(--code)}
+  .status .good{color:var(--ok)} .status .comp{color:var(--comp)} .status .miss{color:var(--miss)}
+
+  .controls{position:sticky;top:8px;z-index:5;display:flex;gap:10px;justify-content:center;
+            align-items:center;flex-wrap:wrap;margin:10px 0 4px;padding:9px 10px;
+            background:rgba(23,26,35,.94);border:1px solid var(--line);border-radius:10px}
+  .step-info{color:var(--muted);font-size:12px;font-family:var(--mono);min-width:96px;text-align:center}
+
+  .codebox{background:#0b0d13;border:1px solid var(--line);border-radius:10px;
+           padding:14px 16px;font-family:var(--mono);font-size:12.5px;line-height:1.7;overflow:auto}
+  .codebox .ln{display:block;padding:0 6px;border-radius:4px;color:var(--code);white-space:pre}
+  .codebox .ln.active{background:rgba(79,140,255,.18)}
+  .kw{color:#c792ea}.num{color:#f78c6c}.cm{color:#5c6370}
+
+  .cols{display:flex;gap:18px;align-items:flex-start;margin-top:18px;flex-wrap:wrap}
+  .cols .setbox{flex:1 1 380px;min-width:0}
+  .cols .codebox{flex:1 1 380px;min-width:300px}
+
+  .note{width:min(960px,100%);background:var(--panel);border:1px solid var(--line);border-radius:14px;
+        padding:18px 22px;margin-top:16px;font-family:var(--mono);font-size:12.5px;color:var(--muted);line-height:1.85}
+  .note .note-h{font-family:var(--sans);font-size:13px;font-weight:600;color:var(--txt);margin-bottom:9px}
+  .note b{color:var(--code);font-weight:600}
+</style>
+</head>
+<body>
+  <h1>Contains Duplicate — множество виденного</h1>
+  <div class="sub">Идём по массиву и складываем значения в <b>HashSet</b>. Метод <b>add</b> возвращает <b>false</b>, если значение там уже лежит — это и есть найденный дубликат, дальше идти незачем (LeetCode 217).</div>
+
+  <div class="stage">
+    <div class="setup">
+      <label>Массив (числа через запятую)
+        <input id="numsIn" type="text" value="1, 2, 3, 1">
+      </label>
+      <button class="btn primary" id="build">Построить</button>
+    </div>
+
+    <div class="preset">
+      <button class="btn" data-nums="1, 2, 3, 1">1,2,3,1 — дубликат через весь массив</button>
+      <button class="btn" data-nums="1, 2, 3, 4">1,2,3,4 — все различны</button>
+      <button class="btn" data-nums="1, 1, 2, 3">1,1,2,3 — ранний выход</button>
+      <button class="btn" data-nums="1, 2, 3, 3">1,2,3,3 — дубликат в конце</button>
+      <button class="btn" data-nums="-1, -2, -1">-1,-2,-1 — отрицательные</button>
+      <button class="btn" data-nums="7">7 — один элемент</button>
+      <button class="btn" data-nums="">пустой массив</button>
+    </div>
+
+    <div class="strwrap">
+      <div class="strlab">массив nums — под каждой ячейкой её индекс</div>
+      <div class="cells" id="cells"></div>
+    </div>
+
+    <div class="status" id="status"></div>
+
+    <div class="controls">
+      <button class="btn" id="prev">◀ Назад</button>
+      <span class="step-info" id="stepInfo">шаг 0 / 0</span>
+      <button class="btn" id="next">Вперёд ▶</button>
+      <button class="btn" id="play">▶ Авто</button>
+      <button class="btn" id="reset">⟲ Сброс</button>
+    </div>
+
+    <div class="cols">
+      <div class="setbox">
+        <div class="cap">множество <b>seenValues</b> — значения, которые уже встретились</div>
+        <div class="chips" id="chips"></div>
+      </div>
+
+      <div class="codebox" id="code"></div>
+    </div>
+  </div>
+
+  <div class="note">
+    <div class="note-h">На что смотреть</div>
+    <b>Ответ возвращается сразу.</b> Нажми пресет <b>1,1,2,3</b>: цикл останавливается на индексе 1, оставшиеся элементы не просматриваются вовсе. Как только дубликат найден, ответ уже не изменится.<br>
+    <b>false живёт после цикла.</b> Утверждение задачи — «существует пара одинаковых», поэтому находка возвращается изнутри цикла, а <b>false</b> — только когда весь массив просмотрен. Частая ошибка — поставить <b>return false</b> внутрь, в ветку «этого значения ещё не было»: одно уникальное значение ничего не доказывает.<br>
+    <b>Одно обращение к таблице вместо двух.</b> <b>add</b> сам сообщает, был ли элемент — поэтому пара <b>contains</b> + <b>add</b> не нужна.
+  </div>
+
+<script>
+const $ = id => document.getElementById(id);
+let nums=[], steps=[], cur=0, timer=null;
+
+const CODE = [
+  {t:`Set&lt;Integer&gt; seenValues = <span class="kw">new</span> HashSet&lt;&gt;();`, line:'init'},
+  {t:`<span class="kw">for</span> (<span class="kw">int</span> currentValue : nums) {`, line:'for'},
+  {t:`    <span class="kw">if</span> (!seenValues.add(currentValue)) {`, line:'add'},
+  {t:`        <span class="kw">return true</span>;`, line:'retTrue'},
+  {t:`    }`, line:'endIf'},
+  {t:`}`, line:'endFor'},
+  {t:`<span class="kw">return false</span>;`, line:'retFalse'},
+];
+
+function buildSteps(){
+  steps=[];
+  const seen=[];
+
+  steps.push({i:-1, line:'init', seen:[...seen], msg:'заводим пустое множество'});
+
+  for(let i=0;i<nums.length;i++){
+    const value=nums[i];
+    steps.push({i, line:'for', seen:[...seen], msg:`берём nums[${i}] = ${value}`});
+
+    if(seen.includes(value)){
+      const twin=nums.indexOf(value);
+      steps.push({i, line:'add', seen:[...seen], clash:value, twin,
+                  msg:`add(${value}) вернул false — значение уже в множестве (впервые на индексе ${twin})`});
+      steps.push({i, line:'retTrue', seen:[...seen], clash:value, twin,
+                  done:true, result:true, good:true,
+                  msg:`✓ true: дубликат найден на индексе ${i}, остаток массива не смотрим`});
+      return;
+    }
+
+    seen.push(value);
+    steps.push({i, line:'add', seen:[...seen], fresh:value,
+                msg:`add(${value}) вернул true — значение новое, кладём в множество`});
+  }
+
+  steps.push({i:nums.length, line:'retFalse', seen:[...seen], done:true, result:false, bad:true,
+              msg: nums.length
+                    ? '✗ false: весь массив просмотрен, повторов нет'
+                    : '✗ false: массив пустой, цикл не начался'});
+}
+
+function renderCells(s){
+  const box=$('cells'); box.innerHTML='';
+  if(!nums.length){
+    box.innerHTML='<div class="empty">массив пуст</div>';
+    return;
+  }
+  for(let i=0;i<nums.length;i++){
+    const wrap=document.createElement('div'); wrap.className='ccell';
+    const cell=document.createElement('div'); cell.className='cell'; cell.textContent=nums[i];
+    if(i===s.i && s.clash!==undefined){
+      cell.classList.add('hit');
+    } else if(i===s.twin){
+      cell.classList.add('twin');
+    } else if(i===s.i && s.fresh!==undefined){
+      cell.classList.add('added');
+    } else if(i<s.i){
+      cell.classList.add('done');
+    }
+    const idx=document.createElement('div');
+    idx.className='idx' + (i===s.i ? ' on' : '');
+    idx.textContent=i;
+    wrap.append(cell,idx); box.append(wrap);
+  }
+}
+
+function renderSet(s){
+  const box=$('chips'); box.innerHTML='';
+  if(!s.seen.length){
+    box.innerHTML='<div class="empty">пусто</div>';
+    return;
+  }
+  for(const value of s.seen){
+    const chip=document.createElement('div'); chip.className='chip'; chip.textContent=value;
+    if(s.clash===value){
+      chip.classList.add('clash');
+    } else if(s.fresh===value){
+      chip.classList.add('fresh');
+    }
+    box.append(chip);
+  }
+}
+
+function renderCode(active){
+  $('code').innerHTML = CODE.map(c=>
+    `<span class="ln ${c.line===active?'active':''}">${c.t}</span>`).join('');
+}
+
+function show(idx){
+  cur=Math.max(0,Math.min(idx,steps.length-1));
+  const s=steps[cur];
+  renderCells(s); renderSet(s); renderCode(s.line);
+  const cls = s.good ? 'good' : s.bad ? 'miss' : s.clash!==undefined ? 'miss' : (s.fresh!==undefined ? 'comp' : 'op');
+  $('status').innerHTML=`<span class="${cls}">${s.msg}</span>`;
+  $('stepInfo').textContent=`шаг ${cur+1} / ${steps.length}`;
+  $('prev').disabled=cur===0; $('next').disabled=cur===steps.length-1;
+}
+
+function build(){
+  stopPlay();
+  nums = $('numsIn').value.split(',')
+      .map(part=>part.trim())
+      .filter(part=>part.length>0)
+      .map(Number)
+      .filter(value=>Number.isFinite(value));
+  $('numsIn').value = nums.join(', ');
+  buildSteps(); show(0);
+}
+function stopPlay(){ if(timer){clearInterval(timer);timer=null;$('play').textContent='▶ Авто';} }
+function togglePlay(){
+  if(timer){stopPlay();return;}
+  if(cur>=steps.length-1) show(0);
+  $('play').textContent='⏸ Пауза';
+  timer=setInterval(()=>{ if(cur>=steps.length-1){stopPlay();return;} show(cur+1); },700);
+}
+
+$('build').onclick=build;
+$('next').onclick=()=>{stopPlay();show(cur+1);};
+$('prev').onclick=()=>{stopPlay();show(cur-1);};
+$('play').onclick=togglePlay;
+$('reset').onclick=()=>{stopPlay();show(0);};
+document.querySelectorAll('.preset .btn').forEach(b=>{
+  b.onclick=()=>{ $('numsIn').value=b.dataset.nums; build(); };
+});
+document.addEventListener('keydown',e=>{
+  if(e.target.tagName==='INPUT') return;
+  if(e.key==='ArrowRight'){stopPlay();show(cur+1);}
+  if(e.key==='ArrowLeft'){stopPlay();show(cur-1);}
+  if(e.key===' '){e.preventDefault();togglePlay();}
+});
+build();
+</script>
+</body>
+</html>

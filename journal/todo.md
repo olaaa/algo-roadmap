@@ -13,7 +13,8 @@
       ПОМЕТКА: «[x]» у задачи ставим, только когда Lela закончила её изучать,
       а не когда код написан и прогнан. Написанный код — это [~].
 - [~] Блок 3. Хеш-таблицы: TwoSum [x] (7/7 PASS, +Pattern_HashMap.md +виз.),
-      ContainsDuplicate [ ], GroupAnagrams [ ], MajorityElement [ ]
+      ContainsDuplicate [~] код написан (14/14 PASS, +виз.), Lela разбирает,
+      GroupAnagrams [ ], MajorityElement [ ]
 - [ ] Блок 4. Скользящее окно (LongestSubstringNoRepeat, MaxAverageSubarray)
 - [ ] Блок 5. Бинарный поиск (BinarySearch, SearchInsertPosition)
 - [ ] Блок 6. Деревья и базовые графы (MaxDepth, SymmetricTree, BFS).
@@ -33,11 +34,12 @@
            со ссылкой, их формулировки тоже надо будет сверить.
 
 ## Следующий шаг
-- [~] Собрать Блок 2 «Строки + стек» — ПО ОДНОЙ ЗАДАЧЕ за подход, а не все четыре
-      сразу. Для каждой: класс + docs/problems/.md + тесты в main() + компиляция
-      и прогон, потом визуализация. Порядок — по договорённости с Lela.
-      Сейчас в работе: FirstUniqueChar (387) — последняя задача блока,
-      после неё блок 2 закрыт.
+- [~] ПО ОДНОЙ ЗАДАЧЕ за подход. Для каждой: класс + docs/problems/.md +
+      тесты в main() + компиляция и прогон + визуализация.
+      Блок 2 «Строки + стек» — все четыре задачи написаны, FirstUniqueChar
+      ещё разбирает Lela.
+      Сейчас в работе блок 3 «Хеш-таблицы»: ContainsDuplicate (217) написан.
+      Следующие: GroupAnagrams (49, Medium), MajorityElement (169).
 
 - [~] Визуализации для остальных задач блока 1: MergeSortedArray [x],
       ValidPalindrome [ ], MoveZeroes [x] (шаблон и рецепт — в progress.md,
