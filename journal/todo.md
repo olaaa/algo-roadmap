@@ -8,7 +8,8 @@
 - [~] Блок 2. Строки + стек: ValidParentheses [x] (32/32 PASS, +виз.),
       ValidAnagram [x] (40/40 PASS, +виз.),
       ReverseString [x] (10/10 PASS, +виз.),
-      FirstUniqueChar [~] код написан (27/27 PASS, +виз.), Lela разбирает
+      FirstUniqueChar [~] код написан (12/12 PASS) + FirstUniqueCharLinkedHashMap
+      (27/27 PASS), +виз., Lela разбирает
       ПОМЕТКА: «[x]» у задачи ставим, только когда Lela закончила её изучать,
       а не когда код написан и прогнан. Написанный код — это [~].
 - [~] Блок 3. Хеш-таблицы: TwoSum [x] (7/7 PASS, +Pattern_HashMap.md +виз.),
