@@ -86,10 +86,6 @@
   .cols .counters{flex:1 1 420px;min-width:0}
   .cols .codebox{flex:1 1 380px;min-width:300px}
 
-  .note{width:min(960px,100%);background:var(--panel);border:1px solid var(--line);border-radius:14px;
-        padding:18px 22px;margin-top:16px;font-family:var(--mono);font-size:12.5px;color:var(--muted);line-height:1.85}
-  .note .note-h{font-family:var(--sans);font-size:13px;font-weight:600;color:var(--txt);margin-bottom:9px}
-  .note b{color:var(--code);font-weight:600}
 </style>
 </head>
 <body>
@@ -142,13 +138,6 @@
 
       <div class="codebox" id="code"></div>
     </div>
-  </div>
-
-  <div class="note">
-    <div class="note-h">На что смотреть</div>
-    <b>Одним проходом не выйдет.</b> Уникален ли символ на позиции i, зависит от того, что стоит правее него. На первом проходе этой информации ещё нет — поэтому сначала собираем сводку целиком, и только потом ищем ответ.<br>
-    <b>Второй проход идёт по строке, а не по счётчикам.</b> Нажми пресет <b>ccdaab</b>: уникальны d (индекс 2) и b (индекс 5). Обход по массиву счётчиков наткнулся бы сначала на b, потому что b стоит в алфавите раньше d — и вернул бы 5 вместо 2.<br>
-    <b>Ответ «не найдено» живёт после цикла.</b> Утверждение задачи — «существует символ со счётчиком 1», поэтому находка возвращается изнутри цикла, а <b>-1</b> — только когда вся строка просмотрена впустую.
   </div>
 
 <script>

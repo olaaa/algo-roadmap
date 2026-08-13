@@ -82,10 +82,6 @@
   .cols .buckets{flex:1 1 440px;min-width:0}
   .cols .codebox{flex:1 1 360px;min-width:300px}
 
-  .note{width:min(980px,100%);background:var(--panel);border:1px solid var(--line);border-radius:14px;
-        padding:18px 22px;margin-top:16px;font-family:var(--mono);font-size:12.5px;color:var(--muted);line-height:1.85}
-  .note .note-h{font-family:var(--sans);font-size:13px;font-weight:600;color:var(--txt);margin-bottom:9px}
-  .note b{color:var(--code);font-weight:600}
 </style>
 </head>
 <body>
@@ -140,13 +136,6 @@
 
       <div class="codebox" id="code"></div>
     </div>
-  </div>
-
-  <div class="note">
-    <div class="note-h">На что смотреть</div>
-    <b>Ключ — это и есть вся задача.</b> Идея хеш-таблицы тут очевидна; сложность Medium берётся из того, что ключ надо придумать самому, а не получить готовым из условия.<br>
-    <b>computeIfAbsent делает три вещи разом.</b> Находит список по ключу, создаёт его при отсутствии, возвращает для добавления слова. Функция вызывается только тогда, когда ключа не было — лишних списков не создаётся.<br>
-    <b>Разделитель в векторе частот обязателен.</b> Переключи способ на «вектор частот»: между счётчиками стоит <b>#</b>. Без него слово с одной <b>a</b> и одиннадцатью <b>b</b> дало бы ключ <b>111…</b> — и слово с одиннадцатью <b>a</b> и одной <b>b</b> тоже. Разные слова слились бы в одну группу.
   </div>
 
 <script>

@@ -75,10 +75,6 @@
   .cols .setbox{flex:1 1 380px;min-width:0}
   .cols .codebox{flex:1 1 380px;min-width:300px}
 
-  .note{width:min(960px,100%);background:var(--panel);border:1px solid var(--line);border-radius:14px;
-        padding:18px 22px;margin-top:16px;font-family:var(--mono);font-size:12.5px;color:var(--muted);line-height:1.85}
-  .note .note-h{font-family:var(--sans);font-size:13px;font-weight:600;color:var(--txt);margin-bottom:9px}
-  .note b{color:var(--code);font-weight:600}
 </style>
 </head>
 <body>
@@ -126,13 +122,6 @@
 
       <div class="codebox" id="code"></div>
     </div>
-  </div>
-
-  <div class="note">
-    <div class="note-h">На что смотреть</div>
-    <b>Ответ возвращается сразу.</b> Нажми пресет <b>1,1,2,3</b>: цикл останавливается на индексе 1, оставшиеся элементы не просматриваются вовсе. Как только дубликат найден, ответ уже не изменится.<br>
-    <b>false живёт после цикла.</b> Утверждение задачи — «существует пара одинаковых», поэтому находка возвращается изнутри цикла, а <b>false</b> — только когда весь массив просмотрен. Частая ошибка — поставить <b>return false</b> внутрь, в ветку «этого значения ещё не было»: одно уникальное значение ничего не доказывает.<br>
-    <b>Одно обращение к таблице вместо двух.</b> <b>add</b> сам сообщает, был ли элемент — поэтому пара <b>contains</b> + <b>add</b> не нужна.
   </div>
 
 <script>

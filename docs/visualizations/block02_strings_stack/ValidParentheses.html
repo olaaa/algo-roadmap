@@ -78,10 +78,6 @@
   .cols .stackbox{flex:1 1 300px;min-width:0}
   .cols .codebox{flex:1 1 420px;min-width:280px}
 
-  .note{width:min(880px,100%);background:var(--panel);border:1px solid var(--line);border-radius:14px;
-        padding:18px 22px;margin-top:16px;font-family:var(--mono);font-size:12.5px;color:var(--muted);line-height:1.85}
-  .note .note-h{font-family:var(--sans);font-size:13px;font-weight:600;color:var(--txt);margin-bottom:9px}
-  .note b{color:var(--code);font-weight:600}
 </style>
 </head>
 <body>
@@ -126,13 +122,6 @@
       <button class="btn" id="play">▶ Авто</button>
       <button class="btn" id="reset">⟲ Сброс</button>
     </div>
-  </div>
-
-  <div class="note">
-    <div class="note-h">Три способа получить false</div>
-    <b>1. Пустой стек</b> — встретили закрывающую, а закрывать нечего. Пример: <b>")"</b>, <b>"())"</b>.<br>
-    <b>2. Не совпал тип</b> — сняли со стека <b>(</b>, а закрываем <b>]</b>. Пример: <b>"(]"</b>, <b>"([)]"</b>.<br>
-    <b>3. Стек не пуст после цикла</b> — самая коварная ветка. Строка <b>"("</b> не нарушает ни одного правила внутри цикла, потому что закрывающих скобок в ней вообще нет. Поэтому в конце возвращается не <b>true</b>, а <b>openBrackets.isEmpty()</b>.
   </div>
 
 <script>

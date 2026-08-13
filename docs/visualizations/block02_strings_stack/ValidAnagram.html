@@ -83,10 +83,6 @@
   .cols .counters{flex:1 1 420px;min-width:0;margin-top:0}
   .cols .codebox{flex:1 1 360px;min-width:290px;margin-top:0}
 
-  .note{width:min(940px,100%);background:var(--panel);border:1px solid var(--line);border-radius:14px;
-        padding:18px 22px;margin-top:16px;font-family:var(--mono);font-size:12.5px;color:var(--muted);line-height:1.85}
-  .note .note-h{font-family:var(--sans);font-size:13px;font-weight:600;color:var(--txt);margin-bottom:9px}
-  .note b{color:var(--code);font-weight:600}
 </style>
 </head>
 <body>
@@ -136,13 +132,6 @@
 
       <div class="codebox" id="code"></div>
     </div>
-  </div>
-
-  <div class="note">
-    <div class="note-h">На что смотреть</div>
-    <b>Проверка длин идёт первой.</b> Она дешёвая и заодно делает возможным единый проход сразу по двум строкам одним индексом.<br>
-    <b>Знак счётчика говорит, где перекос.</b> Положительный — буква лишняя в <b>s</b>, отрицательный — лишняя в <b>t</b>.<br>
-    <b>Ответ виден только после цикла.</b> Внутри цикла нарушений не бывает в принципе: он лишь копит счётчики и ничего не сравнивает. Поэтому финальная проверка — обнулился ли весь массив.
   </div>
 
 <script>
