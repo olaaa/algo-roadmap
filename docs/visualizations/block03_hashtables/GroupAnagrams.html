@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Group Anagrams — визуализация группировки по ключу</title>
+<style>
+  :root{
+    --bg:#0f1117; --panel:#171a23; --cell:#232733; --line:#2e3342;
+    --txt:#e6e8ee; --muted:#8b90a0; --accent:#4f8cff; --cur:#38bdf8; --comp:#fbbf24;
+    --ok:#34d399; --miss:#fb7185; --code:#c7d0e0;
+    --mono:"JetBrains Mono",Consolas,Menlo,monospace;
+    --sans:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--txt);font-family:var(--sans);
+       display:flex;flex-direction:column;align-items:center;min-height:100vh;padding:24px}
+  h1{font-size:18px;font-weight:600;margin:0 0 2px}
+  .sub{color:var(--muted);font-size:13px;margin-bottom:20px;max-width:840px;text-align:center}
+  .stage{width:min(980px,100%);background:var(--panel);border:1px solid var(--line);
+         border-radius:14px;padding:26px 22px}
+  .setup{display:flex;gap:16px;flex-wrap:wrap;align-items:flex-end;margin-bottom:18px}
+  .setup label{display:flex;flex-direction:column;gap:5px;font-size:12px;color:var(--muted)}
+  .setup input{font-family:var(--mono);font-size:14px;background:var(--cell);
+       border:1px solid var(--line);color:var(--txt);border-radius:8px;padding:8px 10px;width:340px}
+  .setup select{font-family:var(--mono);font-size:13px;background:var(--cell);
+       border:1px solid var(--line);color:var(--txt);border-radius:8px;padding:8px 10px}
+  .btn{font-family:var(--sans);font-size:13px;font-weight:500;cursor:pointer;
+       background:var(--cell);border:1px solid var(--line);color:var(--txt);
+       border-radius:8px;padding:9px 14px;transition:.15s}
+  .btn:hover{border-color:var(--accent)}
+  .btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+  .btn:disabled{opacity:.4;cursor:not-allowed}
+  .preset{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:20px}
+  .preset .btn{padding:6px 11px;font-family:var(--mono);font-size:12px}
+
+  .strwrap{margin:18px 0 6px}
+  .strlab{font-family:var(--mono);font-size:12px;color:var(--muted);margin-bottom:8px;text-align:center}
+  .cells{display:flex;gap:7px;flex-wrap:wrap;justify-content:center}
+  .cell{min-width:52px;height:42px;padding:0 10px;border-radius:8px;background:var(--cell);
+        border:2px solid var(--line);display:flex;align-items:center;justify-content:center;
+        font-family:var(--mono);font-size:15px;transition:.2s}
+  .cell.done{opacity:.4}
+  .cell.cur{border-color:var(--cur);background:rgba(56,189,248,.16)}
+  .cell.fresh{border-color:var(--ok);background:rgba(52,211,153,.2)}
+  .cell.joins{border-color:var(--comp);background:rgba(251,191,36,.22)}
+
+  .keyline{text-align:center;font-family:var(--mono);font-size:14px;margin:14px 0 4px;min-height:24px}
+  .keyline .k{color:var(--comp);font-weight:700}
+  .keyline .muted{color:var(--muted)}
+
+  .buckets{background:#0b0d13;border:1px solid var(--line);border-radius:10px;padding:16px 18px}
+  .buckets .cap{font-size:12px;color:var(--muted);margin-bottom:14px;font-family:var(--mono)}
+  .buckets .cap b{color:var(--code);font-weight:600}
+  .bucket{display:flex;align-items:flex-start;gap:12px;padding:8px 0;border-top:1px solid var(--line)}
+  .bucket:first-of-type{border-top:none}
+  .bkey{font-family:var(--mono);font-size:12.5px;color:var(--comp);min-width:150px;
+        word-break:break-all;padding-top:5px}
+  .bkey.hot{color:var(--txt);font-weight:700}
+  .bwords{display:flex;gap:6px;flex-wrap:wrap}
+  .word{padding:4px 10px;border-radius:999px;background:var(--cell);border:1px solid var(--line);
+        font-family:var(--mono);font-size:13px;color:var(--txt)}
+  .word.added{border-color:var(--ok);background:rgba(52,211,153,.22)}
+  .empty{color:var(--muted);font-family:var(--mono);font-size:12.5px}
+
+  .status{min-height:26px;text-align:center;font-family:var(--mono);font-size:14px;margin:14px 0 6px}
+  .status .op{color:var(--code)}
+  .status .good{color:var(--ok)} .status .comp{color:var(--comp)} .status .miss{color:var(--miss)}
+
+  .controls{position:sticky;top:8px;z-index:5;display:flex;gap:10px;justify-content:center;
+            align-items:center;flex-wrap:wrap;margin:10px 0 4px;padding:9px 10px;
+            background:rgba(23,26,35,.94);border:1px solid var(--line);border-radius:10px}
+  .step-info{color:var(--muted);font-size:12px;font-family:var(--mono);min-width:96px;text-align:center}
+
+  .codebox{background:#0b0d13;border:1px solid var(--line);border-radius:10px;
+           padding:14px 16px;font-family:var(--mono);font-size:12.5px;line-height:1.7;overflow:auto}
+  .codebox .ln{display:block;padding:0 6px;border-radius:4px;color:var(--code);white-space:pre}
+  .codebox .ln.active{background:rgba(79,140,255,.18)}
+  .kw{color:#c792ea}.num{color:#f78c6c}.cm{color:#5c6370}
+
+  .cols{display:flex;gap:18px;align-items:flex-start;margin-top:18px;flex-wrap:wrap}
+  .cols .buckets{flex:1 1 440px;min-width:0}
+  .cols .codebox{flex:1 1 360px;min-width:300px}
+
+  .note{width:min(980px,100%);background:var(--panel);border:1px solid var(--line);border-radius:14px;
+        padding:18px 22px;margin-top:16px;font-family:var(--mono);font-size:12.5px;color:var(--muted);line-height:1.85}
+  .note .note-h{font-family:var(--sans);font-size:13px;font-weight:600;color:var(--txt);margin-bottom:9px}
+  .note b{color:var(--code);font-weight:600}
+</style>
+</head>
+<body>
+  <h1>Group Anagrams — раскладывание по корзинам</h1>
+  <div class="sub">Анаграммы неразличимы по составу букв, поэтому каждому слову считается «отпечаток» — ключ, одинаковый у всех анаграмм. Слова с одинаковым ключом попадают в одну корзину карты (LeetCode 49).</div>
+
+  <div class="stage">
+    <div class="setup">
+      <label>Слова (через запятую)
+        <input id="wordsIn" type="text" value="eat, tea, tan, ate, nat, bat">
+      </label>
+      <label>Способ построить ключ
+        <select id="mode">
+          <option value="sorted">отсортированные буквы</option>
+          <option value="counts">вектор частот</option>
+        </select>
+      </label>
+      <button class="btn primary" id="build">Построить</button>
+    </div>
+
+    <div class="preset">
+      <button class="btn" data-words="eat, tea, tan, ate, nat, bat">пример из условия</button>
+      <button class="btn" data-words="ab, ba">ab, ba — одна группа</button>
+      <button class="btn" data-words="a, b, c">a, b, c — три группы</button>
+      <button class="btn" data-words="ab, ba, abc">разная длина</button>
+      <button class="btn" data-words="aacc, ccac">те же буквы, разный счёт</button>
+      <button class="btn" data-words=", ">две пустые строки</button>
+    </div>
+
+    <div class="strwrap">
+      <div class="strlab">входной массив strs</div>
+      <div class="cells" id="cells"></div>
+    </div>
+
+    <div class="keyline" id="keyline"></div>
+
+    <div class="status" id="status"></div>
+
+    <div class="controls">
+      <button class="btn" id="prev">◀ Назад</button>
+      <span class="step-info" id="stepInfo">шаг 0 / 0</span>
+      <button class="btn" id="next">Вперёд ▶</button>
+      <button class="btn" id="play">▶ Авто</button>
+      <button class="btn" id="reset">⟲ Сброс</button>
+    </div>
+
+    <div class="cols">
+      <div class="buckets">
+        <div class="cap">карта <b>groups</b> — ключ и список слов с этим ключом</div>
+        <div id="bucketBox"></div>
+      </div>
+
+      <div class="codebox" id="code"></div>
+    </div>
+  </div>
+
+  <div class="note">
+    <div class="note-h">На что смотреть</div>
+    <b>Ключ — это и есть вся задача.</b> Идея хеш-таблицы тут очевидна; сложность Medium берётся из того, что ключ надо придумать самому, а не получить готовым из условия.<br>
+    <b>computeIfAbsent делает три вещи разом.</b> Находит список по ключу, создаёт его при отсутствии, возвращает для добавления слова. Функция вызывается только тогда, когда ключа не было — лишних списков не создаётся.<br>
+    <b>Разделитель в векторе частот обязателен.</b> Переключи способ на «вектор частот»: между счётчиками стоит <b>#</b>. Без него слово с одной <b>a</b> и одиннадцатью <b>b</b> дало бы ключ <b>111…</b> — и слово с одиннадцатью <b>a</b> и одной <b>b</b> тоже. Разные слова слились бы в одну группу.
+  </div>
+
+<script>
+const $ = id => document.getElementById(id);
+const ALPHABET='abcdefghijklmnopqrstuvwxyz';
+let words=[], mode='sorted', steps=[], cur=0, timer=null;
+
+const CODE_SORTED = [
+  {t:`Map&lt;String, List&lt;String&gt;&gt; groups = <span class="kw">new</span> HashMap&lt;&gt;();`, line:'init'},
+  {t:`<span class="kw">for</span> (String word : strs) {`, line:'for'},
+  {t:`    <span class="kw">char</span>[] letters = word.toCharArray();`, line:'key'},
+  {t:`    Arrays.sort(letters);`, line:'key'},
+  {t:`    String key = <span class="kw">new</span> String(letters);`, line:'key'},
+  {t:`    groups.computeIfAbsent(key, k -&gt; <span class="kw">new</span> ArrayList&lt;&gt;())`, line:'put'},
+  {t:`          .add(word);`, line:'put'},
+  {t:`}`, line:'endFor'},
+  {t:`<span class="kw">return new</span> ArrayList&lt;&gt;(groups.values());`, line:'ret'},
+];
+
+const CODE_COUNTS = [
+  {t:`Map&lt;String, List&lt;String&gt;&gt; groups = <span class="kw">new</span> HashMap&lt;&gt;();`, line:'init'},
+  {t:`<span class="kw">for</span> (String word : strs) {`, line:'for'},
+  {t:`    <span class="kw">int</span>[] letterCounts = <span class="kw">new int</span>[<span class="num">26</span>];`, line:'key'},
+  {t:`    <span class="cm">// считаем буквы, затем склеиваем через '#'</span>`, line:'key'},
+  {t:`    String key = buildCountKey(word);`, line:'key'},
+  {t:`    groups.computeIfAbsent(key, k -&gt; <span class="kw">new</span> ArrayList&lt;&gt;())`, line:'put'},
+  {t:`          .add(word);`, line:'put'},
+  {t:`}`, line:'endFor'},
+  {t:`<span class="kw">return new</span> ArrayList&lt;&gt;(groups.values());`, line:'ret'},
+];
+
+function makeKey(word){
+  if(mode==='sorted'){
+    return [...word].sort().join('');
+  }
+  const counts=new Array(26).fill(0);
+  for(const symbol of word){
+    counts[ALPHABET.indexOf(symbol)]++;
+  }
+  return counts.join('#') + '#';
+}
+
+function keyLabel(key){
+  return key === '' ? '«пустой ключ»' : key;
+}
+
+function buildSteps(){
+  steps=[];
+  /* Порядок ключей сохраняем как порядок первого появления — так нагляднее. */
+  const order=[];
+  const buckets={};
+
+  steps.push({i:-1, line:'init', buckets:{}, order:[], msg:'заводим пустую карту'});
+
+  for(let i=0;i<words.length;i++){
+    const word=words[i];
+    steps.push({i, line:'for', buckets:clone(buckets), order:[...order],
+                msg:`берём strs[${i}] = "${word}"`});
+
+    const key=makeKey(word);
+    steps.push({i, line:'key', buckets:clone(buckets), order:[...order], key,
+                msg:`ключ для "${word}" — ${keyLabel(key)}`});
+
+    const isNew = !(key in buckets);
+    if(isNew){
+      buckets[key]=[];
+      order.push(key);
+    }
+    buckets[key].push(word);
+    steps.push({i, line:'put', buckets:clone(buckets), order:[...order], key,
+                hotKey:key, added:word, isNew,
+                msg: isNew
+                      ? `ключа ${keyLabel(key)} ещё не было — создаём корзину и кладём "${word}"`
+                      : `ключ ${keyLabel(key)} уже есть — дописываем "${word}" в его корзину`});
+  }
+
+  steps.push({i:words.length, line:'ret', buckets:clone(buckets), order:[...order], done:true, good:true,
+              msg: words.length
+                    ? `✓ готово: ${order.length} ${plural(order.length)} из ${words.length} слов`
+                    : '✓ готово: массив пустой, групп нет'});
+}
+
+function plural(count){
+  const lastTwo = count % 100;
+  const last = count % 10;
+  if(lastTwo >= 11 && lastTwo <= 14) return 'групп';
+  if(last === 1) return 'группа';
+  if(last >= 2 && last <= 4) return 'группы';
+  return 'групп';
+}
+
+function clone(buckets){
+  const copy={};
+  for(const key of Object.keys(buckets)){
+    copy[key]=[...buckets[key]];
+  }
+  return copy;
+}
+
+function renderCells(s){
+  const box=$('cells'); box.innerHTML='';
+  if(!words.length){
+    box.innerHTML='<div class="empty">массив пуст</div>';
+    return;
+  }
+  for(let i=0;i<words.length;i++){
+    const cell=document.createElement('div'); cell.className='cell';
+    cell.textContent = words[i] === '' ? '∅' : words[i];
+    if(i===s.i && s.added!==undefined){
+      cell.classList.add(s.isNew ? 'fresh' : 'joins');
+    } else if(i===s.i){
+      cell.classList.add('cur');
+    } else if(i<s.i){
+      cell.classList.add('done');
+    }
+    box.append(cell);
+  }
+}
+
+function renderKeyline(s){
+  if(s.key===undefined){
+    $('keyline').innerHTML='<span class="muted">ключ ещё не посчитан</span>';
+    return;
+  }
+  const word = words[s.i] === '' ? '∅' : words[s.i];
+  $('keyline').innerHTML=`"${word}" → <span class="k">${keyLabel(s.key)}</span>`;
+}
+
+function renderBuckets(s){
+  const box=$('bucketBox'); box.innerHTML='';
+  if(!s.order.length){
+    box.innerHTML='<div class="empty">пусто</div>';
+    return;
+  }
+  for(const key of s.order){
+    const row=document.createElement('div'); row.className='bucket';
+    const keyCell=document.createElement('div');
+    keyCell.className='bkey' + (s.hotKey===key ? ' hot' : '');
+    keyCell.textContent=keyLabel(key);
+    const wordsCell=document.createElement('div'); wordsCell.className='bwords';
+    (s.buckets[key]||[]).forEach((word, position)=>{
+      const chip=document.createElement('div'); chip.className='word';
+      chip.textContent = word === '' ? '∅' : word;
+      const isLast = position === s.buckets[key].length - 1;
+      if(s.hotKey===key && s.added===word && isLast){
+        chip.classList.add('added');
+      }
+      wordsCell.append(chip);
+    });
+    row.append(keyCell, wordsCell); box.append(row);
+  }
+}
+
+function renderCode(active){
+  const source = mode==='sorted' ? CODE_SORTED : CODE_COUNTS;
+  $('code').innerHTML = source.map(c=>
+    `<span class="ln ${c.line===active?'active':''}">${c.t}</span>`).join('');
+}
+
+function show(idx){
+  cur=Math.max(0,Math.min(idx,steps.length-1));
+  const s=steps[cur];
+  renderCells(s); renderKeyline(s); renderBuckets(s); renderCode(s.line);
+  const cls = s.good ? 'good' : (s.added!==undefined ? 'comp' : 'op');
+  $('status').innerHTML=`<span class="${cls}">${s.msg}</span>`;
+  $('stepInfo').textContent=`шаг ${cur+1} / ${steps.length}`;
+  $('prev').disabled=cur===0; $('next').disabled=cur===steps.length-1;
+}
+
+function build(){
+  stopPlay();
+  mode=$('mode').value;
+  const raw=$('wordsIn').value;
+  words = raw.trim() === ''
+      ? []
+      : raw.split(',').map(part=>part.trim().toLowerCase()
+            .split('').filter(ch=>ALPHABET.includes(ch)).join(''));
+  buildSteps(); show(0);
+}
+function stopPlay(){ if(timer){clearInterval(timer);timer=null;$('play').textContent='▶ Авто';} }
+function togglePlay(){
+  if(timer){stopPlay();return;}
+  if(cur>=steps.length-1) show(0);
+  $('play').textContent='⏸ Пауза';
+  timer=setInterval(()=>{ if(cur>=steps.length-1){stopPlay();return;} show(cur+1); },800);
+}
+
+$('build').onclick=build;
+$('mode').onchange=build;
+$('next').onclick=()=>{stopPlay();show(cur+1);};
+$('prev').onclick=()=>{stopPlay();show(cur-1);};
+$('play').onclick=togglePlay;
+$('reset').onclick=()=>{stopPlay();show(0);};
+document.querySelectorAll('.preset .btn').forEach(b=>{
+  b.onclick=()=>{ $('wordsIn').value=b.dataset.words; build(); };
+});
+document.addEventListener('keydown',e=>{
+  if(e.target.tagName==='INPUT'||e.target.tagName==='SELECT') return;
+  if(e.key==='ArrowRight'){stopPlay();show(cur+1);}
+  if(e.key==='ArrowLeft'){stopPlay();show(cur-1);}
+  if(e.key===' '){e.preventDefault();togglePlay();}
+});
+build();
+</script>
+</body>
+</html>

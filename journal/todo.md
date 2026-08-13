@@ -14,7 +14,8 @@
       а не когда код написан и прогнан. Написанный код — это [~].
 - [~] Блок 3. Хеш-таблицы: TwoSum [x] (7/7 PASS, +Pattern_HashMap.md +виз.),
       ContainsDuplicate [~] код написан (14/14 PASS, +виз.), Lela разбирает,
-      GroupAnagrams [ ], MajorityElement [ ]
+      GroupAnagrams [~] код написан (25/25 PASS, +виз.), Lela разбирает,
+      MajorityElement [ ]
 - [ ] Блок 4. Скользящее окно (LongestSubstringNoRepeat, MaxAverageSubarray)
 - [ ] Блок 5. Бинарный поиск (BinarySearch, SearchInsertPosition)
 - [ ] Блок 6. Деревья и базовые графы (MaxDepth, SymmetricTree, BFS).
@@ -38,8 +39,9 @@
       тесты в main() + компиляция и прогон + визуализация.
       Блок 2 «Строки + стек» — все четыре задачи написаны, FirstUniqueChar
       ещё разбирает Lela.
-      Сейчас в работе блок 3 «Хеш-таблицы»: ContainsDuplicate (217) написан.
-      Следующие: GroupAnagrams (49, Medium), MajorityElement (169).
+      Сейчас в работе блок 3 «Хеш-таблицы»: ContainsDuplicate (217) и
+      GroupAnagrams (49, первая Medium в проекте) написаны.
+      Следующая и последняя в блоке: MajorityElement (169).
 
 - [~] Визуализации для остальных задач блока 1: MergeSortedArray [x],
       ValidPalindrome [ ], MoveZeroes [x] (шаблон и рецепт — в progress.md,
