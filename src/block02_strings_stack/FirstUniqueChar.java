@@ -14,8 +14,9 @@ import java.util.Map;
  * Время O(n), память O(1).
  * <p>
  * Рядом лежит вторая реализация {@link #firstUniqCharLinkedHashMap} — обобщение
- * на произвольный алфавит. LinkedHashMap хранит порядок вставки, поэтому ответ
- * ищется проходом по самой карте.
+ * на произвольный алфавит, включая символы вне базовой плоскости. LinkedHashMap
+ * хранит порядок вставки, поэтому ответ ищется проходом по самой карте, а ключ —
+ * кодовая точка (int), потому что в Character эмодзи не помещается.
  * <p>
  * Полное условие, примеры и ограничения:
  * {@code docs/problems/block02_strings_stack/FirstUniqueChar.md}
@@ -61,20 +62,30 @@ public class FirstUniqueChar {
      * вставки ключей, то есть с порядком первого появления символа в строке.
      * Поэтому второй проход идёт по самой карте, а строка больше не нужна —
      * но индекс приходится хранить в значении вместе со счётчиком.
+     * Ключ карты — КОДОВАЯ ТОЧКА (int), а не Character. Character вмещает
+     * ровно 16 бит, потолок U+FFFF, поэтому символы вне базовой плоскости
+     * (эмодзи, редкие иероглифы) в такой ключ не помещаются: они занимают
+     * две кодовые единицы. Считать по Character значило бы считать половинки
+     * суррогатных пар — а у 🐷 и 🐽 старшая половина общая, и они склеились бы
+     * в один «символ».
+     * Возвращаемый индекс — в char-единицах, как у эталона и как требует
+     * LeetCode. Поэтому шаг цикла не единица, а Character.charCount.
      * Память O(k), где k — число различных символов, то есть хуже эталона.
      */
     public static int firstUniqCharLinkedHashMap(String s) {
         record CountAndFirstIndex(int count, int firstIndex) {}
 
-        Map<Character, CountAndFirstIndex> symbolStats = new LinkedHashMap<>();
-        for (int currentIndex = 0; currentIndex < s.length(); currentIndex++) {
-            char symbol = s.charAt(currentIndex);
-            CountAndFirstIndex seen = symbolStats.get(symbol);
+        Map<Integer, CountAndFirstIndex> symbolStats = new LinkedHashMap<>();
+        int currentIndex = 0;
+        while (currentIndex < s.length()) {
+            int codePoint = s.codePointAt(currentIndex);
+            CountAndFirstIndex seen = symbolStats.get(codePoint);
             if (seen == null) {
-                symbolStats.put(symbol, new CountAndFirstIndex(1, currentIndex));
+                symbolStats.put(codePoint, new CountAndFirstIndex(1, currentIndex));
             } else {
-                symbolStats.put(symbol, new CountAndFirstIndex(seen.count() + 1, seen.firstIndex()));
+                symbolStats.put(codePoint, new CountAndFirstIndex(seen.count() + 1, seen.firstIndex()));
             }
+            currentIndex += Character.charCount(codePoint);
         }
         for (CountAndFirstIndex stats : symbolStats.values()) {
             if (stats.count() == 1) {
@@ -135,6 +146,25 @@ public class FirstUniqueChar {
         longInput.append('q');
         check(firstUniqChar(longInput.toString()) == 50_000,
               "длинный вход: единственный уникальный символ в самом конце");
+
+        /*
+         * Проверка того, ради чего ключом взята кодовая точка, а не Character.
+         * 🐷 (U+1F437) и 🐽 (U+1F43D) — разные символы, но старшая половина
+         * суррогатной пары у них общая, U+D83D. Карта с ключом Character
+         * увидела бы D83D дважды и решила бы, что символ повторяется; первым
+         * «уникальным» оказалась бы младшая половина U+DC37 на индексе 1 —
+         * не символ вовсе. Счёт по кодовым точкам даёт верный ответ 0.
+         */
+        check(firstUniqCharLinkedHashMap("🐷🐽") == 0,
+              "Unicode: 🐷🐽 — общая старшая половина не склеивает символы, ответ 0");
+        check(firstUniqCharLinkedHashMap("🐷a🐷b") == 2,
+              "Unicode: повторяется эмодзи, первый уникальный — a на индексе 2");
+        check(firstUniqCharLinkedHashMap("🐷🐽🐷") == 2,
+              "Unicode: уникален 🐽, его индекс в char-единицах равен 2");
+        check(firstUniqCharLinkedHashMap("🐷🐷") == NOT_FOUND,
+              "Unicode: оба символа повторяются — фолбэк");
+        check(firstUniqCharLinkedHashMap("ёжик") == 0,
+              "Unicode: кириллица в базовой плоскости работает как обычно");
     }
 
     private static void check(boolean ok, String name) {
