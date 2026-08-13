@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>First Unique Character — визуализация двух проходов</title>
+<style>
+  :root{
+    --bg:#0f1117; --panel:#171a23; --cell:#232733; --line:#2e3342;
+    --txt:#e6e8ee; --muted:#8b90a0; --accent:#4f8cff; --cur:#38bdf8; --comp:#fbbf24;
+    --ok:#34d399; --miss:#fb7185; --code:#c7d0e0;
+    --mono:"JetBrains Mono",Consolas,Menlo,monospace;
+    --sans:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--txt);font-family:var(--sans);
+       display:flex;flex-direction:column;align-items:center;min-height:100vh;padding:24px}
+  h1{font-size:18px;font-weight:600;margin:0 0 2px}
+  .sub{color:var(--muted);font-size:13px;margin-bottom:20px;max-width:820px;text-align:center}
+  .stage{width:min(960px,100%);background:var(--panel);border:1px solid var(--line);
+         border-radius:14px;padding:26px 22px}
+  .setup{display:flex;gap:16px;flex-wrap:wrap;align-items:flex-end;margin-bottom:18px}
+  .setup label{display:flex;flex-direction:column;gap:5px;font-size:12px;color:var(--muted)}
+  .setup input{font-family:var(--mono);font-size:14px;background:var(--cell);
+       border:1px solid var(--line);color:var(--txt);border-radius:8px;padding:8px 10px;width:260px}
+  .btn{font-family:var(--sans);font-size:13px;font-weight:500;cursor:pointer;
+       background:var(--cell);border:1px solid var(--line);color:var(--txt);
+       border-radius:8px;padding:9px 14px;transition:.15s}
+  .btn:hover{border-color:var(--accent)}
+  .btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+  .btn:disabled{opacity:.4;cursor:not-allowed}
+  .preset{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:20px}
+  .preset .btn{padding:6px 11px;font-family:var(--mono);font-size:12px}
+
+  .phase{display:flex;gap:8px;justify-content:center;margin:4px 0 16px}
+  .ph{font-family:var(--mono);font-size:12px;padding:6px 12px;border-radius:8px;
+      border:1px solid var(--line);background:var(--cell);color:var(--muted)}
+  .ph.on{border-color:var(--accent);color:var(--txt);background:rgba(79,140,255,.16)}
+
+  .strwrap{margin:18px 0 6px}
+  .strlab{font-family:var(--mono);font-size:12px;color:var(--muted);margin-bottom:8px;text-align:center}
+  .cells{display:flex;gap:7px;flex-wrap:wrap;justify-content:center}
+  .ccell{display:flex;flex-direction:column;align-items:center;gap:4px}
+  .cell{width:40px;height:40px;border-radius:8px;background:var(--cell);
+        border:2px solid var(--line);display:flex;align-items:center;justify-content:center;
+        font-family:var(--mono);font-size:18px;transition:.2s}
+  .cell.done{opacity:.4}
+  .cell.count{border-color:var(--comp);background:rgba(251,191,36,.18)}
+  .cell.scanMiss{border-color:var(--miss);background:rgba(251,113,133,.16)}
+  .cell.scanHit{border-color:var(--ok);background:rgba(52,211,153,.24)}
+  .cell.answer{border-color:var(--ok);background:rgba(52,211,153,.34);box-shadow:0 0 0 3px rgba(52,211,153,.18)}
+  .idx{font-family:var(--mono);font-size:10.5px;color:var(--muted)}
+  .idx.on{color:var(--cur)}
+
+  .counters{background:#0b0d13;border:1px solid var(--line);border-radius:10px;padding:16px 18px}
+  .counters .cap{font-size:12px;color:var(--muted);margin-bottom:14px;font-family:var(--mono)}
+  .counters .cap b{color:var(--code);font-weight:600}
+  .cgrid{display:flex;gap:5px;flex-wrap:wrap}
+  .ccol{display:flex;flex-direction:column;align-items:center;gap:4px}
+  .cbox{width:30px;height:30px;border-radius:6px;background:var(--cell);border:1px solid var(--line);
+        display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:13px;
+        color:var(--muted);transition:.2s}
+  .cbox.nonzero{color:var(--txt);border-color:#3c4356}
+  .cbox.unique{border-color:var(--ok);color:var(--txt);font-weight:700}
+  .cbox.touched{border-color:var(--comp);background:rgba(251,191,36,.22);color:var(--txt);font-weight:700}
+  .cbox.lookup{border-color:var(--cur);box-shadow:0 0 0 2px rgba(56,189,248,.18);color:var(--txt);font-weight:700}
+  .clab{font-family:var(--mono);font-size:10.5px;color:var(--muted)}
+
+  .status{min-height:26px;text-align:center;font-family:var(--mono);font-size:14px;margin:16px 0 6px}
+  .status .op{color:var(--code)}
+  .status .good{color:var(--ok)} .status .comp{color:var(--comp)} .status .miss{color:var(--miss)}
+
+  /* Управление липкое и стоит сразу под статусом — сетка счётчиков высокая. */
+  .controls{position:sticky;top:8px;z-index:5;display:flex;gap:10px;justify-content:center;
+            align-items:center;flex-wrap:wrap;margin:10px 0 4px;padding:9px 10px;
+            background:rgba(23,26,35,.94);border:1px solid var(--line);border-radius:10px}
+  .step-info{color:var(--muted);font-size:12px;font-family:var(--mono);min-width:96px;text-align:center}
+
+  .codebox{background:#0b0d13;border:1px solid var(--line);border-radius:10px;
+           padding:14px 16px;font-family:var(--mono);font-size:12.5px;line-height:1.7;overflow:auto}
+  .codebox .ln{display:block;padding:0 6px;border-radius:4px;color:var(--code);white-space:pre}
+  .codebox .ln.active{background:rgba(79,140,255,.18)}
+  .kw{color:#c792ea}.num{color:#f78c6c}.cm{color:#5c6370}
+
+  .cols{display:flex;gap:18px;align-items:flex-start;margin-top:18px;flex-wrap:wrap}
+  .cols .counters{flex:1 1 420px;min-width:0}
+  .cols .codebox{flex:1 1 380px;min-width:300px}
+
+  .note{width:min(960px,100%);background:var(--panel);border:1px solid var(--line);border-radius:14px;
+        padding:18px 22px;margin-top:16px;font-family:var(--mono);font-size:12.5px;color:var(--muted);line-height:1.85}
+  .note .note-h{font-family:var(--sans);font-size:13px;font-weight:600;color:var(--txt);margin-bottom:9px}
+  .note b{color:var(--code);font-weight:600}
+</style>
+</head>
+<body>
+  <h1>First Unique Character — два прохода и почему второй идёт по строке</h1>
+  <div class="sub">Первый проход заполняет 26 счётчиков. Второй ищет символ со счётчиком 1 — и обходит <b>строку</b>, а не массив счётчиков, потому что в массиве буквы лежат по алфавиту, а нужен первый по позиции (LeetCode 387).</div>
+
+  <div class="stage">
+    <div class="setup">
+      <label>Строка s
+        <input id="sIn" type="text" value="loveleetcode">
+      </label>
+      <button class="btn primary" id="build">Построить</button>
+    </div>
+
+    <div class="preset">
+      <button class="btn" data-s="leetcode">leetcode — ответ 0</button>
+      <button class="btn" data-s="loveleetcode">loveleetcode — ответ 2</button>
+      <button class="btn" data-s="ccdaab">ccdaab — алфавит обманул бы</button>
+      <button class="btn" data-s="aabb">aabb — уникальных нет</button>
+      <button class="btn" data-s="aab">aab — ответ последний</button>
+      <button class="btn" data-s="z">z — один символ</button>
+      <button class="btn" data-s="">пустая строка</button>
+    </div>
+
+    <div class="phase">
+      <span class="ph" id="ph1">проход 1: считаем частоты</span>
+      <span class="ph" id="ph2">проход 2: ищем счётчик = 1</span>
+    </div>
+
+    <div class="strwrap">
+      <div class="strlab">строка s — под каждой ячейкой её индекс</div>
+      <div class="cells" id="sCells"></div>
+    </div>
+
+    <div class="status" id="status"></div>
+
+    <div class="controls">
+      <button class="btn" id="prev">◀ Назад</button>
+      <span class="step-info" id="stepInfo">шаг 0 / 0</span>
+      <button class="btn" id="next">Вперёд ▶</button>
+      <button class="btn" id="play">▶ Авто</button>
+      <button class="btn" id="reset">⟲ Сброс</button>
+    </div>
+
+    <div class="cols">
+      <div class="counters">
+        <div class="cap">массив <b>letterCounts</b> — 26 ячеек, по одной на букву латиницы, в алфавитном порядке</div>
+        <div class="cgrid" id="counters"></div>
+      </div>
+
+      <div class="codebox" id="code"></div>
+    </div>
+  </div>
+
+  <div class="note">
+    <div class="note-h">На что смотреть</div>
+    <b>Одним проходом не выйдет.</b> Уникален ли символ на позиции i, зависит от того, что стоит правее него. На первом проходе этой информации ещё нет — поэтому сначала собираем сводку целиком, и только потом ищем ответ.<br>
+    <b>Второй проход идёт по строке, а не по счётчикам.</b> Нажми пресет <b>ccdaab</b>: уникальны d (индекс 2) и b (индекс 5). Обход по массиву счётчиков наткнулся бы сначала на b, потому что b стоит в алфавите раньше d — и вернул бы 5 вместо 2.<br>
+    <b>Ответ «не найдено» живёт после цикла.</b> Утверждение задачи — «существует символ со счётчиком 1», поэтому находка возвращается изнутри цикла, а <b>-1</b> — только когда вся строка просмотрена впустую.
+  </div>
+
+<script>
+const $ = id => document.getElementById(id);
+const ALPHABET = 'abcdefghijklmnopqrstuvwxyz';
+let sStr='', steps=[], cur=0, timer=null;
+
+const CODE = [
+  {t:`<span class="kw">int</span>[] letterCounts = <span class="kw">new int</span>[<span class="num">26</span>];`, line:'init'},
+  {t:`<span class="cm">// проход 1: считаем частоты</span>`, line:'cm1'},
+  {t:`<span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; s.length(); i++) {`, line:'for1'},
+  {t:`    letterCounts[s.charAt(i) - <span class="num">'a'</span>]++;`, line:'inc'},
+  {t:`}`, line:'end1'},
+  {t:`<span class="cm">// проход 2: ищем ответ ПО СТРОКЕ</span>`, line:'cm2'},
+  {t:`<span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; s.length(); i++) {`, line:'for2'},
+  {t:`    <span class="kw">if</span> (letterCounts[s.charAt(i) - <span class="num">'a'</span>] == <span class="num">1</span>) {`, line:'check'},
+  {t:`        <span class="kw">return</span> i;`, line:'retIdx'},
+  {t:`    }`, line:'endCheck'},
+  {t:`}`, line:'end2'},
+  {t:`<span class="kw">return</span> -<span class="num">1</span>;`, line:'retNone'},
+];
+
+function buildSteps(){
+  steps=[];
+  const counts = new Array(26).fill(0);
+
+  steps.push({phase:1, i:-1, line:'init', counts:[...counts],
+              msg:'заводим 26 счётчиков, все нули'});
+
+  /* Проход 1: только копим частоты, ничего не решаем. */
+  for(let i=0;i<sStr.length;i++){
+    const letterIndex = ALPHABET.indexOf(sStr[i]);
+    counts[letterIndex]++;
+    steps.push({phase:1, i, line:'inc', counts:[...counts], touched:letterIndex,
+                msg:`s[${i}] = '${sStr[i]}' → счётчик '${sStr[i]}' стал ${counts[letterIndex]}`});
+  }
+
+  steps.push({phase:1, i:sStr.length, line:'end1', counts:[...counts],
+              msg: sStr.length ? 'частоты собраны, начинаем второй проход' : 'строка пустая, считать нечего'});
+
+  /* Проход 2: идём по строке, а не по массиву счётчиков. */
+  for(let i=0;i<sStr.length;i++){
+    const letterIndex = ALPHABET.indexOf(sStr[i]);
+    const value = counts[letterIndex];
+    if(value === 1){
+      steps.push({phase:2, i, line:'check', counts:[...counts], lookup:letterIndex, hit:true,
+                  msg:`s[${i}] = '${sStr[i]}', счётчик = 1 — нашли`});
+      steps.push({phase:2, i, line:'retIdx', counts:[...counts], lookup:letterIndex, hit:true,
+                  done:true, answer:i, good:true,
+                  msg:`✓ ответ ${i}: '${sStr[i]}' — первый символ, встречающийся ровно один раз`});
+      return;
+    }
+    steps.push({phase:2, i, line:'check', counts:[...counts], lookup:letterIndex, miss:true,
+                msg:`s[${i}] = '${sStr[i]}', счётчик = ${value} — повторяется, идём дальше`});
+  }
+
+  steps.push({phase:2, i:sStr.length, line:'retNone', counts:[...counts], done:true, answer:-1, bad:true,
+              msg: sStr.length
+                    ? '✗ ответ -1: вся строка просмотрена, уникальных символов нет'
+                    : '✗ ответ -1: строка пустая, искать нечего'});
+}
+
+function renderString(s){
+  const box=$('sCells'); box.innerHTML='';
+  for(let i=0;i<sStr.length;i++){
+    const wrap=document.createElement('div'); wrap.className='ccell';
+    const cell=document.createElement('div'); cell.className='cell'; cell.textContent=sStr[i];
+    if(s.done && s.answer===i){
+      cell.classList.add('answer');
+    } else if(i===s.i && s.phase===1){
+      cell.classList.add('count');
+    } else if(i===s.i && s.phase===2){
+      cell.classList.add(s.hit?'scanHit':'scanMiss');
+    } else if(i<s.i){
+      cell.classList.add('done');
+    }
+    const idx=document.createElement('div');
+    idx.className='idx' + (i===s.i ? ' on' : '');
+    idx.textContent=i;
+    wrap.append(cell,idx); box.append(wrap);
+  }
+}
+
+function renderCounters(s){
+  const box=$('counters'); box.innerHTML='';
+  const counts=s.counts||new Array(26).fill(0);
+  for(let letterIndex=0; letterIndex<26; letterIndex++){
+    const col=document.createElement('div'); col.className='ccol';
+    const cbox=document.createElement('div'); cbox.className='cbox';
+    cbox.textContent=counts[letterIndex];
+    if(s.lookup===letterIndex){
+      cbox.classList.add('lookup');
+    } else if(s.touched===letterIndex){
+      cbox.classList.add('touched');
+    } else if(s.phase===2 && counts[letterIndex]===1){
+      cbox.classList.add('unique');
+    } else if(counts[letterIndex]!==0){
+      cbox.classList.add('nonzero');
+    }
+    const lab=document.createElement('div'); lab.className='clab'; lab.textContent=ALPHABET[letterIndex];
+    col.append(cbox,lab); box.append(col);
+  }
+}
+
+function renderCode(active){
+  $('code').innerHTML = CODE.map(c=>
+    `<span class="ln ${c.line===active?'active':''}">${c.t}</span>`).join('');
+}
+
+function renderPhase(s){
+  $('ph1').classList.toggle('on', s.phase===1);
+  $('ph2').classList.toggle('on', s.phase===2);
+}
+
+function show(idx){
+  cur=Math.max(0,Math.min(idx,steps.length-1));
+  const s=steps[cur];
+  renderString(s); renderCounters(s); renderCode(s.line); renderPhase(s);
+  const cls = s.good ? 'good' : s.bad ? 'miss' : s.miss ? 'miss' : (s.touched!==undefined ? 'comp' : 'op');
+  $('status').innerHTML=`<span class="${cls}">${s.msg}</span>`;
+  $('stepInfo').textContent=`шаг ${cur+1} / ${steps.length}`;
+  $('prev').disabled=cur===0; $('next').disabled=cur===steps.length-1;
+}
+
+function build(){
+  stopPlay();
+  const clean = value => [...value.toLowerCase()].filter(ch=>ALPHABET.includes(ch)).join('');
+  sStr = clean($('sIn').value);
+  $('sIn').value = sStr;
+  buildSteps(); show(0);
+}
+function stopPlay(){ if(timer){clearInterval(timer);timer=null;$('play').textContent='▶ Авто';} }
+function togglePlay(){
+  if(timer){stopPlay();return;}
+  if(cur>=steps.length-1) show(0);
+  $('play').textContent='⏸ Пауза';
+  timer=setInterval(()=>{ if(cur>=steps.length-1){stopPlay();return;} show(cur+1); },700);
+}
+
+$('build').onclick=build;
+$('next').onclick=()=>{stopPlay();show(cur+1);};
+$('prev').onclick=()=>{stopPlay();show(cur-1);};
+$('play').onclick=togglePlay;
+$('reset').onclick=()=>{stopPlay();show(0);};
+document.querySelectorAll('.preset .btn').forEach(b=>{
+  b.onclick=()=>{ $('sIn').value=b.dataset.s; build(); };
+});
+document.addEventListener('keydown',e=>{
+  if(e.target.tagName==='INPUT') return;
+  if(e.key==='ArrowRight'){stopPlay();show(cur+1);}
+  if(e.key==='ArrowLeft'){stopPlay();show(cur-1);}
+  if(e.key===' '){e.preventDefault();togglePlay();}
+});
+build();
+</script>
+</body>
+</html>

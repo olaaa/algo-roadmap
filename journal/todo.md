@@ -6,8 +6,11 @@
 - [x] Блок 1. Массивы, два указателя (5 классов: TwoSumSorted, ReverseArray,
       ValidPalindrome, MergeSortedArray — 16/16 PASS; MoveZeroes — 9/9 PASS)
 - [~] Блок 2. Строки + стек: ValidParentheses [x] (32/32 PASS, +виз.),
-      ValidAnagram [x] (40/40 PASS, +виз.), ReverseString [x] (10/10 PASS, +виз.),
-      FirstUniqueChar [ ]
+      ValidAnagram [x] (40/40 PASS, +виз.),
+      ReverseString [x] (10/10 PASS, +виз.),
+      FirstUniqueChar [~] код написан (22/22 PASS, +виз.), Lela разбирает
+      ПОМЕТКА: «[x]» у задачи ставим, только когда Lela закончила её изучать,
+      а не когда код написан и прогнан. Написанный код — это [~].
 - [~] Блок 3. Хеш-таблицы: TwoSum [x] (7/7 PASS, +Pattern_HashMap.md +виз.),
       ContainsDuplicate [ ], GroupAnagrams [ ], MajorityElement [ ]
 - [ ] Блок 4. Скользящее окно (LongestSubstringNoRepeat, MaxAverageSubarray)
@@ -32,7 +35,8 @@
 - [~] Собрать Блок 2 «Строки + стек» — ПО ОДНОЙ ЗАДАЧЕ за подход, а не все четыре
       сразу. Для каждой: класс + docs/problems/.md + тесты в main() + компиляция
       и прогон, потом визуализация. Порядок — по договорённости с Lela.
-      Следующая по блоку 2: FirstUniqueChar (387) — последняя, после неё блок закрыт.
+      Сейчас в работе: FirstUniqueChar (387) — последняя задача блока,
+      после неё блок 2 закрыт.
 
 - [~] Визуализации для остальных задач блока 1: MergeSortedArray [x],
       ValidPalindrome [ ], MoveZeroes [x] (шаблон и рецепт — в progress.md,
