@@ -160,7 +160,7 @@ const CODE_COUNTS = [
   {t:`<span class="kw">for</span> (String word : strs) {`, line:'for'},
   {t:`    <span class="kw">int</span>[] letterCounts = <span class="kw">new int</span>[<span class="num">26</span>];`, line:'key'},
   {t:`    <span class="cm">// считаем буквы, затем склеиваем через '#'</span>`, line:'key'},
-  {t:`    String key = buildCountKey(word);`, line:'key'},
+  {t:`    String key = buildFrequencyKey(word);`, line:'key'},
   {t:`    groups.computeIfAbsent(key, k -&gt; <span class="kw">new</span> ArrayList&lt;&gt;())`, line:'put'},
   {t:`          .add(word);`, line:'put'},
   {t:`}`, line:'endFor'},

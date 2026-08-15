@@ -42,6 +42,7 @@ public class GroupAnagrams {
         Map<String, List<String>> groups = new HashMap<>();
         for (String word : strs) {
             char[] letters = word.toCharArray();
+// способ построить ключ: отсортированные буквы
             Arrays.sort(letters);
             String key = new String(letters);
             groups.computeIfAbsent(key, absentKey -> new ArrayList<>()).add(word);
@@ -60,12 +61,12 @@ public class GroupAnagrams {
     public static List<List<String>> groupAnagramsByCounts(String[] strs) {
         Map<String, List<String>> groups = new HashMap<>();
         for (String word : strs) {
-            groups.computeIfAbsent(buildCountKey(word), absentKey -> new ArrayList<>()).add(word);
+            groups.computeIfAbsent(buildFrequencyKey(word), absentKey -> new ArrayList<>()).add(word);
         }
         return new ArrayList<>(groups.values());
     }
 
-    private static String buildCountKey(String word) {
+    private static String buildFrequencyKey(String word) {
         int[] letterCounts = new int[LOWERCASE_LETTER_COUNT];
         for (int currentIndex = 0; currentIndex < word.length(); currentIndex++) {
             letterCounts[word.charAt(currentIndex) - 'a']++;
@@ -86,7 +87,7 @@ public class GroupAnagrams {
          *   4) слово нулевой длины ............................... [""]
          *   5) все слова в одной группе .......................... ["ab","ba"]
          *   6) все слова в разных группах ........................ ["a","b"]
-         *   7) в buildCountKey цикл по слову не начался .......... [""]
+         *   7) в buildFrequencyKey цикл по слову не начался .......... [""]
          * Обе реализации прогоняются по одному и тому же набору случаев.
          */
         record TestCase(String[] input, String[][] expected, String name) {}
@@ -142,12 +143,12 @@ public class GroupAnagrams {
               "разделитель в ключе: 1×a+11×b и 11×a+1×b — разные группы");
 
         /* Ключи двух анаграмм обязаны совпасть, а двух не-анаграмм — различаться. */
-        check(buildCountKey("eat").equals(buildCountKey("tea")),
-              "buildCountKey: у анаграмм ключи совпадают");
-        check(!buildCountKey("eat").equals(buildCountKey("eaat")),
-              "buildCountKey: лишняя буква меняет ключ");
-        check(buildCountKey("").equals(buildCountKey("")),
-              "buildCountKey: пустая строка даёт ключ из одних нулей");
+        check(buildFrequencyKey("eat").equals(buildFrequencyKey("tea")),
+              "buildFrequencyKey: у анаграмм ключи совпадают");
+        check(!buildFrequencyKey("eat").equals(buildFrequencyKey("eaat")),
+              "buildFrequencyKey: лишняя буква меняет ключ");
+        check(buildFrequencyKey("").equals(buildFrequencyKey("")),
+              "buildFrequencyKey: пустая строка даёт ключ из одних нулей");
 
         /* Все исходные слова обязаны попасть в результат ровно по одному разу. */
         String[] input = {"eat", "tea", "tan", "ate", "nat", "bat"};
