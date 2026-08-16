@@ -1,4 +1,4 @@
-package block02_strings_stack;
+package demo;
 
 /**
  * Демонстрация {@code String.offsetByCodePoints(int index, int codePointOffset)}
@@ -11,6 +11,7 @@ package block02_strings_stack;
  * Это не задача LeetCode, а учебный пример к справочнику по String.
  *
  * @see <a href="../../docs/datastructures/String.md">String.md</a>
+ * @see <a href="../../docs/java/README.md">docs/java/README.md</a>
  */
 public class CodePointOffsets {
 

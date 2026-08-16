@@ -190,7 +190,7 @@ public class GroupAnagrams {
             sortedGroup.sort(Comparator.naturalOrder());
             copy.add(sortedGroup);
         }
-        copy.sort(Comparator.comparing(group -> String.join(",", group)));
+        copy.sort(Comparator.comparing((List<String> group) -> String.join(",", group)));
         return copy;
     }
 

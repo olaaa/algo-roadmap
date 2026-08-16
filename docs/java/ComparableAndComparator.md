@@ -58,7 +58,7 @@ error: incompatible types: inference variable T has incompatible bounds
 Самый частый способ построить компаратор: описать не «как сравнивать объекты», а «что у объекта брать для сравнения».
 
 ```java
-copy.sort(Comparator.comparing(group -> String.join(",", group)));
+copy.sort(Comparator.comparing((List<String> group) -> String.join(",", group)));
 ```
 
 Разбор по частям:
@@ -145,8 +145,14 @@ set.add("APPLE");   // вернул false
 **Что должен возвращать `compareTo`?**
 `int`, у которого важен знак: отрицательное — первый раньше, ноль — равны, положительное — первый позже. Величина ничего не значит.
 
-**Почему нельзя писать `return first.age - second.age`?**
-При больших значениях разность переполняет `int` и знак становится неверным. Правильно — `Integer.compare(first.age, second.age)` или `Comparator.comparingInt`.
+**Почему нельзя сравнивать вычитанием, `return first.hashCode() - second.hashCode()`?**
+Разность переполняет `int`, если у чисел **разные знаки** и истинная разность достигает `2^31`. Тогда знак результата становится противоположным правильному, и порядок ломается. `hashCode` — как раз опасный случай: он бывает большим отрицательным.
+
+Если оба значения неотрицательные (или оба неположительные), переполнения не бывает никогда — например, с полем «возраст» вычитание не сломается. Но полагаться на это не стоит: правило про знаки легко забыть при рефакторинге, когда поле начнёт принимать отрицательные значения.
+
+Правильно — `Integer.compare(first, second)` или `Comparator.comparingInt`.
+
+Диапазон, дополнительный код и цифры — [`Int.md`](Int.md), класс-иллюстрация `demo.IntSubtractionOverflow`.
 
 **Как отсортировать по двум полям?**
 `Comparator.comparing(...).thenComparing(...)`. Второй компаратор срабатывает, только если первый вернул ноль.
@@ -160,5 +166,6 @@ set.add("APPLE");   // вернул false
 ## См. также
 
 - Задача, где это применяется: [`GroupAnagrams.md`](../problems/block03_hashtables/GroupAnagrams.md) — метод `normalize` приводит группировку к каноническому виду
+- [`Int.md`](Int.md) — диапазон, дополнительный код, переполнение вычитания
 - Порядок обхода коллекций: [`docs/datastructures/README.md`](../datastructures/README.md)
 - Официальная документация: <https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/Comparator.html>
