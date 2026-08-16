@@ -138,6 +138,35 @@ groups.computeIfAbsent(key, absent -> new ArrayList<>()).add(word);
 
 Функция вызывается **только при отсутствии ключа**, поэтому лишних `ArrayList` не создаётся.
 
+## Как сравнить результат с ожиданием
+
+Порядок групп в ответе и порядок слов внутри группы по условию не важны. Значит сравнивать результат с ожиданием напрямую нельзя: группы приходят из `HashMap`, а её порядок обхода зависит от хешей ключей и спецификацией не определён. Тест падал бы на верном ответе.
+
+Поэтому обе стороны сначала приводятся к каноническому виду — метод `normalize`:
+
+```java
+copy.sort(Comparator.comparing(group -> String.join(",", group)));
+```
+
+```
+до:    [[eat, tea, ate], [bat], [tan, nat]]
+после: [[ate, eat, tea], [bat], [nat, tan]]
+```
+
+Два шага: слова внутри каждой группы сортируются по алфавиту, затем сортируются сами группы.
+
+Второй шаг интереснее первого. Написать `copy.sort(Comparator.naturalOrder())` нельзя — `List` не реализует `Comparable`, естественного порядка у списков нет:
+
+```
+error: incompatible types: inference variable T has incompatible bounds
+    upper bounds: Comparable<? super T>
+    lower bounds: List<String>
+```
+
+Поэтому порядок задаётся снаружи, через **ключ сравнения**: каждая группа склеивается в строку, и сравниваются уже строки, у которых естественный порядок есть.
+
+Тема `Comparable` против `Comparator` — частый вопрос на собеседовании сам по себе. Полный разбор: [`docs/java/ComparableAndComparator.md`](../../java/ComparableAndComparator.md).
+
 ## Сложность
 
 Обозначим `n` — количество строк, `k` — максимальная длина строки.
@@ -164,6 +193,7 @@ groups.computeIfAbsent(key, absent -> new ArrayList<>()).add(word);
 - Визуализация: [`docs/visualizations/block03_hashtables/GroupAnagrams.html`](../../visualizations/block03_hashtables/GroupAnagrams.html)
 - Обзор блока: [`Pattern_HashMap.md`](Pattern_HashMap.md) — форма «группировка по ключу»
 - Приёмы: [`heuristics.md`](../../heuristics.md) — приём 7 (проверка ключа-отпечатка на склейку)
+- Механика языка: [`docs/java/ComparableAndComparator.md`](../../java/ComparableAndComparator.md) — почему у списка нет естественного порядка и как задать его снаружи
 - Та же проверка на двух строках: [`ValidAnagram.md`](../block02_strings_stack/ValidAnagram.md) — там разобрано, почему `symbol - 'a'` работает
 - Соседние задачи блока: [`TwoSum.md`](TwoSum.md), [`ContainsDuplicate.md`](ContainsDuplicate.md)
 - LeetCode: <https://leetcode.com/problems/group-anagrams/>

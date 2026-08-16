@@ -15,3 +15,4 @@
 | Файл | О чём |
 |------|-------|
 | [`VariablesAndMemory.md`](VariablesAndMemory.md) | Как отличить переменную от значения, кадр метода, слоты, стек операндов, куча |
+| [`ComparableAndComparator.md`](ComparableAndComparator.md) | Два интерфейса порядка, `comparing` и ключ сравнения, `thenComparing`, согласованность с `equals` |

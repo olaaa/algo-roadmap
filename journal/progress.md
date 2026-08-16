@@ -431,3 +431,20 @@
   то есть чистка привела набор к единому виду.
   Правило записано в CLAUDE.md: в .html допустим только текст, объясняющий
   САМУ КАРТИНКУ, разбор задачи живёт в .md.
+- buildCountKey переименован в buildFrequencyKey (по просьбе Lela) — совпадает
+  с термином «вектор частот» из .md и Javadoc.
+- НОВЫЙ СПРАВОЧНИК docs/java/ComparableAndComparator.md. Повод — вопрос Lela
+  про строку copy.sort(Comparator.comparing(...)) в normalize: тема Comparable
+  и Comparator всплывает на собеседовании сама по себе, поэтому вынесена
+  из комментария в код в отдельный файл.
+  Содержание: таблица различий двух интерфейсов, естественный порядок String
+  (заглавные раньше строчных, 'A'=65 против 'a'=97), ошибка компиляции
+  на groups.sort(Comparator.naturalOrder()) для List<List<String>> —
+  «inference variable T has incompatible bounds», разбор comparing как
+  сравнения по ключу, замер вызовов извлекателя (4 вызова на 3 элементах,
+  то есть O(n log n), а не по разу на элемент), thenComparing и reversed
+  на записи Person, рассогласование с equals на TreeSet с
+  CASE_INSENSITIVE_ORDER, раздел «Типичные вопросы на собеседовании».
+  Всё проверено запуском на локальной JDK 25.
+  В GroupAnagrams.md добавлен раздел «Как сравнить результат с ожиданием» —
+  короткий разбор normalize со ссылкой на справочник.

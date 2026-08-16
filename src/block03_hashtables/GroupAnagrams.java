@@ -45,7 +45,8 @@ public class GroupAnagrams {
 // способ построить ключ: отсортированные буквы
             Arrays.sort(letters);
             String key = new String(letters);
-            groups.computeIfAbsent(key, absentKey -> new ArrayList<>()).add(word);
+            groups.computeIfAbsent(key, absentKey -> new ArrayList<>())
+                    .add(word);
         }
         return new ArrayList<>(groups.values());
     }
@@ -61,7 +62,8 @@ public class GroupAnagrams {
     public static List<List<String>> groupAnagramsByCounts(String[] strs) {
         Map<String, List<String>> groups = new HashMap<>();
         for (String word : strs) {
-            groups.computeIfAbsent(buildFrequencyKey(word), absentKey -> new ArrayList<>()).add(word);
+            groups.computeIfAbsent(buildFrequencyKey(word), absentKey -> new ArrayList<>())
+                    .add(word);
         }
         return new ArrayList<>(groups.values());
     }
@@ -174,6 +176,13 @@ public class GroupAnagrams {
         return normalizedActual.equals(normalize(expectedAsList));
     }
 
+    /*
+     * Канонический вид: слова внутри группы по алфавиту, затем сами группы.
+     * до:    [[eat, tea, ate], [bat], [tan, nat]]
+     * после: [[ate, eat, tea], [bat], [nat, tan]]
+     * Разбор — GroupAnagrams.md, раздел «Как сравнить результат с ожиданием»
+     * и docs/java/ComparableAndComparator.md.
+     */
     private static List<List<String>> normalize(List<List<String>> groups) {
         List<List<String>> copy = new ArrayList<>();
         for (List<String> group : groups) {
