@@ -150,6 +150,7 @@ Math.floorMod(-7, 3) = 2
 ## См. также
 
 - [`ComparableAndComparator.md`](ComparableAndComparator.md) — где переполнение вычитания ломает порядок сортировки
+- [`Double.md`](Double.md) — дробный тип: почему `0.1` не представима точно, `NaN`, минус ноль
 - [`Rounding.md`](Rounding.md) — `floor`, `ceil`, `round`, `rint` и усечение `(int)`
 - [`VariablesAndMemory.md`](VariablesAndMemory.md) — где живут значения примитивов: слоты кадра, стек операндов
 - Класс-иллюстрация: `demo.IntSubtractionOverflow`

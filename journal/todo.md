@@ -15,7 +15,8 @@
 - [~] Блок 3. Хеш-таблицы: TwoSum [x] (7/7 PASS, +Pattern_HashMap.md +виз.),
       ContainsDuplicate [~] код написан (14/14 PASS, +виз.), Lela разбирает,
       GroupAnagrams [~] код написан (25/25 PASS, +виз.), Lela разбирает,
-      MajorityElement [ ]
+      MajorityElement [~] код написан (28/28 PASS, +виз.), Lela разбирает.
+      КОД ПО ВСЕМУ БЛОКУ 3 НАПИСАН, остаётся разбор.
 - [ ] Блок 4. Скользящее окно (LongestSubstringNoRepeat, MaxAverageSubarray)
 - [ ] Блок 5. Бинарный поиск (BinarySearch, SearchInsertPosition)
 - [ ] Блок 6. Деревья и базовые графы (MaxDepth, SymmetricTree, BFS).
@@ -39,9 +40,12 @@
       тесты в main() + компиляция и прогон + визуализация.
       Блок 2 «Строки + стек» — все четыре задачи написаны, FirstUniqueChar
       ещё разбирает Lela.
-      Сейчас в работе блок 3 «Хеш-таблицы»: ContainsDuplicate (217) и
-      GroupAnagrams (49, первая Medium в проекте) написаны.
-      Следующая и последняя в блоке: MajorityElement (169).
+      Блок 3 «Хеш-таблицы» написан целиком: TwoSum, ContainsDuplicate,
+      GroupAnagrams, MajorityElement.
+      Следующий по плану — блок 4 «Скользящее окно»:
+      LongestSubstringNoRepeat (3, Medium) и MaxAverageSubarray (643).
+      Обзорного файла Pattern_SlidingWindow.md ещё нет, его надо завести
+      вместе с первой задачей блока.
 
 - [~] Визуализации для остальных задач блока 1: MergeSortedArray [x],
       ValidPalindrome [ ], MoveZeroes [x] (шаблон и рецепт — в progress.md,
