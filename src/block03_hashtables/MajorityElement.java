@@ -31,7 +31,11 @@ public class MajorityElement {
         return bestValue;
     }
 
-    /* Голосование Бойера—Мура. Чужой голос выбивает один голос за кандидата. */
+    /*
+     * Голосование Бойера—Мура. Чужой голос выбивает один голос за кандидата.
+     * Проверки на пустой массив нет намеренно: по ограничениям задачи длина
+     * не меньше единицы. Случай без гарантий — MajorityElementNotGuaranteed.
+     */
     public static int majorityElementByVoting(int[] nums) {
         int majorityCandidate = nums[0];
         int survivingVotes = 1;
