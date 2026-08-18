@@ -77,7 +77,7 @@
 </head>
 <body>
   <h1>Majority Element — голосование Бойера—Мура</h1>
-  <div class="sub">Две переменные вместо хеш-таблицы: кандидат и баланс. Чужой элемент взаимно выбывает с одним сторонником кандидата; баланс — это число выживших сторонников (LeetCode 169).</div>
+  <div class="sub">Две переменные вместо хеш-таблицы: <b>majority</b> — текущий фаворит, <b>count</b> — сколько голосов за него ещё не погашено. Чужой элемент взаимно выбывает с одним сторонником фаворита (LeetCode 169).</div>
 
   <div class="stage">
     <div class="setup">
@@ -103,11 +103,11 @@
 
     <div class="state">
       <div class="card cand">
-        <div class="cap">candidate</div>
+        <div class="cap">majority — текущий фаворит</div>
         <div class="val" id="candVal">—</div>
       </div>
       <div class="card bal" id="balCard">
-        <div class="cap">balance — выжившие сторонники</div>
+        <div class="cap">count — непогашенные голоса за него</div>
         <div class="val" id="balVal">0</div>
         <div class="bar" id="balBar"></div>
       </div>
@@ -131,52 +131,57 @@ const $ = id => document.getElementById(id);
 let nums=[], steps=[], cur=0, timer=null;
 
 const CODE = [
-  {t:`<span class="kw">int</span> candidate = nums[<span class="num">0</span>];`, line:'init'},
-  {t:`<span class="kw">int</span> balance = <span class="num">0</span>;`, line:'init'},
-  {t:`<span class="kw">for</span> (<span class="kw">int</span> value : nums) {`, line:'for'},
-  {t:`    <span class="kw">if</span> (balance == <span class="num">0</span>) {`, line:'check'},
-  {t:`        candidate = value;`, line:'newCand'},
+  {t:`<span class="kw">int</span> majority = <span class="num">0</span>;`, line:'init'},
+  {t:`<span class="kw">int</span> count = <span class="num">0</span>;`, line:'init'},
+  {t:`<span class="kw">for</span> (<span class="kw">int</span> n : nums) {`, line:'for'},
+  {t:`    <span class="kw">if</span> (count == <span class="num">0</span>) {`, line:'check'},
+  {t:`        majority = n;`, line:'newCand'},
   {t:`    }`, line:'endIf'},
-  {t:`    balance += (value == candidate) ? <span class="num">1</span> : -<span class="num">1</span>;`, line:'vote'},
+  {t:`    <span class="kw">if</span> (n == majority) {`, line:'vote'},
+  {t:`        count++;`, line:'vote'},
+  {t:`    } <span class="kw">else</span> {`, line:'vote'},
+  {t:`        count--;`, line:'vote'},
+  {t:`    }`, line:'endVote'},
   {t:`}`, line:'endFor'},
-  {t:`<span class="kw">return</span> candidate;`, line:'ret'},
+  {t:`<span class="kw">return</span> majority;`, line:'ret'},
 ];
 
 function buildSteps(){
   steps=[];
   if(!nums.length){
-    steps.push({i:-1, line:'init', candidate:null, balance:0, done:true, bad:true,
-                msg:'массив пустой — по условию так не бывает, алгоритму нечего читать'});
+    steps.push({i:-1, line:'ret', candidate:0, balance:0, done:true, bad:true,
+                msg:'массив пустой — цикл не начинается, возвращается начальное majority = 0'});
     return;
   }
 
-  let candidate = nums[0];
-  let balance = 0;
-  steps.push({i:-1, line:'init', candidate, balance, msg:`кандидат = nums[0] = ${candidate}, баланс = 0`});
+  let majority = 0;
+  let count = 0;
+  steps.push({i:-1, line:'init', candidate:majority, balance:count,
+              msg:'majority = 0, count = 0 — начальные значения'});
 
   for(let i=0;i<nums.length;i++){
     const value = nums[i];
-    steps.push({i, line:'for', candidate, balance, msg:`берём nums[${i}] = ${value}`});
+    steps.push({i, line:'for', candidate:majority, balance:count, msg:`берём nums[${i}] = ${value}`});
 
-    if(balance === 0){
-      candidate = value;
-      steps.push({i, line:'newCand', candidate, balance, newCand:true,
-                  msg:`баланс ноль — прежний кандидат вытеснен, новый кандидат ${candidate}`});
+    if(count === 0){
+      majority = value;
+      steps.push({i, line:'newCand', candidate:majority, balance:count, newCand:true,
+                  msg:`count ноль — прежний фаворит погашен, новый фаворит ${majority}`});
     } else {
-      steps.push({i, line:'check', candidate, balance,
-                  msg:`баланс ${balance}, не ноль — кандидат остаётся ${candidate}`});
+      steps.push({i, line:'check', candidate:majority, balance:count,
+                  msg:`count ${count}, не ноль — фаворит остаётся ${majority}`});
     }
 
-    const supports = value === candidate;
-    balance += supports ? 1 : -1;
-    steps.push({i, line:'vote', candidate, balance, supports,
+    const supports = value === majority;
+    count += supports ? 1 : -1;
+    steps.push({i, line:'vote', candidate:majority, balance:count, supports,
                 msg: supports
-                      ? `${value} за кандидата — баланс стал ${balance}`
-                      : `${value} против — взаимно выбывает со сторонником, баланс стал ${balance}`});
+                      ? `${value} за фаворита — count стал ${count}`
+                      : `${value} против — взаимно выбывает со сторонником, count стал ${count}`});
   }
 
-  steps.push({i:nums.length, line:'ret', candidate, balance, done:true, good:true,
-              msg:`✓ ответ ${candidate}: сторонников осталось ${balance}, чужих на всех не хватило`});
+  steps.push({i:nums.length, line:'ret', candidate:majority, balance:count, done:true, good:true,
+              msg:`✓ ответ ${majority}: сторонников осталось ${count}, чужих на всех не хватило`});
 }
 
 function renderCells(s){
