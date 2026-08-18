@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Maximum Average Subarray — визуализация окна фиксированной ширины</title>
+<style>
+  :root{
+    --bg:#0f1117; --panel:#171a23; --cell:#232733; --line:#2e3342;
+    --txt:#e6e8ee; --muted:#8b90a0; --accent:#4f8cff; --cur:#38bdf8; --comp:#fbbf24;
+    --ok:#34d399; --miss:#fb7185; --code:#c7d0e0;
+    --mono:"JetBrains Mono",Consolas,Menlo,monospace;
+    --sans:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--txt);font-family:var(--sans);
+       display:flex;flex-direction:column;align-items:center;min-height:100vh;padding:24px}
+  h1{font-size:18px;font-weight:600;margin:0 0 2px}
+  .sub{color:var(--muted);font-size:13px;margin-bottom:20px;max-width:840px;text-align:center}
+  .stage{width:min(980px,100%);background:var(--panel);border:1px solid var(--line);
+         border-radius:14px;padding:26px 22px}
+  .setup{display:flex;gap:16px;flex-wrap:wrap;align-items:flex-end;margin-bottom:18px}
+  .setup label{display:flex;flex-direction:column;gap:5px;font-size:12px;color:var(--muted)}
+  .setup input[type=text]{font-family:var(--mono);font-size:14px;background:var(--cell);
+       border:1px solid var(--line);color:var(--txt);border-radius:8px;padding:8px 10px;width:300px}
+  .setup input[type=number]{font-family:var(--mono);font-size:14px;background:var(--cell);
+       border:1px solid var(--line);color:var(--txt);border-radius:8px;padding:8px 10px;width:70px}
+  .btn{font-family:var(--sans);font-size:13px;font-weight:500;cursor:pointer;
+       background:var(--cell);border:1px solid var(--line);color:var(--txt);
+       border-radius:8px;padding:9px 14px;transition:.15s}
+  .btn:hover{border-color:var(--accent)}
+  .btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+  .btn:disabled{opacity:.4;cursor:not-allowed}
+  .preset{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:20px}
+  .preset .btn{padding:6px 11px;font-family:var(--mono);font-size:12px}
+
+  .strwrap{margin:18px 0 6px}
+  .strlab{font-family:var(--mono);font-size:12px;color:var(--muted);margin-bottom:8px;text-align:center}
+  .cells{display:flex;gap:5px;flex-wrap:wrap;justify-content:center}
+  .ccell{display:flex;flex-direction:column;align-items:center;gap:4px}
+  .cell{min-width:44px;height:42px;padding:0 8px;border-radius:8px;background:var(--cell);
+        border:2px solid var(--line);display:flex;align-items:center;justify-content:center;
+        font-family:var(--mono);font-size:14px;transition:.2s}
+  .cell.inWindow{border-color:var(--accent);background:rgba(79,140,255,.18)}
+  .cell.best{border-color:var(--ok);background:rgba(52,211,153,.22)}
+  .cell.entering{border-color:var(--ok);background:rgba(52,211,153,.3)}
+  .cell.leaving{border-color:var(--miss);background:rgba(251,113,133,.28)}
+  .idx{font-family:var(--mono);font-size:10.5px;color:var(--muted)}
+  .idx.on{color:var(--cur)}
+
+  .state{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin:18px 0 4px}
+  .card{background:#0b0d13;border:1px solid var(--line);border-radius:10px;
+        padding:12px 20px;min-width:150px;text-align:center}
+  .card .cap{font-family:var(--mono);font-size:11.5px;color:var(--muted);margin-bottom:6px}
+  .card .val{font-family:var(--mono);font-size:24px;font-weight:700}
+  .card.sum .val{color:var(--accent)}
+  .card.best .val{color:var(--ok)}
+  .card.avg .val{color:var(--comp)}
+
+  .status{min-height:26px;text-align:center;font-family:var(--mono);font-size:14px;margin:14px 0 6px}
+  .status .op{color:var(--code)}
+  .status .good{color:var(--ok)} .status .comp{color:var(--comp)} .status .miss{color:var(--miss)}
+
+  .controls{position:sticky;top:8px;z-index:5;display:flex;gap:10px;justify-content:center;
+            align-items:center;flex-wrap:wrap;margin:10px 0 4px;padding:9px 10px;
+            background:rgba(23,26,35,.94);border:1px solid var(--line);border-radius:10px}
+  .step-info{color:var(--muted);font-size:12px;font-family:var(--mono);min-width:96px;text-align:center}
+
+  .codebox{background:#0b0d13;border:1px solid var(--line);border-radius:10px;
+           padding:14px 16px;font-family:var(--mono);font-size:12.5px;line-height:1.7;
+           overflow:auto;margin-top:18px}
+  .codebox .ln{display:block;padding:0 6px;border-radius:4px;color:var(--code);white-space:pre}
+  .codebox .ln.active{background:rgba(79,140,255,.18)}
+  .kw{color:#c792ea}.num{color:#f78c6c}.cm{color:#5c6370}
+</style>
+</head>
+<body>
+  <h1>Maximum Average Subarray — окно фиксированной ширины</h1>
+  <div class="sub">Соседние окна отличаются двумя элементами: один вошёл справа, один вышел слева. Поэтому сумма не считается заново, а правится на разницу (LeetCode 643).</div>
+
+  <div class="stage">
+    <div class="setup">
+      <label>Массив (числа через запятую)
+        <input id="numsIn" type="text" value="1, 12, -5, -6, 50, 3">
+      </label>
+      <label>Ширина окна k
+        <input id="kIn" type="number" value="4" min="1">
+      </label>
+      <button class="btn primary" id="build">Построить</button>
+    </div>
+
+    <div class="preset">
+      <button class="btn" data-nums="1, 12, -5, -6, 50, 3" data-k="4">пример из условия</button>
+      <button class="btn" data-nums="-1, -2, -3" data-k="2">все отрицательные</button>
+      <button class="btn" data-nums="0, 4, 0, 3, 2" data-k="1">k = 1 — поиск максимума</button>
+      <button class="btn" data-nums="1, 2, 3" data-k="3">окно во весь массив</button>
+      <button class="btn" data-nums="5, 1, 1, 1" data-k="2">лучшее окно первое</button>
+      <button class="btn" data-nums="1, 1, 1, 5" data-k="2">лучшее окно последнее</button>
+    </div>
+
+    <div class="strwrap">
+      <div class="strlab">массив nums — под каждой ячейкой её индекс</div>
+      <div class="cells" id="cells"></div>
+    </div>
+
+    <div class="state">
+      <div class="card sum">
+        <div class="cap">windowSum</div>
+        <div class="val" id="sumVal">0</div>
+      </div>
+      <div class="card best">
+        <div class="cap">maxSum</div>
+        <div class="val" id="bestVal">—</div>
+      </div>
+      <div class="card avg">
+        <div class="cap">maxSum / k</div>
+        <div class="val" id="avgVal">—</div>
+      </div>
+    </div>
+
+    <div class="status" id="status"></div>
+
+    <div class="controls">
+      <button class="btn" id="prev">◀ Назад</button>
+      <span class="step-info" id="stepInfo">шаг 0 / 0</span>
+      <button class="btn" id="next">Вперёд ▶</button>
+      <button class="btn" id="play">▶ Авто</button>
+      <button class="btn" id="reset">⟲ Сброс</button>
+    </div>
+
+    <div class="codebox" id="code"></div>
+  </div>
+
+<script>
+const $ = id => document.getElementById(id);
+let nums=[], windowSize=1, steps=[], cur=0, timer=null;
+
+const CODE = [
+  {t:`<span class="kw">int</span> windowSum = <span class="num">0</span>;`, line:'init'},
+  {t:`<span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; k; i++) {`, line:'fill'},
+  {t:`    windowSum += nums[i];`, line:'fill'},
+  {t:`}`, line:'fillEnd'},
+  {t:`<span class="kw">int</span> maxSum = windowSum;`, line:'firstMax'},
+  {t:`<span class="kw">for</span> (<span class="kw">int</span> i = k; i &lt; nums.length; i++) {`, line:'slide'},
+  {t:`    windowSum += nums[i] - nums[i - k];`, line:'shift'},
+  {t:`    maxSum = Math.max(maxSum, windowSum);`, line:'max'},
+  {t:`}`, line:'slideEnd'},
+  {t:`<span class="kw">return</span> (<span class="kw">double</span>) maxSum / k;`, line:'ret'},
+];
+
+function buildSteps(){
+  steps=[];
+  if(!nums.length || windowSize < 1 || windowSize > nums.length){
+    steps.push({line:'init', from:-1, to:-1, sum:0, best:null, done:true, bad:true,
+                msg:`k должно быть от 1 до ${nums.length || 0} — окно обязано помещаться в массив`});
+    return;
+  }
+
+  let windowSum = 0;
+  steps.push({line:'init', from:-1, to:-1, sum:0, best:null, msg:'windowSum = 0, окно ещё не набрано'});
+
+  for(let i=0;i<windowSize;i++){
+    windowSum += nums[i];
+    steps.push({line:'fill', from:0, to:i, sum:windowSum, best:null, entering:i,
+                msg:`набираем первое окно: += nums[${i}] = ${nums[i]}, сумма ${windowSum}`});
+  }
+
+  let maxSum = windowSum;
+  let bestFrom = 0;
+  steps.push({line:'firstMax', from:0, to:windowSize-1, sum:windowSum, best:maxSum, bestFrom,
+              msg:`первое окно готово, сумма ${windowSum} — это и начальный максимум`});
+
+  for(let i=windowSize;i<nums.length;i++){
+    const leaving = i - windowSize;
+    windowSum += nums[i] - nums[leaving];
+    steps.push({line:'shift', from:leaving+1, to:i, sum:windowSum, best:maxSum, bestFrom,
+                entering:i, leaving,
+                msg:`вошёл nums[${i}] = ${nums[i]}, вышел nums[${leaving}] = ${nums[leaving]} → сумма ${windowSum}`});
+
+    if(windowSum > maxSum){
+      maxSum = windowSum;
+      bestFrom = leaving + 1;
+      steps.push({line:'max', from:leaving+1, to:i, sum:windowSum, best:maxSum, bestFrom, improved:true,
+                  msg:`${windowSum} больше прежнего максимума — запоминаем`});
+    } else {
+      steps.push({line:'max', from:leaving+1, to:i, sum:windowSum, best:maxSum, bestFrom,
+                  msg:`${windowSum} не лучше ${maxSum} — максимум не меняется`});
+    }
+  }
+
+  const average = maxSum / windowSize;
+  steps.push({line:'ret', from:bestFrom, to:bestFrom+windowSize-1, sum:windowSum, best:maxSum, bestFrom,
+              done:true, good:true, showAverage:true,
+              msg:`✓ ответ ${average}: лучшая сумма ${maxSum}, делим на k = ${windowSize} ОДИН раз в конце`});
+}
+
+function renderCells(s){
+  const box=$('cells'); box.innerHTML='';
+  if(!nums.length){
+    box.innerHTML='<div class="idx">массив пуст</div>';
+    return;
+  }
+  for(let i=0;i<nums.length;i++){
+    const wrap=document.createElement('div'); wrap.className='ccell';
+    const cell=document.createElement('div'); cell.className='cell'; cell.textContent=nums[i];
+    const inWindow = s.from >= 0 && i >= s.from && i <= s.to;
+    const inBest = s.done && s.bestFrom !== undefined
+                && i >= s.bestFrom && i < s.bestFrom + windowSize;
+    if(s.leaving === i){
+      cell.classList.add('leaving');
+    } else if(s.entering === i){
+      cell.classList.add('entering');
+    } else if(inBest){
+      cell.classList.add('best');
+    } else if(inWindow){
+      cell.classList.add('inWindow');
+    }
+    const idx=document.createElement('div');
+    idx.className='idx' + (inWindow ? ' on' : '');
+    idx.textContent=i;
+    wrap.append(cell,idx); box.append(wrap);
+  }
+}
+
+function renderState(s){
+  $('sumVal').textContent = s.sum;
+  $('bestVal').textContent = s.best === null || s.best === undefined ? '—' : s.best;
+  $('avgVal').textContent = s.showAverage ? (s.best / windowSize) : '—';
+}
+
+function renderCode(active){
+  $('code').innerHTML = CODE.map(c=>
+    `<span class="ln ${c.line===active?'active':''}">${c.t}</span>`).join('');
+}
+
+function show(idx){
+  cur=Math.max(0,Math.min(idx,steps.length-1));
+  const s=steps[cur];
+  renderCells(s); renderState(s); renderCode(s.line);
+  const cls = s.good ? 'good' : s.bad ? 'miss' : s.improved ? 'good'
+            : s.leaving !== undefined ? 'comp' : 'op';
+  $('status').innerHTML=`<span class="${cls}">${s.msg}</span>`;
+  $('stepInfo').textContent=`шаг ${cur+1} / ${steps.length}`;
+  $('prev').disabled=cur===0; $('next').disabled=cur===steps.length-1;
+}
+
+function build(){
+  stopPlay();
+  nums = $('numsIn').value.split(',')
+      .map(part=>part.trim())
+      .filter(part=>part.length>0)
+      .map(Number)
+      .filter(value=>Number.isFinite(value));
+  $('numsIn').value = nums.join(', ');
+  windowSize = Number($('kIn').value) || 1;
+  buildSteps(); show(0);
+}
+function stopPlay(){ if(timer){clearInterval(timer);timer=null;$('play').textContent='▶ Авто';} }
+function togglePlay(){
+  if(timer){stopPlay();return;}
+  if(cur>=steps.length-1) show(0);
+  $('play').textContent='⏸ Пауза';
+  timer=setInterval(()=>{ if(cur>=steps.length-1){stopPlay();return;} show(cur+1); },800);
+}
+
+$('build').onclick=build;
+$('next').onclick=()=>{stopPlay();show(cur+1);};
+$('prev').onclick=()=>{stopPlay();show(cur-1);};
+$('play').onclick=togglePlay;
+$('reset').onclick=()=>{stopPlay();show(0);};
+document.querySelectorAll('.preset .btn').forEach(b=>{
+  b.onclick=()=>{ $('numsIn').value=b.dataset.nums; $('kIn').value=b.dataset.k; build(); };
+});
+document.addEventListener('keydown',e=>{
+  if(e.target.tagName==='INPUT') return;
+  if(e.key==='ArrowRight'){stopPlay();show(cur+1);}
+  if(e.key==='ArrowLeft'){stopPlay();show(cur-1);}
+  if(e.key===' '){e.preventDefault();togglePlay();}
+});
+build();
+</script>
+</body>
+</html>

@@ -19,7 +19,9 @@
       MajorityElementNotGuaranteed для случая без гарантии (20/20 PASS),
       Lela разбирает.
       КОД ПО ВСЕМУ БЛОКУ 3 НАПИСАН, остаётся разбор.
-- [ ] Блок 4. Скользящее окно (LongestSubstringNoRepeat, MaxAverageSubarray)
+- [~] Блок 4. Скользящее окно: Pattern_SlidingWindow.md [x],
+      MaxAverageSubarray [~] код написан (18/18 PASS, +виз.), Lela разбирает,
+      LongestSubstringNoRepeat [ ] (3, Medium — окно переменной ширины)
 - [ ] Блок 5. Бинарный поиск (BinarySearch, SearchInsertPosition)
 - [ ] Блок 6. Деревья и базовые графы (MaxDepth, SymmetricTree, BFS).
       ВНИМАНИЕ: docs/problems/block06_trees_graphs/Pattern_GraphTraversal.md
@@ -44,10 +46,10 @@
       ещё разбирает Lela.
       Блок 3 «Хеш-таблицы» написан целиком: TwoSum, ContainsDuplicate,
       GroupAnagrams, MajorityElement.
-      Следующий по плану — блок 4 «Скользящее окно»:
-      LongestSubstringNoRepeat (3, Medium) и MaxAverageSubarray (643).
-      Обзорного файла Pattern_SlidingWindow.md ещё нет, его надо завести
-      вместе с первой задачей блока.
+      Сейчас блок 4 «Скользящее окно». Порядок взяли не по плану, а по логике
+      обучения: сначала MaxAverageSubarray (643, окно фиксированной ширины),
+      он уже написан. Следующая — LongestSubstringNoRepeat (3, Medium):
+      окно переменной ширины плюс множество виденного, две новые вещи разом.
 
 - [~] Визуализации для остальных задач блока 1: MergeSortedArray [x],
       ValidPalindrome [ ], MoveZeroes [x] (шаблон и рецепт — в progress.md,
