@@ -17,6 +17,9 @@ import java.util.Map;
  * {@link #majorityElementByVoting} — голосование Бойера—Мура, ответ
  * на follow-up «линейное время и O(1) дополнительной памяти».
  * <p>
+ * Оба метода опираются на гарантию из условия: мажоритарный элемент точно
+ * существует. Вариант без этой гарантии — {@link MajorityElementNotGuaranteed}.
+ * <p>
  * Полное условие, примеры и ограничения:
  * {@code docs/problems/block03_hashtables/MajorityElement.md}
  *
@@ -62,7 +65,6 @@ public class MajorityElement {
      * и падает; vote вместо n, потому что перебираются голоса.
      * Почему именно surviving, а не unmatched или outstanding, — разобрано
      * в .md, раздел «Почему survivingVotes, а не другое английское слово».
-     * Дословная копия книжного кода — в {@link MajorityElementBookVersion}.
      */
     public static int majorityElementByVoting(int[] nums) {
         int majorityCandidate = 0;

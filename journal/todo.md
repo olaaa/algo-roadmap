@@ -15,7 +15,9 @@
 - [~] Блок 3. Хеш-таблицы: TwoSum [x] (7/7 PASS, +Pattern_HashMap.md +виз.),
       ContainsDuplicate [~] код написан (14/14 PASS, +виз.), Lela разбирает,
       GroupAnagrams [~] код написан (25/25 PASS, +виз.), Lela разбирает,
-      MajorityElement [~] код написан (28/28 PASS, +виз.), Lela разбирает.
+      MajorityElement [~] код написан (30/30 PASS, +виз.) + класс
+      MajorityElementNotGuaranteed для случая без гарантии (20/20 PASS),
+      Lela разбирает.
       КОД ПО ВСЕМУ БЛОКУ 3 НАПИСАН, остаётся разбор.
 - [ ] Блок 4. Скользящее окно (LongestSubstringNoRepeat, MaxAverageSubarray)
 - [ ] Блок 5. Бинарный поиск (BinarySearch, SearchInsertPosition)
