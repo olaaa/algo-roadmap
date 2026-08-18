@@ -17,6 +17,9 @@ import static block03_hashtables.MajorityElement.majorityElementByVoting;
  * значение ВСЕГДА, даже на массиве без мажоритарного элемента. Без проверки
  * этот мусор ушёл бы в ответ.
  * <p>
+ * Пустой массив тоже обрабатывается здесь, а не в голосовании: там его
+ * не бывает по ограничениям LeetCode, а тут гарантий нет никаких.
+ * <p>
  * Сложность не меняется: два линейных прохода это O(n) времени, а хранятся
  * по-прежнему только кандидат и счётчик, то есть O(1) памяти.
  * <p>
@@ -33,6 +36,15 @@ public class MajorityElementNotGuaranteed {
     private static final int NOT_FOUND = -1;
 
     public static int findMajorityElement(int[] nums) {
+        /*
+         * Пустой массив отсекается здесь. Голосование его не обрабатывает —
+         * оно написано под ограничения LeetCode, где длина не меньше единицы,
+         * и берёт nums[0] без оглядки. Класс без гарантий обязан быть строже,
+         * поэтому проверка стоит первой строкой, до вызова.
+         */
+        if (nums.length == 0) {
+            return NOT_FOUND;
+        }
         int candidate = majorityElementByVoting(nums);
         return isMajority(nums, candidate) ? candidate : NOT_FOUND;
     }
@@ -55,13 +67,13 @@ public class MajorityElementNotGuaranteed {
     public static void main(String[] args) {
         /*
          * Ветви метода и тест, который каждую из них закрывает:
-         *   1) isMajority вернул true -> возвращаем кандидата ... [1,2,1]
-         *   2) isMajority вернул false -> возвращаем -1 ......... [1,2,3] — ФОЛБЭК
-         *   3) внутри isMajority: value == candidate ............ [7,7,7]
-         *   4) внутри isMajority: value != candidate ............ [1,2,1]
-         *   5) массив из одного элемента ........................ [7]
-         *   6) ровно половина — порог не взят ................... [1,1,2,2]
-         *   7) пустой массив, цикл не начался ................... []
+         *   1) ранний выход на пустом массиве ................... []
+         *   2) isMajority вернул true -> возвращаем кандидата ... [1,2,1]
+         *   3) isMajority вернул false -> возвращаем -1 ......... [1,2,3] — ФОЛБЭК
+         *   4) внутри isMajority: value == candidate ............ [7,7,7]
+         *   5) внутри isMajority: value != candidate ............ [1,2,1]
+         *   6) массив из одного элемента ........................ [7]
+         *   7) ровно половина — порог не взят ................... [1,1,2,2]
          */
         record TestCase(int[] input, int expected, String name) {}
 

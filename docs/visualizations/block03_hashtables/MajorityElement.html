@@ -93,7 +93,7 @@
       <button class="btn" data-nums="5, 9, 9, 9, 9">5,9,9,9,9 — кандидат меняется</button>
       <button class="btn" data-nums="1, 2, 1, 2, 1">1,2,1,2,1 — выжившие кончаются дважды</button>
       <button class="btn" data-nums="7, 7, 7">7,7,7 — все одинаковые</button>
-      <button class="btn" data-nums="1">1 — один элемент</button>
+      <button class="btn" data-nums="1">1 — один элемент, цикл не начнётся</button>
     </div>
 
     <div class="strwrap">
@@ -131,9 +131,10 @@ const $ = id => document.getElementById(id);
 let nums=[], steps=[], cur=0, timer=null;
 
 const CODE = [
-  {t:`<span class="kw">int</span> majorityCandidate = <span class="num">0</span>;`, line:'init'},
-  {t:`<span class="kw">int</span> survivingVotes = <span class="num">0</span>;`, line:'init'},
-  {t:`<span class="kw">for</span> (<span class="kw">int</span> vote : nums) {`, line:'for'},
+  {t:`<span class="kw">int</span> majorityCandidate = nums[<span class="num">0</span>];`, line:'init'},
+  {t:`<span class="kw">int</span> survivingVotes = <span class="num">1</span>;`, line:'init'},
+  {t:`<span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">1</span>; i &lt; nums.length; i++) {`, line:'for'},
+  {t:`    <span class="kw">int</span> vote = nums[i];`, line:'for'},
   {t:`    <span class="kw">if</span> (survivingVotes == <span class="num">0</span>) {`, line:'check'},
   {t:`        majorityCandidate = vote;`, line:'newCand'},
   {t:`    }`, line:'endIf'},
@@ -149,17 +150,17 @@ const CODE = [
 function buildSteps(){
   steps=[];
   if(!nums.length){
-    steps.push({i:-1, line:'ret', candidate:0, balance:0, done:true, bad:true,
-                msg:'массив пустой — цикл не начинается, возвращается начальный majorityCandidate = 0'});
+    steps.push({i:-1, line:'init', candidate:null, balance:0, done:true, bad:true,
+                msg:'по условию задачи массив непустой — на пустом nums[0] бросил бы исключение'});
     return;
   }
 
-  let majorityCandidate = 0;
-  let survivingVotes = 0;
-  steps.push({i:-1, line:'init', candidate:majorityCandidate, balance:survivingVotes,
-              msg:'majorityCandidate = 0, survivingVotes = 0 — начальные значения'});
+  let majorityCandidate = nums[0];
+  let survivingVotes = 1;
+  steps.push({i:0, line:'init', candidate:majorityCandidate, balance:survivingVotes, newCand:true,
+              msg:`кандидатом сразу становится nums[0] = ${majorityCandidate}, за него один голос`});
 
-  for(let i=0;i<nums.length;i++){
+  for(let i=1;i<nums.length;i++){
     const vote = nums[i];
     steps.push({i, line:'for', candidate:majorityCandidate, balance:survivingVotes,
                 msg:`берём nums[${i}] = ${vote}`});
