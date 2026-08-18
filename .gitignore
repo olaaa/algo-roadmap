@@ -4,4 +4,6 @@
 # IntelliJ output
 out/
 target/
-/.idea/db-forest-config.xml
+
+# Настройки IDE — у каждого свои, в репозитории не нужны
+.idea/
