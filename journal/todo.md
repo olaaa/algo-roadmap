@@ -2,6 +2,9 @@
 
 Легенда: [ ] не начато · [~] в работе · [x] сделано
 
+`[x]` у задачи ставится, только когда Lela закончила её РАЗБИРАТЬ. Написанный
+и прогнанный код — это `[~]`. Подробнее в CLAUDE.md, раздел «Как мы работаем».
+
 ## Реализация блоков (по ядру из algo-prep-plan.md)
 - [x] Блок 1. Массивы, два указателя (5 классов: TwoSumSorted, ReverseArray,
       ValidPalindrome, MergeSortedArray — 16/16 PASS; MoveZeroes — 9/9 PASS)
@@ -10,8 +13,6 @@
       ReverseString [x] (10/10 PASS, +виз.),
       FirstUniqueChar [~] код написан (12/12 PASS) + FirstUniqueCharLinkedHashMap
       (27/27 PASS), +виз., Lela разбирает
-      ПОМЕТКА: «[x]» у задачи ставим, только когда Lela закончила её изучать,
-      а не когда код написан и прогнан. Написанный код — это [~].
 - [~] Блок 3. Хеш-таблицы: TwoSum [x] (7/7 PASS, +Pattern_HashMap.md +виз.),
       ContainsDuplicate [~] код написан (14/14 PASS, +виз.), Lela разбирает,
       GroupAnagrams [~] код написан (25/25 PASS, +виз.), Lela разбирает,
