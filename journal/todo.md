@@ -22,7 +22,10 @@
       КОД ПО ВСЕМУ БЛОКУ 3 НАПИСАН, остаётся разбор.
 - [~] Блок 4. Скользящее окно: Pattern_SlidingWindow.md [x],
       MaxAverageSubarray [~] код написан (18/18 PASS, +виз.), Lela разбирает,
-      LongestSubstringNoRepeat [ ] (3, Medium — окно переменной ширины)
+      LongestSubstringNoRepeat [~] код написан (36/36 PASS, +виз.), два метода
+      в классе — сжатие по одному символу и прыжок по карте позиций,
+      Lela разбирает.
+      КОД ПО ВСЕМУ БЛОКУ 4 НАПИСАН, остаётся разбор.
 - [ ] Блок 5. Бинарный поиск (BinarySearch, SearchInsertPosition)
 - [ ] Блок 6. Деревья и базовые графы (MaxDepth, SymmetricTree, BFS).
       ВНИМАНИЕ: docs/problems/block06_trees_graphs/Pattern_GraphTraversal.md
@@ -47,10 +50,12 @@
       ещё разбирает Lela.
       Блок 3 «Хеш-таблицы» написан целиком: TwoSum, ContainsDuplicate,
       GroupAnagrams, MajorityElement.
-      Сейчас блок 4 «Скользящее окно». Порядок взяли не по плану, а по логике
-      обучения: сначала MaxAverageSubarray (643, окно фиксированной ширины),
-      он уже написан. Следующая — LongestSubstringNoRepeat (3, Medium):
-      окно переменной ширины плюс множество виденного, две новые вещи разом.
+      Блок 4 «Скользящее окно» написан целиком: MaxAverageSubarray (643, окно
+      фиксированной ширины) и LongestSubstringNoRepeat (3, окно переменной
+      ширины). Порядок взяли не по плану, а по логике обучения — от простого
+      к сложному.
+      Следующий блок — 5 «Бинарный поиск»: BinarySearch, потом
+      SearchInsertPosition.
 
 - [~] Визуализации для остальных задач блока 1: MergeSortedArray [x],
       ValidPalindrome [ ], MoveZeroes [x] (шаблон и рецепт — в progress.md,

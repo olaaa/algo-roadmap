@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Longest Substring Without Repeating Characters — визуализация окна переменной ширины</title>
+<style>
+  :root{
+    --bg:#0f1117; --panel:#171a23; --cell:#232733; --line:#2e3342;
+    --txt:#e6e8ee; --muted:#8b90a0; --accent:#4f8cff; --cur:#38bdf8; --comp:#fbbf24;
+    --ok:#34d399; --miss:#fb7185; --code:#c7d0e0;
+    --mono:"JetBrains Mono",Consolas,Menlo,monospace;
+    --sans:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--txt);font-family:var(--sans);
+       display:flex;flex-direction:column;align-items:center;min-height:100vh;padding:24px}
+  h1{font-size:18px;font-weight:600;margin:0 0 2px}
+  .sub{color:var(--muted);font-size:13px;margin-bottom:20px;max-width:860px;text-align:center}
+  .stage{width:min(1000px,100%);background:var(--panel);border:1px solid var(--line);
+         border-radius:14px;padding:26px 22px}
+  .setup{display:flex;gap:16px;flex-wrap:wrap;align-items:flex-end;margin-bottom:14px}
+  .setup label{display:flex;flex-direction:column;gap:5px;font-size:12px;color:var(--muted)}
+  .setup input[type=text]{font-family:var(--mono);font-size:14px;background:var(--cell);
+       border:1px solid var(--line);color:var(--txt);border-radius:8px;padding:8px 10px;width:300px}
+  .setup select{font-family:var(--sans);font-size:13px;background:var(--cell);
+       border:1px solid var(--line);color:var(--txt);border-radius:8px;padding:8px 10px}
+  .btn{font-family:var(--sans);font-size:13px;font-weight:500;cursor:pointer;
+       background:var(--cell);border:1px solid var(--line);color:var(--txt);
+       border-radius:8px;padding:9px 14px;transition:.15s}
+  .btn:hover{border-color:var(--accent)}
+  .btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+  .btn:disabled{opacity:.4;cursor:not-allowed}
+  .preset{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:18px}
+  .preset .btn{padding:6px 11px;font-family:var(--mono);font-size:12px}
+
+  .strwrap{margin:18px 0 6px}
+  .strlab{font-family:var(--mono);font-size:12px;color:var(--muted);margin-bottom:8px;text-align:center}
+  .cells{display:flex;gap:5px;flex-wrap:wrap;justify-content:center}
+  .ccell{display:flex;flex-direction:column;align-items:center;gap:4px}
+  .cell{min-width:38px;height:42px;padding:0 8px;border-radius:8px;background:var(--cell);
+        border:2px solid var(--line);display:flex;align-items:center;justify-content:center;
+        font-family:var(--mono);font-size:15px;transition:.2s}
+  .cell.inWindow{border-color:var(--accent);background:rgba(79,140,255,.18)}
+  .cell.best{border-color:var(--ok);background:rgba(52,211,153,.22)}
+  .cell.entering{border-color:var(--cur);background:rgba(56,189,248,.28)}
+  .cell.leaving{border-color:var(--miss);background:rgba(251,113,133,.28)}
+  .cell.clash{border-color:var(--comp);background:rgba(251,191,36,.26)}
+  .idx{font-family:var(--mono);font-size:10.5px;color:var(--muted)}
+  .idx.on{color:var(--cur)}
+  .marks{display:flex;gap:5px;flex-wrap:wrap;justify-content:center;margin-top:6px}
+  .mark{min-width:38px;padding:0 8px;text-align:center;font-family:var(--mono);
+        font-size:11px;color:var(--cur);height:16px}
+
+  .state{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin:18px 0 4px}
+  .card{background:#0b0d13;border:1px solid var(--line);border-radius:10px;
+        padding:12px 18px;min-width:132px;text-align:center}
+  .card .cap{font-family:var(--mono);font-size:11.5px;color:var(--muted);margin-bottom:6px}
+  .card .val{font-family:var(--mono);font-size:22px;font-weight:700}
+  .card.len .val{color:var(--accent)}
+  .card.best .val{color:var(--ok)}
+  .card.bound .val{color:var(--cur)}
+
+  .store{background:#0b0d13;border:1px solid var(--line);border-radius:10px;
+         padding:11px 14px;margin-top:14px;font-family:var(--mono);font-size:12.5px;
+         color:var(--code);min-height:42px;display:flex;gap:8px;align-items:center;
+         flex-wrap:wrap;justify-content:center}
+  .store .cap{color:var(--muted)}
+  .chip{background:var(--cell);border:1px solid var(--line);border-radius:6px;padding:3px 8px}
+  .chip.hot{border-color:var(--comp);color:var(--comp)}
+  .chip.stale{color:var(--muted);border-style:dashed}
+
+  .status{min-height:26px;text-align:center;font-family:var(--mono);font-size:13.5px;margin:14px 0 6px}
+  .status .op{color:var(--code)}
+  .status .good{color:var(--ok)} .status .comp{color:var(--comp)} .status .miss{color:var(--miss)}
+
+  .controls{position:sticky;top:8px;z-index:5;display:flex;gap:10px;justify-content:center;
+            align-items:center;flex-wrap:wrap;margin:10px 0 4px;padding:9px 10px;
+            background:rgba(23,26,35,.94);border:1px solid var(--line);border-radius:10px}
+  .step-info{color:var(--muted);font-size:12px;font-family:var(--mono);min-width:96px;text-align:center}
+
+  .codebox{background:#0b0d13;border:1px solid var(--line);border-radius:10px;
+           padding:14px 16px;font-family:var(--mono);font-size:12.5px;line-height:1.7;
+           overflow:auto;margin-top:18px}
+  .codebox .ln{display:block;padding:0 6px;border-radius:4px;color:var(--code);white-space:pre}
+  .codebox .ln.active{background:rgba(79,140,255,.18)}
+  .kw{color:#c792ea}.num{color:#f78c6c}.cm{color:#5c6370}
+
+  .legend{margin-top:16px;font-size:12.5px;color:var(--muted);line-height:1.75;max-width:900px}
+  .legend b{color:var(--txt);font-weight:600}
+  .sw{display:inline-block;width:11px;height:11px;border-radius:3px;vertical-align:middle;
+      margin-right:5px;border:2px solid}
+  .sw.win{border-color:var(--accent);background:rgba(79,140,255,.18)}
+  .sw.ent{border-color:var(--cur);background:rgba(56,189,248,.28)}
+  .sw.lv{border-color:var(--miss);background:rgba(251,113,133,.28)}
+  .sw.cl{border-color:var(--comp);background:rgba(251,191,36,.26)}
+  .sw.bs{border-color:var(--ok);background:rgba(52,211,153,.22)}
+</style>
+</head>
+<body>
+  <h1>Longest Substring Without Repeating Characters — окно переменной ширины</h1>
+  <div class="sub">Правая граница расширяет окно на каждом шаге, левая сжимает его, пока внутри есть повтор. Два режима показывают два способа сдвинуть левую границу (LeetCode 3).</div>
+
+  <div class="stage">
+    <div class="setup">
+      <label>Строка
+        <input id="textIn" type="text" value="abcabcbb">
+      </label>
+      <label>Режим
+        <select id="modeIn">
+          <option value="set">окно с множеством — сжатие по одному символу</option>
+          <option value="jump">окно с картой позиций — прыжок левой границы</option>
+        </select>
+      </label>
+      <button class="btn primary" id="build">Построить</button>
+    </div>
+
+    <div class="preset">
+      <button class="btn" data-text="abcabcbb">abcabcbb — пример 1</button>
+      <button class="btn" data-text="bbbbb">bbbbb — все одинаковые</button>
+      <button class="btn" data-text="pwwkew">pwwkew — подстрока, не подпоследовательность</button>
+      <button class="btn" data-text="abba">abba — граница не пятится назад</button>
+      <button class="btn" data-text="dvdf">dvdf — сброс окна был бы ошибкой</button>
+      <button class="btn" data-text="abcb">abcb — два шага сжатия за итерацию</button>
+      <button class="btn" data-text="tmmzuxt">tmmzuxt — лучшее окно в конце</button>
+      <button class="btn" data-text="">пустая строка</button>
+    </div>
+
+    <div class="strwrap">
+      <div class="strlab">строка — под каждой ячейкой её индекс, под индексами границы окна</div>
+      <div class="cells" id="cells"></div>
+      <div class="marks" id="marks"></div>
+    </div>
+
+    <div class="state">
+      <div class="card bound">
+        <div class="cap">windowStart</div>
+        <div class="val" id="startVal">0</div>
+      </div>
+      <div class="card bound">
+        <div class="cap">windowEnd</div>
+        <div class="val" id="endVal">—</div>
+      </div>
+      <div class="card len">
+        <div class="cap">длина окна</div>
+        <div class="val" id="lenVal">0</div>
+      </div>
+      <div class="card best">
+        <div class="cap">longestLength</div>
+        <div class="val" id="bestVal">0</div>
+      </div>
+    </div>
+
+    <div class="store" id="store"></div>
+
+    <div class="status" id="status"></div>
+
+    <div class="controls">
+      <button class="btn" id="prev">◀ Назад</button>
+      <span class="step-info" id="stepInfo">шаг 0 / 0</span>
+      <button class="btn" id="next">Вперёд ▶</button>
+      <button class="btn" id="play">▶ Авто</button>
+      <button class="btn" id="reset">⟲ Сброс</button>
+    </div>
+
+    <div class="codebox" id="code"></div>
+
+    <div class="legend" id="legend"></div>
+  </div>
+
+<script>
+const $ = id => document.getElementById(id);
+let text='', mode='set', steps=[], cur=0, timer=null;
+
+const CODE_SET = [
+  {t:`Set&lt;Character&gt; windowChars = <span class="kw">new</span> HashSet&lt;&gt;();`, line:'init'},
+  {t:`<span class="kw">int</span> longestLength = <span class="num">0</span>, windowStart = <span class="num">0</span>;`, line:'init'},
+  {t:`<span class="kw">for</span> (<span class="kw">int</span> windowEnd = <span class="num">0</span>; windowEnd &lt; text.length(); windowEnd++) {`, line:'enter'},
+  {t:`    <span class="kw">char</span> enteringChar = text.charAt(windowEnd);`, line:'enter'},
+  {t:`    <span class="kw">while</span> (windowChars.contains(enteringChar)) {`, line:'check'},
+  {t:`        windowChars.remove(text.charAt(windowStart));`, line:'shrink'},
+  {t:`        windowStart++;`, line:'shrink'},
+  {t:`    }`, line:'checkEnd'},
+  {t:`    windowChars.add(enteringChar);`, line:'add'},
+  {t:`    longestLength = Math.max(longestLength, windowEnd - windowStart + <span class="num">1</span>);`, line:'max'},
+  {t:`}`, line:'loopEnd'},
+  {t:`<span class="kw">return</span> longestLength;`, line:'ret'},
+];
+
+const CODE_JUMP = [
+  {t:`Map&lt;Character, Integer&gt; lastSeenIndex = <span class="kw">new</span> HashMap&lt;&gt;();`, line:'init'},
+  {t:`<span class="kw">int</span> longestLength = <span class="num">0</span>, windowStart = <span class="num">0</span>;`, line:'init'},
+  {t:`<span class="kw">for</span> (<span class="kw">int</span> windowEnd = <span class="num">0</span>; windowEnd &lt; text.length(); windowEnd++) {`, line:'enter'},
+  {t:`    <span class="kw">char</span> enteringChar = text.charAt(windowEnd);`, line:'enter'},
+  {t:`    Integer previousIndex = lastSeenIndex.get(enteringChar);`, line:'check'},
+  {t:`    <span class="kw">if</span> (previousIndex != <span class="kw">null</span>) {`, line:'check'},
+  {t:`        windowStart = Math.max(windowStart, previousIndex + <span class="num">1</span>);`, line:'jump'},
+  {t:`    }`, line:'checkEnd'},
+  {t:`    lastSeenIndex.put(enteringChar, windowEnd);`, line:'add'},
+  {t:`    longestLength = Math.max(longestLength, windowEnd - windowStart + <span class="num">1</span>);`, line:'max'},
+  {t:`}`, line:'loopEnd'},
+  {t:`<span class="kw">return</span> longestLength;`, line:'ret'},
+];
+
+function snapshotSet(windowStart, windowEnd){
+  const chars=[];
+  for(let index=windowStart;index<=windowEnd;index++){
+    chars.push({key:text[index], stale:false});
+  }
+  return chars;
+}
+
+function snapshotMap(lastSeen, windowStart){
+  return Object.keys(lastSeen).map(key=>({
+    key:`${key}→${lastSeen[key]}`,
+    stale: lastSeen[key] < windowStart
+  }));
+}
+
+function buildStepsSet(){
+  const result=[];
+  let windowStart=0, longestLength=0;
+  const inWindow=new Set();
+
+  result.push({line:'init', start:0, end:-1, best:0, store:[],
+               storeCap:'windowChars:', msg:'окно пустое, множество пустое'});
+
+  for(let windowEnd=0;windowEnd<text.length;windowEnd++){
+    const enteringChar=text[windowEnd];
+    result.push({line:'enter', start:windowStart, end:windowEnd-1, best:longestLength,
+                 entering:windowEnd, store:snapshotSet(windowStart,windowEnd-1),
+                 storeCap:'windowChars:',
+                 msg:`входит text[${windowEnd}] = '${enteringChar}'`});
+
+    let clashIndex=-1;
+    if(inWindow.has(enteringChar)){
+      for(let index=windowStart;index<windowEnd;index++){
+        if(text[index]===enteringChar){ clashIndex=index; break; }
+      }
+      result.push({line:'check', start:windowStart, end:windowEnd-1, best:longestLength,
+                   entering:windowEnd, clash:clashIndex,
+                   store:snapshotSet(windowStart,windowEnd-1), storeCap:'windowChars:',
+                   warn:true,
+                   msg:`'${enteringChar}' в окне уже есть (позиция ${clashIndex}) — сжимаем слева`});
+    } else {
+      result.push({line:'check', start:windowStart, end:windowEnd-1, best:longestLength,
+                   entering:windowEnd, store:snapshotSet(windowStart,windowEnd-1),
+                   storeCap:'windowChars:',
+                   msg:`'${enteringChar}' в окне нет — сжимать не надо`});
+    }
+
+    while(inWindow.has(enteringChar)){
+      const leavingChar=text[windowStart];
+      inWindow.delete(leavingChar);
+      const leavingIndex=windowStart;
+      windowStart++;
+      result.push({line:'shrink', start:windowStart, end:windowEnd-1, best:longestLength,
+                   entering:windowEnd, leaving:leavingIndex,
+                   store:snapshotSet(windowStart,windowEnd-1), storeCap:'windowChars:',
+                   drop:true,
+                   msg:`выбрасываем text[${leavingIndex}] = '${leavingChar}', windowStart = ${windowStart}`});
+    }
+
+    inWindow.add(enteringChar);
+    result.push({line:'add', start:windowStart, end:windowEnd, best:longestLength,
+                 store:snapshotSet(windowStart,windowEnd), storeCap:'windowChars:',
+                 msg:`'${enteringChar}' добавлен, окно [${windowStart}..${windowEnd}] снова без повторов`});
+
+    const windowLength=windowEnd-windowStart+1;
+    const improved=windowLength>longestLength;
+    longestLength=Math.max(longestLength,windowLength);
+    result.push({line:'max', start:windowStart, end:windowEnd, best:longestLength,
+                 store:snapshotSet(windowStart,windowEnd), storeCap:'windowChars:',
+                 improved,
+                 msg: improved
+                   ? `длина ${windowLength} — новый максимум`
+                   : `длина ${windowLength} не бьёт ${longestLength}, максимум прежний`});
+  }
+
+  result.push({line:'ret', start:0, end:-1, best:longestLength, store:[], storeCap:'windowChars:',
+               done:true, good:true, msg:`✓ ответ ${longestLength}`});
+  return result;
+}
+
+function buildStepsJump(){
+  const result=[];
+  let windowStart=0, longestLength=0;
+  const lastSeen={};
+
+  result.push({line:'init', start:0, end:-1, best:0, store:[],
+               storeCap:'lastSeenIndex:', msg:'окно пустое, карта позиций пустая'});
+
+  for(let windowEnd=0;windowEnd<text.length;windowEnd++){
+    const enteringChar=text[windowEnd];
+    result.push({line:'enter', start:windowStart, end:windowEnd-1, best:longestLength,
+                 entering:windowEnd, store:snapshotMap(lastSeen,windowStart),
+                 storeCap:'lastSeenIndex:',
+                 msg:`входит text[${windowEnd}] = '${enteringChar}'`});
+
+    const previousIndex = Object.prototype.hasOwnProperty.call(lastSeen,enteringChar)
+        ? lastSeen[enteringChar] : null;
+
+    if(previousIndex === null){
+      result.push({line:'check', start:windowStart, end:windowEnd-1, best:longestLength,
+                   entering:windowEnd, store:snapshotMap(lastSeen,windowStart),
+                   storeCap:'lastSeenIndex:',
+                   msg:`'${enteringChar}' встречается впервые, границу не трогаем`});
+    } else if(previousIndex + 1 > windowStart){
+      const previousStart=windowStart;
+      windowStart=previousIndex+1;
+      result.push({line:'jump', start:windowStart, end:windowEnd-1, best:longestLength,
+                   entering:windowEnd, clash:previousIndex,
+                   store:snapshotMap(lastSeen,windowStart), storeCap:'lastSeenIndex:',
+                   drop:true,
+                   msg:`'${enteringChar}' виден на ${previousIndex}, это внутри окна — windowStart прыгает с ${previousStart} на ${windowStart}`});
+    } else {
+      result.push({line:'jump', start:windowStart, end:windowEnd-1, best:longestLength,
+                   entering:windowEnd, clash:previousIndex,
+                   store:snapshotMap(lastSeen,windowStart), storeCap:'lastSeenIndex:',
+                   warn:true,
+                   msg:`'${enteringChar}' виден на ${previousIndex}, но окно начинается с ${windowStart} — Math.max держит границу на месте`});
+    }
+
+    lastSeen[enteringChar]=windowEnd;
+    result.push({line:'add', start:windowStart, end:windowEnd, best:longestLength,
+                 store:snapshotMap(lastSeen,windowStart), storeCap:'lastSeenIndex:',
+                 msg:`запоминаем '${enteringChar}' → ${windowEnd}`});
+
+    const windowLength=windowEnd-windowStart+1;
+    const improved=windowLength>longestLength;
+    longestLength=Math.max(longestLength,windowLength);
+    result.push({line:'max', start:windowStart, end:windowEnd, best:longestLength,
+                 store:snapshotMap(lastSeen,windowStart), storeCap:'lastSeenIndex:',
+                 improved,
+                 msg: improved
+                   ? `длина ${windowLength} — новый максимум`
+                   : `длина ${windowLength} не бьёт ${longestLength}, максимум прежний`});
+  }
+
+  result.push({line:'ret', start:0, end:-1, best:longestLength, store:[],
+               storeCap:'lastSeenIndex:', done:true, good:true,
+               msg:`✓ ответ ${longestLength}`});
+  return result;
+}
+
+function renderCells(step){
+  const box=$('cells'); box.innerHTML='';
+  const marks=$('marks'); marks.innerHTML='';
+  if(!text.length){
+    box.innerHTML='<div class="idx">строка пустая — цикл не начнётся ни разу</div>';
+    return;
+  }
+  for(let index=0;index<text.length;index++){
+    const wrap=document.createElement('div'); wrap.className='ccell';
+    const cell=document.createElement('div'); cell.className='cell';
+    cell.textContent = text[index]===' ' ? '␣' : text[index];
+    const inWindow = step.end >= step.start && index >= step.start && index <= step.end;
+    if(step.leaving === index){
+      cell.classList.add('leaving');
+    } else if(step.entering === index){
+      cell.classList.add('entering');
+    } else if(step.clash === index){
+      cell.classList.add('clash');
+    } else if(inWindow){
+      cell.classList.add(step.done ? 'best' : 'inWindow');
+    }
+    const idx=document.createElement('div');
+    idx.className='idx' + (inWindow ? ' on' : '');
+    idx.textContent=index;
+    wrap.append(cell,idx); box.append(wrap);
+
+    const mark=document.createElement('div'); mark.className='mark';
+    if(!step.done){
+      if(index===step.start && index===step.entering){ mark.textContent='↑↑'; }
+      else if(index===step.start){ mark.textContent='start'; }
+      else if(index===step.entering){ mark.textContent='end'; }
+    }
+    marks.append(mark);
+  }
+}
+
+function renderState(step){
+  $('startVal').textContent = step.done ? '—' : step.start;
+  $('endVal').textContent = step.entering === undefined
+      ? (step.end >= step.start ? step.end : '—') : step.entering;
+  const length = step.end >= step.start ? step.end - step.start + 1 : 0;
+  $('lenVal').textContent = step.done ? '—' : length;
+  $('bestVal').textContent = step.best;
+}
+
+function renderStore(step){
+  const box=$('store'); box.innerHTML='';
+  const cap=document.createElement('span'); cap.className='cap'; cap.textContent=step.storeCap;
+  box.append(cap);
+  if(!step.store.length){
+    const empty=document.createElement('span'); empty.className='cap'; empty.textContent='пусто';
+    box.append(empty);
+    return;
+  }
+  step.store.forEach(entry=>{
+    const chip=document.createElement('span');
+    chip.className='chip' + (entry.stale ? ' stale' : '');
+    chip.textContent = entry.key.replace(/ /g,'␣');
+    box.append(chip);
+  });
+}
+
+function renderCode(active){
+  const codeLines = mode==='set' ? CODE_SET : CODE_JUMP;
+  $('code').innerHTML = codeLines.map(line=>
+    `<span class="ln ${line.line===active?'active':''}">${line.t}</span>`).join('');
+}
+
+function renderLegend(){
+  const common = `
+    <b>Что на схеме.</b> Каждая ячейка — символ строки, под ней индекс, ниже подписи границ:
+    <span class="mono">start</span> — левая граница окна, <span class="mono">end</span> — правая.
+    <span class="sw win"></span>синим залито текущее окно,
+    <span class="sw ent"></span>голубым — символ, который входит на этом шаге,
+    <span class="sw cl"></span>жёлтым — его прошлое вхождение,
+    <span class="sw lv"></span>розовым — символ, покидающий окно,
+    <span class="sw bs"></span>зелёным — окно на финальном шаге.`;
+  const store = mode==='set'
+    ? `<br><b>Строка windowChars</b> — содержимое множества, то есть символы текущего окна.
+       Множество и окно всегда совпадают: это и есть состояние, которое надо обновлять
+       симметрично — вошёл <span class="mono">add</span>, вышел <span class="mono">remove</span>.`
+    : `<br><b>Строка lastSeenIndex</b> — карта «символ → последняя позиция». Пунктирные бледные
+       фишки — записи о символах, которые окно уже покинули: карта их помнит, но окном они
+       не являются. Именно из-за них левая граница защищена
+       <span class="mono">Math.max</span>: без неё она прыгнула бы назад на такую запись.`;
+  $('legend').innerHTML = common + store;
+}
+
+function show(index){
+  cur=Math.max(0,Math.min(index,steps.length-1));
+  const step=steps[cur];
+  renderCells(step); renderState(step); renderStore(step); renderCode(step.line);
+  const cls = step.good ? 'good' : step.warn ? 'comp' : step.drop ? 'miss'
+            : step.improved ? 'good' : 'op';
+  $('status').innerHTML=`<span class="${cls}">${step.msg}</span>`;
+  $('stepInfo').textContent=`шаг ${cur+1} / ${steps.length}`;
+  $('prev').disabled=cur===0; $('next').disabled=cur===steps.length-1;
+}
+
+function build(){
+  stopPlay();
+  text=$('textIn').value;
+  mode=$('modeIn').value;
+  steps = mode==='set' ? buildStepsSet() : buildStepsJump();
+  renderLegend();
+  show(0);
+}
+function stopPlay(){ if(timer){clearInterval(timer);timer=null;$('play').textContent='▶ Авто';} }
+function togglePlay(){
+  if(timer){stopPlay();return;}
+  if(cur>=steps.length-1) show(0);
+  $('play').textContent='⏸ Пауза';
+  timer=setInterval(()=>{ if(cur>=steps.length-1){stopPlay();return;} show(cur+1); },700);
+}
+
+$('build').onclick=build;
+$('modeIn').onchange=build;
+$('next').onclick=()=>{stopPlay();show(cur+1);};
+$('prev').onclick=()=>{stopPlay();show(cur-1);};
+$('play').onclick=togglePlay;
+$('reset').onclick=()=>{stopPlay();show(0);};
+document.querySelectorAll('.preset .btn').forEach(button=>{
+  button.onclick=()=>{ $('textIn').value=button.dataset.text; build(); };
+});
+document.addEventListener('keydown',event=>{
+  if(event.target.tagName==='INPUT' || event.target.tagName==='SELECT') return;
+  if(event.key==='ArrowRight'){stopPlay();show(cur+1);}
+  if(event.key==='ArrowLeft'){stopPlay();show(cur-1);}
+  if(event.key===' '){event.preventDefault();togglePlay();}
+});
+build();
+</script>
+</body>
+</html>

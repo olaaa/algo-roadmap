@@ -77,13 +77,16 @@ for (int currentIndex = 0; currentIndex < k; currentIndex++) {
 }
 
 int maxSum = windowSum;
-for (int currentIndex = k; currentIndex < nums.length; currentIndex++) {
-    windowSum += nums[currentIndex] - nums[currentIndex - k];
+for (int windowEnd = k; windowEnd < nums.length; windowEnd++) {
+    int windowStart = windowEnd - k;
+    windowSum = windowSum + nums[windowEnd] - nums[windowStart];
     maxSum = Math.max(maxSum, windowSum);
 }
 
 return (double) maxSum / k;
 ```
+
+Имена индексов разные не случайно. В первом цикле у индекса нет роли, кроме «идём по первым `k` элементам», поэтому он нейтральный `currentIndex`. Во втором роль есть: это правая граница окна, а вычитаемый индекс — левая. Имена её и называют, и пояснять их отдельным комментарием уже не нужно.
 
 Про сам приём — [`Pattern_SlidingWindow.md`](Pattern_SlidingWindow.md), подвид «окно фиксированной ширины».
 
@@ -91,7 +94,7 @@ return (double) maxSum / k;
 
 Самое частое место для ошибки — индекс уходящего элемента.
 
-Когда правая граница стоит на `currentIndex`, окно занимает позиции с `currentIndex - k + 1` по `currentIndex` включительно. Значит на прошлом шаге оно начиналось на `currentIndex - k` — этот элемент и покидает окно.
+Когда правая граница стоит на `windowEnd`, окно занимает позиции с `windowEnd - k + 1` по `windowEnd` включительно. Значит на прошлом шаге оно начиналось на `windowEnd - k` — этот элемент и покидает окно, и он же в коде назван `windowStart`.
 
 ```
 nums:          [1, 12, -5, -6, 50, 3]
@@ -102,7 +105,7 @@ nums:          [1, 12, -5, -6, 50, 3]
               вышел nums[0]   вошёл nums[4]
 ```
 
-Проверить себя можно на длине окна: `currentIndex - (currentIndex - k + 1) + 1 = k`.
+Проверить себя можно на длине окна: `windowEnd - (windowEnd - k + 1) + 1 = k`.
 
 ### Максимум ищем по сумме, а не по среднему
 
