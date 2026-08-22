@@ -41,9 +41,10 @@ public class MaxAverageSubarray {
          * из одних отрицательных чисел ноль остался бы победителем навсегда.
          */
         int maxSum = windowSum;
-        for (int currentIndex = k; currentIndex < nums.length; currentIndex++) {
-            /* Вошёл nums[currentIndex], вышел nums[currentIndex - k]. */
-            windowSum = windowSum + nums[currentIndex] - nums[currentIndex - k];
+        for (int windowEnd = k; windowEnd < nums.length; windowEnd++) {
+            /* Вошёл nums[windowEnd], вышел nums[windowEnd - k]. */
+            int windowStart = windowEnd - k;
+            windowSum = windowSum + nums[windowEnd] - nums[windowStart];
             maxSum = Math.max(maxSum, windowSum);
         }
         return (double) maxSum / k;
