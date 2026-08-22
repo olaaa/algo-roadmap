@@ -31,6 +31,7 @@ public class MaxAverageSubarray {
         }
 
         int windowSum = 0;
+// первое окно
         for (int currentIndex = 0; currentIndex < k; currentIndex++) {
             windowSum += nums[currentIndex];
         }
@@ -42,7 +43,7 @@ public class MaxAverageSubarray {
         int maxSum = windowSum;
         for (int currentIndex = k; currentIndex < nums.length; currentIndex++) {
             /* Вошёл nums[currentIndex], вышел nums[currentIndex - k]. */
-            windowSum += nums[currentIndex] - nums[currentIndex - k];
+            windowSum = windowSum + nums[currentIndex] - nums[currentIndex - k];
             maxSum = Math.max(maxSum, windowSum);
         }
         return (double) maxSum / k;
