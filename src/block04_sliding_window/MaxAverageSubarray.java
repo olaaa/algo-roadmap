@@ -32,19 +32,24 @@ public class MaxAverageSubarray {
 
         int windowSum = 0;
 // первое окно
-        for (int currentIndex = 0; currentIndex < k; currentIndex++) {
-            windowSum += nums[currentIndex];
+        for (int windowEnd = 0; windowEnd < k; windowEnd++) {
+            windowSum += nums[windowEnd];
         }
-
+// набрано первым циклом (индексы):  [0..3]
         /*
          * Начальный максимум — сумма первого окна, а не ноль: на массиве
          * из одних отрицательных чисел ноль остался бы победителем навсегда.
          */
         int maxSum = windowSum;
         for (int windowEnd = k; windowEnd < nums.length; windowEnd++) {
-            /* Вошёл nums[windowEnd], вышел nums[windowEnd - k]. */
-            int windowStart = windowEnd - k;
-            windowSum = windowSum + nums[windowEnd] - nums[windowStart];
+            /*
+             * Окно занимает позиции windowEnd - k + 1 .. windowEnd, поэтому
+             * покидает его элемент ровно левее — на windowEnd - k.
+             * В первой итерации по данному циклу:
+             *     k = 4, windowEnd = 4, новое окно (индексы) [1..4] -> leavingIndex = 0.
+             */
+            int leavingIndex = windowEnd - k;
+            windowSum = windowSum + nums[windowEnd] - nums[leavingIndex];
             maxSum = Math.max(maxSum, windowSum);
         }
         return (double) maxSum / k;

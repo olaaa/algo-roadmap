@@ -33,13 +33,14 @@ public class LongestSubstringNoRepeat {
 
         for (int windowEnd = 0; windowEnd < text.length(); windowEnd++) {
             char enteringChar = text.charAt(windowEnd);
-            /* Сжимаем окно слева, пока входящий символ в нём уже есть. */
+            /* Сжимаем окно слева до тех пора, пока входящий символ в нём есть. */
             while (windowChars.contains(enteringChar)) {
                 windowChars.remove(text.charAt(windowStart));
                 windowStart++;
             }
             windowChars.add(enteringChar);
-            longestLength = Math.max(longestLength, windowEnd - windowStart + 1);
+            /* Множество и окно совпадают по содержимому, поэтому size() — это длина окна. */
+            longestLength = Math.max(longestLength, windowChars.size());
         }
         return longestLength;
     }
