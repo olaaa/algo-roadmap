@@ -237,15 +237,15 @@ const CODE_SET = [
 ];
 
 const CODE_JUMP = [
-  {t:`Map&lt;Character, Integer&gt; lastSeenIndex = <span class="kw">new</span> HashMap&lt;&gt;();`, line:'init'},
+  {t:`Map&lt;Character, Integer&gt; lastIndexByChar = <span class="kw">new</span> HashMap&lt;&gt;();`, line:'init'},
   {t:`<span class="kw">int</span> longestLength = <span class="num">0</span>, windowStart = <span class="num">0</span>;`, line:'init'},
   {t:`<span class="kw">for</span> (<span class="kw">int</span> windowEnd = <span class="num">0</span>; windowEnd &lt; text.length(); windowEnd++) {`, line:'enter'},
   {t:`    <span class="kw">char</span> enteringChar = text.charAt(windowEnd);`, line:'enter'},
-  {t:`    Integer previousIndex = lastSeenIndex.get(enteringChar);`, line:'check'},
+  {t:`    Integer previousIndex = lastIndexByChar.get(enteringChar);`, line:'check'},
   {t:`    <span class="kw">if</span> (previousIndex != <span class="kw">null</span>) {`, line:'check'},
   {t:`        windowStart = Math.max(windowStart, previousIndex + <span class="num">1</span>);`, line:'jump'},
   {t:`    }`, line:'checkEnd'},
-  {t:`    lastSeenIndex.put(enteringChar, windowEnd);`, line:'add'},
+  {t:`    lastIndexByChar.put(enteringChar, windowEnd);`, line:'add'},
   {t:`    longestLength = Math.max(longestLength, windowEnd - windowStart + <span class="num">1</span>);`, line:'max'},
   {t:`}`, line:'loopEnd'},
   {t:`<span class="kw">return</span> longestLength;`, line:'ret'},
@@ -337,13 +337,13 @@ function buildStepsJump(){
   const lastSeen={};
 
   result.push({line:'init', start:0, end:-1, best:0, store:[],
-               storeCap:'lastSeenIndex:', msg:'окно пустое, карта позиций пустая'});
+               storeCap:'lastIndexByChar:', msg:'окно пустое, карта позиций пустая'});
 
   for(let windowEnd=0;windowEnd<text.length;windowEnd++){
     const enteringChar=text[windowEnd];
     result.push({line:'enter', start:windowStart, end:windowEnd-1, best:longestLength,
                  entering:windowEnd, store:snapshotMap(lastSeen,windowStart),
-                 storeCap:'lastSeenIndex:',
+                 storeCap:'lastIndexByChar:',
                  msg:`входит text[${windowEnd}] = '${enteringChar}'`});
 
     const previousIndex = Object.prototype.hasOwnProperty.call(lastSeen,enteringChar)
@@ -352,34 +352,34 @@ function buildStepsJump(){
     if(previousIndex === null){
       result.push({line:'check', start:windowStart, end:windowEnd-1, best:longestLength,
                    entering:windowEnd, store:snapshotMap(lastSeen,windowStart),
-                   storeCap:'lastSeenIndex:',
+                   storeCap:'lastIndexByChar:',
                    msg:`'${enteringChar}' встречается впервые, границу не трогаем`});
     } else if(previousIndex + 1 > windowStart){
       const previousStart=windowStart;
       windowStart=previousIndex+1;
       result.push({line:'jump', start:windowStart, end:windowEnd-1, best:longestLength,
                    entering:windowEnd, clash:previousIndex,
-                   store:snapshotMap(lastSeen,windowStart), storeCap:'lastSeenIndex:',
+                   store:snapshotMap(lastSeen,windowStart), storeCap:'lastIndexByChar:',
                    drop:true,
                    msg:`'${enteringChar}' виден на ${previousIndex}, это внутри окна — windowStart прыгает с ${previousStart} на ${windowStart}`});
     } else {
       result.push({line:'jump', start:windowStart, end:windowEnd-1, best:longestLength,
                    entering:windowEnd, clash:previousIndex,
-                   store:snapshotMap(lastSeen,windowStart), storeCap:'lastSeenIndex:',
+                   store:snapshotMap(lastSeen,windowStart), storeCap:'lastIndexByChar:',
                    warn:true,
                    msg:`'${enteringChar}' виден на ${previousIndex}, но окно начинается с ${windowStart} — Math.max держит границу на месте`});
     }
 
     lastSeen[enteringChar]=windowEnd;
     result.push({line:'add', start:windowStart, end:windowEnd, best:longestLength,
-                 store:snapshotMap(lastSeen,windowStart), storeCap:'lastSeenIndex:',
+                 store:snapshotMap(lastSeen,windowStart), storeCap:'lastIndexByChar:',
                  msg:`запоминаем '${enteringChar}' → ${windowEnd}`});
 
     const windowLength=windowEnd-windowStart+1;
     const improved=windowLength>longestLength;
     longestLength=Math.max(longestLength,windowLength);
     result.push({line:'max', start:windowStart, end:windowEnd, best:longestLength,
-                 store:snapshotMap(lastSeen,windowStart), storeCap:'lastSeenIndex:',
+                 store:snapshotMap(lastSeen,windowStart), storeCap:'lastIndexByChar:',
                  improved,
                  msg: improved
                    ? `длина ${windowLength} — новый максимум`
@@ -387,7 +387,7 @@ function buildStepsJump(){
   }
 
   result.push({line:'ret', start:0, end:-1, best:longestLength, store:[],
-               storeCap:'lastSeenIndex:', done:true, good:true,
+               storeCap:'lastIndexByChar:', done:true, good:true,
                msg:`✓ ответ ${longestLength}`});
   return result;
 }
@@ -464,7 +464,7 @@ function renderStoreNote(){
   $('storeNote').innerHTML = mode==='set'
     ? `Строка <code>windowChars</code> — содержимое множества, то есть символы текущего окна.
        Множество и окно всегда совпадают: вошёл — <code>add</code>, вышел — <code>remove</code>.`
-    : `Строка <code>lastSeenIndex</code> — карта «символ → последняя позиция». Бледные пунктирные
+    : `Строка <code>lastIndexByChar</code> — карта «символ → последняя позиция». Бледные пунктирные
        фишки — записи о символах, которые окно уже покинули: карта их помнит, но окном они не
        являются. Из-за них левая граница и защищена <code>Math.max</code>.`;
 }

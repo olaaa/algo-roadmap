@@ -56,18 +56,29 @@ public class LongestSubstringNoRepeat {
             throw new NullPointerException("строка не должна быть null");
         }
 
-        Map<Character, Integer> lastSeenIndex = new HashMap<>();
+        Map<Character, Integer> lastIndexByChar = new HashMap<>();
         int longestLength = 0;
         int windowStart = 0;
 
         for (int windowEnd = 0; windowEnd < text.length(); windowEnd++) {
             char enteringChar = text.charAt(windowEnd);
-            Integer previousIndex = lastSeenIndex.get(enteringChar);
+            Integer previousIndex = lastIndexByChar.get(enteringChar);
             if (previousIndex != null) {
+                /*
+                 * Карта помнит последнюю позицию символа в СТРОКЕ, а не в окне,
+                 * поэтому прошлое вхождение может лежать левее границы окна.
+                 * Случай windowStart > previousIndex + 1: вхождение вне окна.
+                 * На "abba" первая 'a' выпала из окна, вытесненная повтором 'b',
+                 * и к моменту последней 'a' её прошлая позиция уже за границей —
+                 * такое вхождение надо проигнорировать, границу не двигать.
+                 * Случай windowStart < previousIndex + 1: вхождение внутри окна,
+                 * граница прыгает за него.
+                 */
                 windowStart = Math.max(windowStart, previousIndex + 1);
             }
-            lastSeenIndex.put(enteringChar, windowEnd);
-            longestLength = Math.max(longestLength, windowEnd - windowStart + 1);
+            lastIndexByChar.put(enteringChar, windowEnd);
+            int windowLength = windowEnd - windowStart + 1;
+            longestLength = Math.max(longestLength, windowLength);
         }
         return longestLength;
     }
