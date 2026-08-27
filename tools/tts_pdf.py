@@ -16,7 +16,10 @@ weasyprint и beautifulsoup4. На Windows ничего этого нет и н�
   «-» между пробелами (a - b) не произносится    -> рядом слово «минус»;
   «-» перед цифрой (-5) произносится верно       -> не трогаем;
   «−» U+2212 не произносится вообще              -> приводим к дефису;
-  «→» не произносится                            -> рядом слово «значит».
+  «→» не произносится                            -> рядом слово-подсказка,
+      причём слово зависит от роли стрелки: в записи отображения
+      «ключ → значение» это «соответствует», в выводе «сигнал → класс» —
+      «значит». Роль определяется по обрамлению, см. arrow_word.
 
 Подсказки и точки красятся бледно-серым: глазу почти не видно, в текстовом
 слое они есть. В блоки с кодом (```java) подсказки НЕ ставятся.
@@ -34,6 +37,8 @@ ENDINGS = '.!?:…»'
 BLOCKS = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'li', 'td', 'th', 'dt', 'dd']
 NBSP = ' '
 TYPOGRAPHIC_MINUS = '−'
+MAPPING_ARROW_WORD = 'соответствует'
+LOGIC_ARROW_WORD = 'значит'
 
 CSS = """
 @page {
@@ -100,6 +105,36 @@ def normalize_minus_in_code(soup) -> int:
     return fixed
 
 
+def arrow_word(text: str, position: int, inside_inline_code: bool) -> str:
+    """
+    У стрелки две роли, и вслух они звучат по-разному.
+
+    Отображение — запись вида «символ → последняя позиция» или `a→0`: слева
+    ключ, справа значение. «Значит» тут не подходит («символ значит позиция»),
+    нужно «соответствует».
+
+    Вывод — «сигнал → класс», «участок → окно». Здесь как раз «значит».
+
+    Отличаем по обрамлению: стрелка внутри кавычек-ёлочек или внутри
+    инлайнового кода считается отображением, в остальных случаях выводом.
+    """
+    if inside_inline_code:
+        return MAPPING_ARROW_WORD
+
+    opening_before = text.rfind('«', 0, position)
+    closing_before = text.rfind('»', 0, position)
+    if opening_before == -1 or closing_before > opening_before:
+        return LOGIC_ARROW_WORD
+
+    closing_after = text.find('»', position)
+    opening_after = text.find('«', position)
+    if closing_after == -1:
+        return LOGIC_ARROW_WORD
+    if opening_after != -1 and opening_after < closing_after:
+        return LOGIC_ARROW_WORD
+    return MAPPING_ARROW_WORD
+
+
 def voice_symbols(soup) -> tuple[int, int]:
     """Ставит слово-подсказку рядом с минусом и стрелкой. Код не трогает."""
     minuses = arrows = 0
@@ -112,19 +147,32 @@ def voice_symbols(soup) -> tuple[int, int]:
                 node.replace_with(NavigableString(text))
             continue
 
+        inside_inline_code = node.find_parent('code') is not None
         pieces = []
-        for part in re.split(r'((?<=\s)-(?=\s)|→)', text):
-            if part in ('-', '→'):
-                word = 'минус' if part == '-' else 'значит'
-                minuses += part == '-'
-                arrows += part == '→'
-                pieces.append(NavigableString(part + ' '))
-                hint = soup.new_tag('span')
-                hint['class'] = 'tts'
-                hint.string = word
-                pieces.append(hint)
-            elif part:
-                pieces.append(NavigableString(part))
+        position = 0
+        for match in re.finditer(r'(?<=\s)-(?=\s)|→', text):
+            start, end = match.span()
+            if start > position:
+                pieces.append(NavigableString(text[position:start]))
+            symbol = match.group()
+            if symbol == '-':
+                word = 'минус'
+                minuses += 1
+            else:
+                word = arrow_word(text, start, inside_inline_code)
+                arrows += 1
+            pieces.append(NavigableString(symbol + ' '))
+            hint = soup.new_tag('span')
+            hint['class'] = 'tts'
+            hint.string = word
+            pieces.append(hint)
+            position = end
+            # В записи вида a→0 за подсказкой сразу идёт цифра, и синтез
+            # слышит «соответствует0». Отделяем пробелом.
+            if position < len(text) and not text[position].isspace():
+                pieces.append(NavigableString(' '))
+        if position < len(text):
+            pieces.append(NavigableString(text[position:]))
         node.replace_with(*pieces)
     return minuses, arrows
 
