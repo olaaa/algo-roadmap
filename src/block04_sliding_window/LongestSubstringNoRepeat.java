@@ -62,9 +62,11 @@ public class LongestSubstringNoRepeat {
 
         for (int windowEnd = 0; windowEnd < text.length(); windowEnd++) {
             char enteringChar = text.charAt(windowEnd);
+// Объектный тип, а не примитивный, потому что null говорит о том, что символ еще не встречался
             Integer previousIndex = lastIndexByChar.get(enteringChar);
             if (previousIndex != null) {
                 /*
+                 * Инвариант: ЛЕВАЯ ГРАНИЦА ТОЛЬКО РАСТЁТ
                  * Карта помнит последнюю позицию символа в СТРОКЕ, а не в окне,
                  * поэтому прошлое вхождение может лежать левее границы окна.
                  * Случай windowStart > previousIndex + 1: вхождение вне окна.
