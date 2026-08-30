@@ -180,21 +180,38 @@ def voice_symbols(soup) -> tuple[int, int]:
 def glue_inline_code(soup) -> int:
     """Пробел рядом с инлайновым <code> теряется при извлечении текста, и синтез
     слышит «участкаk». Ставим неразрывный пробел; если он оказывается одиноким
-    узлом между двумя тегами, теряется и он — тогда переносим внутрь
-    предыдущего тега."""
+    узлом между двумя тегами, теряется и он — тогда переносим внутрь соседнего
+    тега.
+
+    Обрабатываются обе стороны. Пробел ПЕРЕД <code> терялся с самого начала,
+    пробел ПОСЛЕ него — так же: запись «в `nums` **различны**» давала на слух
+    «numsразличны», потому что между </code> и <strong> стоит одинокий пробел.
+    """
     fixed = 0
     for tag in soup.find_all('code'):
         if tag.find_parent('pre'):
             continue
+
         before = tag.previous_sibling
         if isinstance(before, NavigableString) and str(before).endswith((' ', NBSP)):
             head = str(before)[:-1]
             host = before.previous_sibling
-            if head == '' and hasattr(host, 'append'):
+            if head == '' and getattr(host, 'name', None) is not None:
                 before.extract()
                 host.append(NavigableString(NBSP))
             else:
                 before.replace_with(NavigableString(head + NBSP))
+            fixed += 1
+
+        after = tag.next_sibling
+        if isinstance(after, NavigableString) and str(after).startswith((' ', NBSP)):
+            tail = str(after)[1:]
+            host = after.next_sibling
+            if tail == '' and getattr(host, 'name', None) is not None:
+                after.extract()
+                host.insert(0, NavigableString(NBSP))
+            else:
+                after.replace_with(NavigableString(NBSP + tail))
             fixed += 1
     return fixed
 
