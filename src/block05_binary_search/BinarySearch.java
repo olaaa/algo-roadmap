@@ -16,17 +16,12 @@ import java.util.Arrays;
 public class BinarySearch {
 
     /*
-     * Отсортированность входа — предусловие, а не то, что метод проверяет:
-     * проверка стоила бы O(n) и съела бы весь выигрыш от O(log n).
-     * Пустой массив охранной проверки тоже не требует: ограничения задачи
-     * его исключают, а если он всё же придёт, highIndex станет -1,
-     * цикл не начнётся и метод вернёт -1 — корректный ответ «не найдено».
+     * Охранных проверок нет по условию: ограничения задают 1 <= nums.length,
+     * то есть ни null, ни пустой массив на вход не приходят.
+     * Отсортированность — предусловие: проверка стоила бы O(n) и съела бы
+     * весь выигрыш от O(log n).
      */
     public static int search(int[] nums, int target) {
-        if (nums == null) {
-            throw new NullPointerException("массив не должен быть null");
-        }
-
         int lowIndex = 0;
         int highIndex = nums.length - 1;
 
@@ -36,13 +31,7 @@ public class BinarySearch {
          * Со строгим < этот элемент остался бы непросмотренным.
          */
         while (lowIndex <= highIndex) {
-            /*
-             * Полусумма записана как lowIndex + (highIndex - lowIndex) / 2,
-             * а не (lowIndex + highIndex) / 2: сумма двух больших индексов
-             * переполняет int и становится отрицательной. Здесь же
-             * складывается индекс с ПОЛОВИНОЙ длины участка, и переполниться
-             * такая сумма не может.
-             */
+            /* Про эту запись середины — раздел «Дополнение» в .md. */
             int middleIndex = lowIndex + (highIndex - lowIndex) / 2;
             int middleValue = nums[middleIndex];
 
@@ -69,12 +58,12 @@ public class BinarySearch {
     public static void main(String[] args) {
         /*
          * Ветви метода и тесты, которые их закрывают:
-         *   1) охранная проверка на null ........................ отдельный тест
-         *   2) цикл не начался (пустой массив) .................. пустой вход
-         *   3) middleValue == target, выход из цикла ............ большинство тестов
-         *   4) middleValue < target, сдвиг левой границы ........ target правее середины
-         *   5) middleValue > target, сдвиг правой границы ....... target левее середины
-         *   6) фолбэк return -1 после цикла ..................... значения нет в массиве
+         *   1) middleValue == target, выход из цикла ............ большинство тестов
+         *   2) middleValue < target, сдвиг левой границы ........ target правее середины
+         *   3) middleValue > target, сдвиг правой границы ....... target левее середины
+         *   4) фолбэк return -1 после цикла ..................... значения нет в массиве
+         * Пустого массива и null среди случаев нет: ограничения задачи
+         * задают 1 <= nums.length, такие входы не приходят.
          */
         record TestCase(int[] nums, int target, int expected, String name) {}
 
@@ -86,7 +75,6 @@ public class BinarySearch {
             new TestCase(new int[]{-1, 0, 3, 5, 9, 12}, -1, 0, "первый элемент, только сдвиги правой границы"),
             new TestCase(new int[]{5}, 5, 0, "один элемент, он же ответ"),
             new TestCase(new int[]{5}, 3, -1, "один элемент, не тот"),
-            new TestCase(new int[]{}, 1, -1, "пустой массив: цикл не начался"),
             new TestCase(new int[]{1, 2}, 1, 0, "два элемента, левый"),
             new TestCase(new int[]{1, 2}, 2, 1, "два элемента, правый"),
             new TestCase(new int[]{1, 2}, 3, -1, "два элемента, ни один не подошёл"),
@@ -107,15 +95,6 @@ public class BinarySearch {
                           + ", target = " + testCase.target()
                           + " -> " + actual + " (ожидалось " + testCase.expected() + ")");
         }
-
-        /* Охранная проверка на null. */
-        boolean nullRejected = false;
-        try {
-            search(null, 1);
-        } catch (NullPointerException expected) {
-            nullRejected = true;
-        }
-        check(nullRejected, "null отвергается");
 
         /*
          * Сплошная проверка: массив чётных чисел от 0 до 1998. Каждое чётное
@@ -140,21 +119,6 @@ public class BinarySearch {
         }
         check(everyValueFound, "все 1000 значений найдены по своим индексам");
         check(everyGapMissed, "все 1000 промежуточных значений дали -1");
-
-        /*
-         * Полусумма против переполнения. Здесь проверяется не метод,
-         * а само арифметическое утверждение из комментария к нему:
-         * на больших индексах наивная сумма уходит в минус, а разностная
-         * форма даёт правильную середину.
-         */
-        int lowIndex = 2_000_000_000;
-        int highIndex = 2_100_000_000;
-        check(lowIndex + highIndex == -194_967_296,
-              "наивная сумма двух больших индексов переполняет int и даёт -194 967 296");
-        check((lowIndex + highIndex) / 2 == -97_483_648,
-              "наивная середина уходит в минус: такой индекс дал бы исключение");
-        check(lowIndex + (highIndex - lowIndex) / 2 == 2_050_000_000,
-              "разностная форма даёт верную середину");
     }
 
     private static void check(boolean ok, String name) {
