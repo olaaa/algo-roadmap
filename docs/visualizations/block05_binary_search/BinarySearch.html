@@ -224,7 +224,7 @@ const CODE = [
   {t:`<span class="kw">int</span> highIndex = nums.length - <span class="num">1</span>;`, line:'init'},
   {t:``, line:'none'},
   {t:`<span class="kw">while</span> (lowIndex &lt;= highIndex) {`, line:'while'},
-  {t:`    <span class="kw">int</span> middleIndex = lowIndex + (highIndex - lowIndex) / <span class="num">2</span>;`, line:'mid'},
+  {t:`    <span class="kw">int</span> middleIndex = (lowIndex + highIndex) / <span class="num">2</span>;`, line:'mid'},
   {t:`    <span class="kw">int</span> middleValue = nums[middleIndex];`, line:'mid'},
   {t:``, line:'none'},
   {t:`    <span class="kw">if</span> (middleValue == target) {`, line:'cmpEq'},
@@ -260,11 +260,11 @@ function buildSteps(){
     steps.push({line:'while', low:lowIndex, high:highIndex, mid:null, comparisons,
                 msg:`${lowIndex} <= ${highIndex} — на участке ещё есть непроверенные ячейки, входим в тело`});
 
-    const middleIndex = lowIndex + Math.floor((highIndex - lowIndex) / 2);
+    const middleIndex = Math.floor((lowIndex + highIndex) / 2);
     const middleValue = nums[middleIndex];
     comparisons++;
     steps.push({line:'mid', low:lowIndex, high:highIndex, mid:middleIndex, comparisons,
-                msg:`середина: ${lowIndex} + (${highIndex} − ${lowIndex}) / 2 = ${middleIndex}, там значение ${middleValue}`});
+                msg:`середина: (${lowIndex} + ${highIndex}) / 2 = ${middleIndex}, там значение ${middleValue}`});
 
     if(middleValue === target){
       steps.push({line:'cmpEq', low:lowIndex, high:highIndex, mid:middleIndex, comparisons,

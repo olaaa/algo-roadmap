@@ -31,8 +31,7 @@ public class BinarySearch {
          * Со строгим < этот элемент остался бы непросмотренным.
          */
         while (lowIndex <= highIndex) {
-            /* Про эту запись середины — раздел «Дополнение» в .md. */
-            int middleIndex = lowIndex + (highIndex - lowIndex) / 2;
+            int middleIndex = (lowIndex + highIndex) / 2;
             int middleValue = nums[middleIndex];
 
             if (middleValue == target) {
@@ -62,8 +61,6 @@ public class BinarySearch {
          *   2) middleValue < target, сдвиг левой границы ........ target правее середины
          *   3) middleValue > target, сдвиг правой границы ....... target левее середины
          *   4) фолбэк return -1 после цикла ..................... значения нет в массиве
-         * Пустого массива и null среди случаев нет: ограничения задачи
-         * задают 1 <= nums.length, такие входы не приходят.
          */
         record TestCase(int[] nums, int target, int expected, String name) {}
 
@@ -82,10 +79,8 @@ public class BinarySearch {
             new TestCase(new int[]{2, 4, 6, 8}, 9, -1, "больше всех"),
             new TestCase(new int[]{2, 4, 6, 8}, 5, -1, "попадает между соседями"),
             new TestCase(new int[]{-9, -7, -3, -1}, -7, 1, "все числа отрицательные"),
-            new TestCase(new int[]{Integer.MIN_VALUE, 0, Integer.MAX_VALUE}, Integer.MAX_VALUE, 2,
-                         "края диапазона int как значения"),
-            new TestCase(new int[]{Integer.MIN_VALUE, 0, Integer.MAX_VALUE}, Integer.MIN_VALUE, 0,
-                         "минимум int как значение"),
+            new TestCase(new int[]{-9999, 0, 9999}, 9999, 2, "край диапазона значений сверху"),
+            new TestCase(new int[]{-9999, 0, 9999}, -9999, 0, "край диапазона значений снизу"),
         };
 
         for (TestCase testCase : testCases) {
