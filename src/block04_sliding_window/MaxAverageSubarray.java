@@ -22,14 +22,6 @@ public class MaxAverageSubarray {
      * целочисленное, и дробная часть молча теряется.
      */
     public static double findMaxAverage(int[] nums, int k) {
-        if (nums == null) {
-            throw new NullPointerException("массив не должен быть null");
-        }
-        if (k < 1 || k > nums.length) {
-            throw new IllegalArgumentException(
-                    "длина окна вне диапазона 1.." + nums.length + ": " + k);
-        }
-
         int windowSum = 0;
 // первое окно
         for (int windowEnd = 0; windowEnd < k; windowEnd++) {
@@ -58,14 +50,14 @@ public class MaxAverageSubarray {
     public static void main(String[] args) {
         /*
          * Ветви метода и тест, который каждую из них закрывает:
-         *   1) охранная проверка на null ..................... отдельным тестом
-         *   2) охранная проверка k вне диапазона ............. k = 0 и k = n + 1
-         *   3) первый цикл набирает окно ..................... любой вход
-         *   4) второй цикл не начался, k == n ................ [1,2,3], k = 3
-         *   5) второй цикл, Math.max выбрал новое окно ....... [1,12,-5,-6,50,3]
-         *   6) второй цикл, Math.max оставил прежнее ......... [5,1,1,1], k = 1
-         *   7) окно из одного элемента ....................... k = 1
-         *   8) все числа отрицательные ....................... [-1,-2,-3], k = 2
+         *   1) первый цикл набирает окно ..................... любой вход
+         *   2) второй цикл не начался, k == n ................ [1,2,3], k = 3
+         *   3) второй цикл, Math.max выбрал новое окно ....... [1,12,-5,-6,50,3]
+         *   4) второй цикл, Math.max оставил прежнее ......... [5,1,1,1], k = 1
+         *   5) окно из одного элемента ....................... k = 1
+         *   6) все числа отрицательные ....................... [-1,-2,-3], k = 2
+         * Охранных проверок нет: ограничения задают 1 <= k <= n, то есть
+         * ни null, ни ширина окна вне диапазона на вход не приходят.
          */
         record TestCase(int[] nums, int windowSize, double expected, String name) {}
 
@@ -97,19 +89,6 @@ public class MaxAverageSubarray {
         check(findMaxAverage(new int[]{10, 11, 10, 11}, 4) == 10.5,
               "дробное среднее не потеряно при делении");
 
-        /* Охранные проверки. */
-        check(throwsIllegalArgument(new int[]{1, 2, 3}, 0), "k = 0 отвергается");
-        check(throwsIllegalArgument(new int[]{1, 2, 3}, 4), "k больше длины отвергается");
-        check(throwsIllegalArgument(new int[]{1, 2, 3}, -1), "отрицательное k отвергается");
-
-        boolean nullRejected = false;
-        try {
-            findMaxAverage(null, 1);
-        } catch (NullPointerException expected) {
-            nullRejected = true;
-        }
-        check(nullRejected, "null отвергается");
-
         /*
          * Длинный вход: лучшее окно в самом конце, чтобы проверить, что сдвиг
          * доезжает до края массива.
@@ -127,15 +106,6 @@ public class MaxAverageSubarray {
         Arrays.fill(maxValues, 10_000);
         check(findMaxAverage(maxValues, length) == 10_000.0,
               "предельная сумма 10^9 помещается в int");
-    }
-
-    private static boolean throwsIllegalArgument(int[] nums, int windowSize) {
-        try {
-            findMaxAverage(nums, windowSize);
-            return false;
-        } catch (IllegalArgumentException expected) {
-            return true;
-        }
     }
 
     private static void check(boolean ok, String name) {

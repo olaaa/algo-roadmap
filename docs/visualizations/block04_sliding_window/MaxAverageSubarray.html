@@ -192,7 +192,6 @@
       <button class="btn" data-nums="5, 1, 1, 1" data-k="2">лучшее окно первое</button>
       <button class="btn" data-nums="1, 1, 1, 5" data-k="2">лучшее окно последнее</button>
       <button class="btn" data-nums="10, 11, 10, 11" data-k="4">дробное среднее 10.5</button>
-      <button class="btn" data-nums="1, 2, 3" data-k="5">k больше длины — вход отвергается</button>
     </div>
   </div>
 
@@ -218,7 +217,7 @@ function buildSteps(){
   steps=[];
   if(!nums.length || windowSize < 1 || windowSize > nums.length){
     steps.push({line:'init', from:-1, to:-1, sum:0, best:null, done:true, bad:true,
-                msg:`k должно быть от 1 до ${nums.length || 0} — окно обязано помещаться в массив`});
+                msg:`такого входа условие не допускает: ширина окна обязана лежать в 1..${nums.length || 0}`});
     return;
   }
 

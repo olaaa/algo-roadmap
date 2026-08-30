@@ -40,7 +40,7 @@ public class ValidPalindrome {
     public static void main(String[] args) {
         check(isPalindrome("A man, a plan, a canal: Panama"), "классический палиндром");
         check(!isPalindrome("race a car"), "не палиндром");
-        check(isPalindrome(""), "пустая строка");
+        check(isPalindrome(" "), "пробел: после чистки не остаётся ни одного символа");
         check(isPalindrome(".,"), "только знаки препинания");
         check(isPalindrome("0P") == false, "цифра vs буква");
     }

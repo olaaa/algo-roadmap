@@ -59,8 +59,8 @@ public class FirstUniqueChar {
          *   3) второй цикл, условие == 1 ложно, идём дальше "loveleetcode" -> 2
          *   4) return currentIndex, ответ НЕ в начале ...... "loveleetcode" -> 2
          *   5) return NOT_FOUND после цикла ............... "aabb" — ФОЛБЭК
-         *   6) второй цикл не начался (пустая строка) ..... "" -> -1
-         *   7) ответ на последней позиции ................. "aab" -> 2
+         *   6) ответ на последней позиции ................. "aab" -> 2
+         * Пустой строки среди случаев нет: ограничения задают 1 <= s.length.
          */
         record TestCase(String input, int expected, String name) {}
 
@@ -69,7 +69,6 @@ public class FirstUniqueChar {
             new TestCase("loveleetcode", 2, "первая буква повторяется, ответ дальше"),
             new TestCase("aabb", NOT_FOUND, "уникальных нет — фолбэк после цикла"),
             new TestCase("z", 0, "один символ, он же уникальный"),
-            new TestCase("", NOT_FOUND, "пустая строка, цикл не начался"),
             new TestCase("aab", 2, "ответ на последней позиции"),
             new TestCase("abcabd", 2, "уникальны c и d, берём первый по позиции"),
             new TestCase("aaaa", NOT_FOUND, "все символы одинаковые"),

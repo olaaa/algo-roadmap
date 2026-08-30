@@ -23,10 +23,6 @@ public class LongestSubstringNoRepeat {
      * в окно, поэтому длина считается уже на корректном окне.
      */
     public static int lengthOfLongestSubstring(String text) {
-        if (text == null) {
-            throw new NullPointerException("строка не должна быть null");
-        }
-
         Set<Character> windowChars = new HashSet<>();
         int longestLength = 0;
         int windowStart = 0;
@@ -52,10 +48,6 @@ public class LongestSubstringNoRepeat {
      * символы, уже покинувшие окно, а левая граница пятиться не имеет права.
      */
     public static int lengthOfLongestSubstringWithJump(String text) {
-        if (text == null) {
-            throw new NullPointerException("строка не должна быть null");
-        }
-
         Map<Character, Integer> lastIndexByChar = new HashMap<>();
         int longestLength = 0;
         int windowStart = 0;
@@ -88,17 +80,18 @@ public class LongestSubstringNoRepeat {
     public static void main(String[] args) {
         /*
          * Ветви обоих методов и тест, который каждую из них закрывает:
-         *   1) охранная проверка на null ......................... отдельным тестом
-         *   2) цикл for не начался, пустая строка ................ ""
-         *   3) while ни разу не сработал, повторов нет ........... "abcde"
-         *   4) while сработал один раз ........................... "abcabcbb"
-         *   5) while сработал несколько раз за итерацию .......... "abcb"
-         *   6) while съел всё окно, все символы равны ............ "bbbbb"
-         *   7) Math.max обновил максимум ......................... "pwwkew"
-         *   8) Math.max оставил прежний максимум ................. "abcab"
-         *   9) previousIndex == null, символ виден впервые ....... любой вход
-         *  10) previousIndex внутри окна, граница прыгает ........ "dvdf"
-         *  11) previousIndex вне окна, Math.max держит границу ... "abba"
+         *   1) цикл for не начался, пустая строка ................ ""
+         *   2) while ни разу не сработал, повторов нет ........... "abcde"
+         *   3) while сработал один раз ........................... "abcabcbb"
+         *   4) while сработал несколько раз за итерацию .......... "abcb"
+         *   5) while съел всё окно, все символы равны ............ "bbbbb"
+         *   6) Math.max обновил максимум ......................... "pwwkew"
+         *   7) Math.max оставил прежний максимум ................. "abcab"
+         *   8) previousIndex == null, символ виден впервые ....... любой вход
+         *   9) previousIndex внутри окна, граница прыгает ........ "dvdf"
+         *  10) previousIndex вне окна, Math.max держит границу ... "abba"
+         * Охранной проверки на null нет: ограничения задают 0 <= s.length,
+         * то есть строка приходит всегда, пустая строка — законный вход.
          */
         record TestCase(String text, int expected, String name) {}
 
@@ -132,12 +125,6 @@ public class LongestSubstringNoRepeat {
                           + ": \"" + testCase.text() + "\" -> " + actualByJump);
         }
 
-        /* Охранные проверки обоих методов. */
-        check(throwsNullPointer(() -> lengthOfLongestSubstring(null)),
-              "окно с множеством: null отвергается");
-        check(throwsNullPointer(() -> lengthOfLongestSubstringWithJump(null)),
-              "окно с прыжком: null отвергается");
-
         /*
          * Предельный вход по ограничениям задачи: 100 000 символов из четырёх
          * повторяющихся букв. Проверяет, что левая граница движется только
@@ -164,15 +151,6 @@ public class LongestSubstringNoRepeat {
               "512 различных символов: окно во всю строку");
         check(lengthOfLongestSubstringWithJump(allDistinct.toString()) == 512,
               "512 различных символов, вариант с прыжком");
-    }
-
-    private static boolean throwsNullPointer(Runnable call) {
-        try {
-            call.run();
-            return false;
-        } catch (NullPointerException expected) {
-            return true;
-        }
     }
 
     private static void check(boolean ok, String name) {
