@@ -91,6 +91,37 @@ public class BinarySearch {
                           + " -> " + actual + " (ожидалось " + testCase.expected() + ")");
         }
 
+        int[] evenNumbers = createEvenNumberArray();
+
+        /*
+         * Наглядная часть: те же поиски с печатью шагов. Ответы сверяются
+         * с обычным search, чтобы трассировка не разошлась с решением.
+         */
+        System.out.println();
+        System.out.println("=== по шагам ===");
+
+        record TracedCase(int[] nums, int target, String name) {}
+
+        TracedCase[] tracedCases = {
+            new TracedCase(new int[]{-1, 0, 3, 5, 9, 12}, 9, "пример из условия"),
+            new TracedCase(new int[]{-1, 0, 3, 5, 9, 12}, 2, "значения нет"),
+            new TracedCase(new int[]{5}, 5, "массив из одного элемента"),
+            new TracedCase(evenNumbers, 1998,
+                           "тысяча элементов, худший случай — ответ на десятом шаге"),
+            new TracedCase(evenNumbers, 1999,
+                           "тысяча элементов, значения нет — те же десять шагов"),
+        };
+
+        for (TracedCase tracedCase : tracedCases) {
+            System.out.println();
+            System.out.println(tracedCase.name() + ":");
+            int traced = searchWithStepLog(tracedCase.nums(), tracedCase.target());
+            check(traced == search(tracedCase.nums(), tracedCase.target()),
+                  "трассировка и решение дали один ответ: " + traced);
+        }
+    }
+
+    private static int[] createEvenNumberArray() {
         /*
          * Сплошная проверка: массив чётных чисел от 0 до 1998. Каждое чётное
          * обязано найтись по своему индексу, каждое нечётное — не найтись
@@ -114,6 +145,50 @@ public class BinarySearch {
         }
         check(everyValueFound, "все 1000 значений найдены по своим индексам");
         check(everyGapMissed, "все 1000 промежуточных значений дали -1");
+        return evenNumbers;
+    }
+
+    /*
+     * Тот же поиск, но с печатью каждого шага и итогового числа шагов.
+     * Нужен только для наглядности при запуске main: сам ответ считается
+     * ровно так же, как в search, и результаты обоих методов сверяются
+     * тестом. В решении задачи такой печати быть не должно — метод обязан
+     * быть чистой функцией «вход -> выход».
+     */
+    private static int searchWithStepLog(int[] nums, int target) {
+        /*
+         * Предел шагов — это floor(log2(n)) + 1. Считается через позицию
+         * старшего единичного бита длины, без вещественной арифметики.
+         */
+        int stepLimit = Integer.SIZE - Integer.numberOfLeadingZeros(nums.length);
+        System.out.println("ищем " + target + ", длина массива " + nums.length
+                + ", предел числа шагов " + stepLimit);
+
+        int lowIndex = 0;
+        int highIndex = nums.length - 1;
+        int steps = 0;
+
+        while (lowIndex <= highIndex) {
+            int middleIndex = (lowIndex + highIndex) / 2;
+            int middleValue = nums[middleIndex];
+            steps++;
+
+            System.out.println("  шаг " + steps + ": участок [" + lowIndex + ".." + highIndex
+                    + "], середина " + middleIndex + ", значение " + middleValue);
+
+            if (middleValue == target) {
+                System.out.println("  найдено на шаге " + steps + ", индекс " + middleIndex);
+                return middleIndex;
+            }
+            if (middleValue < target) {
+                lowIndex = middleIndex + 1;
+            } else {
+                highIndex = middleIndex - 1;
+            }
+        }
+
+        System.out.println("  не найдено, потрачено шагов: " + steps);
+        return -1;
     }
 
     private static void check(boolean ok, String name) {
