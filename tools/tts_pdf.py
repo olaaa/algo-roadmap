@@ -61,8 +61,11 @@ li { margin:5px 0 }
 code { font-family:"DejaVu Sans Mono",monospace; font-size:11pt; background:#eef1f6;
        padding:1px 4px; border-radius:3px; color:#1f3355 }
 pre { background:#f6f8fb; border:1px solid #dde2ec; border-left:3px solid #4f8cff;
-      border-radius:4px; padding:11px 14px; margin:11px 0; page-break-inside:avoid }
-pre code { background:none; padding:0; font-size:10.5pt; line-height:1.45; color:#1b2430 }
+      border-radius:4px; padding:11px 14px; margin:11px 0; page-break-inside:avoid;
+      /* Длинная строка кода переносится, а не уезжает за край страницы. */
+      white-space:pre-wrap; overflow-wrap:break-word }
+pre code { background:none; padding:0; font-size:10.5pt; line-height:1.45; color:#1b2430;
+           white-space:pre-wrap; overflow-wrap:break-word }
 table { border-collapse:collapse; width:100%; margin:12px 0; font-size:11.5pt;
         page-break-inside:avoid }
 th, td { border:1px solid #ccd3e0; padding:7px 9px; text-align:left; vertical-align:top }
@@ -263,6 +266,41 @@ def add_stops(soup) -> int:
     return added
 
 
+SUPERSCRIPTS = {
+    '0': '⁰', '1': '¹', '2': '²', '3': '³', '4': '⁴',
+    '5': '⁵', '6': '⁶', '7': '⁷', '8': '⁸', '9': '⁹',
+    '-': '⁻', '+': '⁺',
+    'n': 'ⁿ', 'k': 'ᵏ', 'm': 'ᵐ', 'i': 'ⁱ', 'j': 'ʲ', 'x': 'ˣ', 'p': 'ᵖ',
+}
+POWER = re.compile(r'\^(-?[0-9A-Za-z]+)')
+
+
+def superscript_powers(soup) -> int:
+    """Знак ^ синтез речи молча проглатывает: «2^k» читается как «два ка».
+    Поэтому степень поднимается в надстрочные символы: 2ᵏ, 10⁴, 2³¹.
+    Блоки с указанным языком не трогаем — там это был бы уже не код."""
+    raised = 0
+    for node in list(soup.find_all(string=True)):
+        if in_code_block(node):
+            continue
+        text = str(node)
+        if '^' not in text:
+            continue
+
+        def replace(match):
+            nonlocal raised
+            power = match.group(1)
+            if not all(ch in SUPERSCRIPTS for ch in power):
+                return match.group(0)
+            raised += 1
+            return ''.join(SUPERSCRIPTS[ch] for ch in power)
+
+        replaced = POWER.sub(replace, text)
+        if replaced != text:
+            node.replace_with(NavigableString(replaced))
+    return raised
+
+
 def verify(pdf_path: Path) -> None:
     """На глаз подсказки в PDF не проверить — смотрим текстовый слой."""
     from pypdf import PdfReader
@@ -285,6 +323,7 @@ def build(sources: list[Path], output: Path) -> None:
 
     soup = BeautifulSoup(body, 'html.parser')
     in_code = normalize_minus_in_code(soup)
+    raised = superscript_powers(soup)
     minuses, arrows = voice_symbols(soup)
     glued = glue_inline_code(soup)
     block_dots = stops_in_text_blocks(soup)
@@ -299,6 +338,7 @@ def build(sources: list[Path], output: Path) -> None:
     print(f'минусов озвучено  : {minuses}')
     print(f'стрелок озвучено  : {arrows}')
     print(f'минусов в коде    : {in_code} (приведены к дефису)')
+    print(f'степеней поднято  : {raised} (знак ^ убран)')
     print(f'пробелов склеено  : {glued}')
     print(f'точек в блоках    : {block_dots}')
     print(f'точек в прозе     : {dots}')
