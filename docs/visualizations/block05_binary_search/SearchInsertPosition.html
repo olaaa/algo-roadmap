@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Search Insert Position — визуализация позиции вставки</title>
+<style>
+  :root{
+    --bg:#0f1117; --panel:#171a23; --cell:#232733; --line:#2e3342;
+    --txt:#e6e8ee; --muted:#8b90a0; --accent:#4f8cff; --cur:#38bdf8; --comp:#fbbf24;
+    --ok:#34d399; --miss:#fb7185; --code:#c7d0e0;
+    --mono:"JetBrains Mono",Consolas,Menlo,monospace;
+    --sans:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--txt);font-family:var(--sans);
+       min-height:100vh;padding:16px 18px 28px}
+  h1{font-size:17px;font-weight:600;margin:0 0 2px;text-align:center}
+  .sub{color:var(--muted);font-size:12.5px;margin:0 auto 14px;max-width:860px;text-align:center}
+
+  .layout{display:grid;grid-template-columns:minmax(0,1fr) 264px;gap:14px;
+          max-width:1320px;margin:0 auto;align-items:start}
+  .stage{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px 18px}
+  .side{position:sticky;top:12px;display:flex;flex-direction:column;gap:12px}
+
+  .setup{display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end}
+  .setup label{display:flex;flex-direction:column;gap:4px;font-size:11.5px;color:var(--muted)}
+  .setup input[type=text]{font-family:var(--mono);font-size:14px;background:var(--cell);
+       border:1px solid var(--line);color:var(--txt);border-radius:8px;padding:7px 10px;width:300px}
+  .setup input[type=number]{font-family:var(--mono);font-size:14px;background:var(--cell);
+       border:1px solid var(--line);color:var(--txt);border-radius:8px;padding:7px 10px;width:80px}
+  .btn{font-family:var(--sans);font-size:13px;font-weight:500;cursor:pointer;
+       background:var(--cell);border:1px solid var(--line);color:var(--txt);
+       border-radius:8px;padding:8px 13px;transition:.15s}
+  .btn:hover{border-color:var(--accent)}
+  .btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+  .btn:disabled{opacity:.4;cursor:not-allowed}
+
+  .warn{margin-top:10px;padding:8px 11px;border-radius:8px;font-size:12px;line-height:1.5;
+        border:1px solid var(--miss);background:rgba(251,113,133,.12);color:var(--txt);display:none}
+  .warn.on{display:block}
+
+  .controls{position:sticky;top:12px;z-index:5;display:flex;gap:9px;justify-content:center;
+            align-items:center;flex-wrap:wrap;margin:14px 0 4px;padding:8px 10px;
+            background:rgba(23,26,35,.96);border:1px solid var(--line);border-radius:10px}
+  .step-info{color:var(--muted);font-size:12px;font-family:var(--mono);min-width:88px;text-align:center}
+  .progress{height:3px;background:var(--cell);border-radius:2px;margin:6px 0 2px;overflow:hidden}
+  .progress i{display:block;height:100%;background:var(--accent);width:0;transition:width .15s}
+
+  .strwrap{margin:14px 0 4px}
+  .strlab{font-family:var(--mono);font-size:11.5px;color:var(--muted);margin-bottom:7px;text-align:center}
+  .cells{display:flex;gap:5px;flex-wrap:wrap;justify-content:center;align-items:flex-start}
+  .ccell{display:flex;flex-direction:column;align-items:center;gap:3px}
+  .ptr{font-family:var(--mono);font-size:10px;height:13px;color:var(--comp);white-space:nowrap}
+  .cell{min-width:42px;height:40px;padding:0 8px;border-radius:8px;background:var(--cell);
+        border:2px solid var(--line);display:flex;align-items:center;justify-content:center;
+        font-family:var(--mono);font-size:14px;transition:.2s}
+  .cell.inRange{border-color:var(--accent);background:rgba(79,140,255,.18)}
+  .cell.middle{border-color:var(--cur);background:rgba(56,189,248,.28)}
+  .cell.found{border-color:var(--ok);background:rgba(52,211,153,.28)}
+  .cell.out{opacity:.3}
+  .cell.slot{min-width:26px;border-style:dashed;border-color:var(--ok);
+             background:rgba(52,211,153,.14);color:var(--ok)}
+  .idx{font-family:var(--mono);font-size:10px;color:var(--muted)}
+  .idx.on{color:var(--cur)}
+  .idx.here{color:var(--ok)}
+
+  .state{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:14px 0 4px}
+  .card{background:#0b0d13;border:1px solid var(--line);border-radius:10px;
+        padding:9px 16px;min-width:118px;text-align:center}
+  .card .cap{font-family:var(--mono);font-size:11px;color:var(--muted);margin-bottom:4px}
+  .card .val{font-family:var(--mono);font-size:20px;font-weight:700}
+  .card.low .val{color:var(--comp)}
+  .card.high .val{color:var(--comp)}
+  .card.mid .val{color:var(--cur)}
+  .card.answer .val{color:var(--ok)}
+  .card.steps .val{color:var(--accent)}
+
+  .status{min-height:24px;text-align:center;font-family:var(--mono);font-size:13px;margin:12px 0 2px}
+  .status .op{color:var(--code)}
+  .status .good{color:var(--ok)} .status .comp{color:var(--comp)} .status .miss{color:var(--miss)}
+
+  .codebox{background:#0b0d13;border:1px solid var(--line);border-radius:10px;
+           padding:12px 14px;font-family:var(--mono);font-size:12px;line-height:1.65;
+           overflow:auto;max-height:320px;margin-top:12px}
+  .codebox .ln{display:block;padding:0 6px;border-radius:4px;color:var(--code);white-space:pre}
+  .codebox .ln.active{background:rgba(79,140,255,.2)}
+  .kw{color:#c792ea}.num{color:#f78c6c}
+
+  .box{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+  .box h2{font-size:12px;margin:0 0 9px;color:var(--muted);font-weight:600;
+          text-transform:uppercase;letter-spacing:.04em}
+  .legend-item{display:flex;gap:8px;align-items:flex-start;font-size:12px;line-height:1.45;
+               margin-bottom:7px;color:var(--txt)}
+  .sw{flex:0 0 auto;width:13px;height:13px;border-radius:4px;border:2px solid;margin-top:2px}
+  .sw.rng{border-color:var(--accent);background:rgba(79,140,255,.18)}
+  .sw.mid{border-color:var(--cur);background:rgba(56,189,248,.28)}
+  .sw.fnd{border-color:var(--ok);background:rgba(52,211,153,.28)}
+  .sw.slt{border-color:var(--ok);border-style:dashed;background:rgba(52,211,153,.14)}
+  .sw.out{border-color:var(--line);background:var(--cell);opacity:.35}
+  .note{font-size:11.5px;color:var(--muted);line-height:1.5}
+  .note code{font-family:var(--mono);color:var(--code)}
+  .note+.note{margin-top:7px}
+  .keys{font-size:11.5px;color:var(--muted);line-height:1.6}
+  .keys b{color:var(--txt);font-family:var(--mono);font-weight:600}
+
+  .presets{max-width:1320px;margin:14px auto 0;background:var(--panel);
+           border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+  .presets h2{font-size:12px;margin:0 0 9px;color:var(--muted);font-weight:600;
+              text-transform:uppercase;letter-spacing:.04em}
+  .preset{display:flex;gap:7px;flex-wrap:wrap}
+  .preset .btn{padding:6px 11px;font-family:var(--mono);font-size:12px}
+
+  @media (max-width:980px){
+    .layout{grid-template-columns:minmax(0,1fr)}
+    .side{position:static}
+  }
+</style>
+</head>
+<body>
+  <h1>Search Insert Position — куда встанет значение</h1>
+  <div class="sub">Цикл тот же, что в задаче 704. Разница в том, что возвращается после него: там <code>-1</code>, здесь <code>lowIndex</code> — позиция, где все элементы слева меньше target, а справа больше (LeetCode 35).</div>
+
+  <div class="layout">
+    <div class="stage">
+      <div class="setup">
+        <label>Массив (числа через запятую, по возрастанию)
+          <input id="numsIn" type="text" value="1, 3, 5, 6">
+        </label>
+        <label>target
+          <input id="targetIn" type="number" value="2">
+        </label>
+        <button class="btn primary" id="build">Построить</button>
+      </div>
+      <div class="warn" id="warn"></div>
+
+      <div class="controls">
+        <button class="btn" id="prev">◀ Назад</button>
+        <span class="step-info" id="stepInfo">шаг 0 / 0</span>
+        <button class="btn" id="next">Вперёд ▶</button>
+        <button class="btn" id="play">▶ Авто</button>
+        <button class="btn" id="reset">⟲ Сброс</button>
+      </div>
+      <div class="progress"><i id="progressBar"></i></div>
+
+      <div class="strwrap">
+        <div class="strlab">массив nums — сверху границы участка, снизу индекс ячейки</div>
+        <div class="cells" id="cells"></div>
+      </div>
+
+      <div class="state">
+        <div class="card low">
+          <div class="cap">lowIndex</div>
+          <div class="val" id="lowVal">—</div>
+        </div>
+        <div class="card high">
+          <div class="cap">highIndex</div>
+          <div class="val" id="highVal">—</div>
+        </div>
+        <div class="card mid">
+          <div class="cap">middleIndex</div>
+          <div class="val" id="midVal">—</div>
+        </div>
+        <div class="card steps">
+          <div class="cap">сравнений</div>
+          <div class="val" id="stepsVal">0</div>
+        </div>
+        <div class="card answer">
+          <div class="cap">ответ</div>
+          <div class="val" id="answerVal">—</div>
+        </div>
+      </div>
+
+      <div class="status" id="status"></div>
+      <div class="codebox" id="code"></div>
+    </div>
+
+    <div class="side">
+      <div class="box">
+        <h2>Цвета на схеме</h2>
+        <div class="legend-item"><span class="sw rng"></span>участок, где ещё может лежать target</div>
+        <div class="legend-item"><span class="sw mid"></span>средний элемент — с ним идёт сравнение</div>
+        <div class="legend-item"><span class="sw fnd"></span>target нашёлся, это его индекс</div>
+        <div class="legend-item"><span class="sw slt"></span>место вставки: пунктирный слот между ячейками</div>
+        <div class="legend-item"><span class="sw out"></span>отсечённые ячейки</div>
+      </div>
+
+      <div class="box">
+        <h2>На что смотреть в конце</h2>
+        <div class="note">Когда границы разошлись, <code>lowIndex</code> и есть ответ. Пунктирный слот показывает, куда встало бы значение.</div>
+        <div class="note">Если target больше всех, слот оказывается ЗА последней ячейкой, и ответ равен длине массива — такого индекса в массиве нет, и это правильно.</div>
+        <div class="note"><code>highIndex</code> в конце равен <code>lowIndex − 1</code> и указывает на соседа слева, поэтому ответом он быть не может.</div>
+      </div>
+
+      <div class="box">
+        <h2>Клавиши</h2>
+        <div class="keys">
+          <b>→</b> шаг вперёд<br>
+          <b>←</b> шаг назад<br>
+          <b>пробел</b> запустить и остановить
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="presets">
+    <h2>Готовые примеры</h2>
+    <div class="preset">
+      <button class="btn" data-nums="1, 3, 5, 6" data-target="5">пример 1 — значение есть</button>
+      <button class="btn" data-nums="1, 3, 5, 6" data-target="2">пример 2 — вставка между соседями</button>
+      <button class="btn" data-nums="1, 3, 5, 6" data-target="7">пример 3 — вставка в хвост</button>
+      <button class="btn" data-nums="1, 3, 5, 6" data-target="0">вставка в начало</button>
+      <button class="btn" data-nums="1, 3, 5, 6" data-target="4">вставка в середину</button>
+      <button class="btn" data-nums="1" data-target="2">один элемент, вставка после</button>
+      <button class="btn" data-nums="1, 3, 5, 7, 9, 11, 13, 15" data-target="12">восемь элементов</button>
+    </div>
+  </div>
+
+<script>
+const $ = id => document.getElementById(id);
+let nums=[], target=0, steps=[], cur=0, timer=null;
+
+const CODE = [
+  {t:`<span class="kw">int</span> lowIndex = <span class="num">0</span>;`, line:'init'},
+  {t:`<span class="kw">int</span> highIndex = nums.length - <span class="num">1</span>;`, line:'init'},
+  {t:``, line:'none'},
+  {t:`<span class="kw">while</span> (lowIndex &lt;= highIndex) {`, line:'while'},
+  {t:`    <span class="kw">int</span> middleIndex = (lowIndex + highIndex) / <span class="num">2</span>;`, line:'mid'},
+  {t:`    <span class="kw">int</span> middleValue = nums[middleIndex];`, line:'mid'},
+  {t:``, line:'none'},
+  {t:`    <span class="kw">if</span> (middleValue == target) {`, line:'cmpEq'},
+  {t:`        <span class="kw">return</span> middleIndex;`, line:'found'},
+  {t:`    }`, line:'none'},
+  {t:`    <span class="kw">if</span> (middleValue &lt; target) {`, line:'cmpLess'},
+  {t:`        lowIndex = middleIndex + <span class="num">1</span>;`, line:'moveLow'},
+  {t:`    } <span class="kw">else</span> {`, line:'none'},
+  {t:`        highIndex = middleIndex - <span class="num">1</span>;`, line:'moveHigh'},
+  {t:`    }`, line:'none'},
+  {t:`}`, line:'whileEnd'},
+  {t:`<span class="kw">return</span> lowIndex;`, line:'insert'},
+];
+
+function buildSteps(){
+  steps=[];
+  let comparisons = 0;
+  let lowIndex = 0;
+  let highIndex = nums.length - 1;
+
+  steps.push({line:'init', low:lowIndex, high:highIndex, mid:null, comparisons,
+              msg:`участок поиска — весь массив: lowIndex = ${lowIndex}, highIndex = ${highIndex}`});
+
+  while(lowIndex <= highIndex){
+    steps.push({line:'while', low:lowIndex, high:highIndex, mid:null, comparisons,
+                msg:`${lowIndex} <= ${highIndex} — на участке есть непроверенные ячейки`});
+
+    const middleIndex = Math.floor((lowIndex + highIndex) / 2);
+    const middleValue = nums[middleIndex];
+    comparisons++;
+    steps.push({line:'mid', low:lowIndex, high:highIndex, mid:middleIndex, comparisons,
+                msg:`середина: (${lowIndex} + ${highIndex}) / 2 = ${middleIndex}, там значение ${middleValue}`});
+
+    if(middleValue === target){
+      steps.push({line:'cmpEq', low:lowIndex, high:highIndex, mid:middleIndex, comparisons,
+                  msg:`${middleValue} == ${target} — совпало`});
+      steps.push({line:'found', low:lowIndex, high:highIndex, mid:middleIndex, comparisons,
+                  done:true, good:true, foundIndex:middleIndex, answer:middleIndex,
+                  msg:`✓ ответ ${middleIndex}: target уже стоит на этой позиции`});
+      return;
+    }
+
+    steps.push({line:'cmpEq', low:lowIndex, high:highIndex, mid:middleIndex, comparisons,
+                msg:`${middleValue} != ${target} — смотрим, в какую сторону идти`});
+
+    if(middleValue < target){
+      steps.push({line:'cmpLess', low:lowIndex, high:highIndex, mid:middleIndex, comparisons,
+                  msg:`${middleValue} < ${target} — значит место target правее`});
+      lowIndex = middleIndex + 1;
+      steps.push({line:'moveLow', low:lowIndex, high:highIndex, mid:middleIndex, comparisons,
+                  msg:`отсекаем левую половину вместе с серединой: lowIndex = ${lowIndex}`});
+    } else {
+      steps.push({line:'cmpLess', low:lowIndex, high:highIndex, mid:middleIndex, comparisons,
+                  msg:`${middleValue} > ${target} — значит место target левее`});
+      highIndex = middleIndex - 1;
+      steps.push({line:'moveHigh', low:lowIndex, high:highIndex, mid:middleIndex, comparisons,
+                  msg:`отсекаем правую половину вместе с серединой: highIndex = ${highIndex}`});
+    }
+  }
+
+  steps.push({line:'whileEnd', low:lowIndex, high:highIndex, mid:null, comparisons,
+              msg:`${lowIndex} > ${highIndex} — границы разошлись, проверять больше нечего`});
+  steps.push({line:'insert', low:lowIndex, high:highIndex, mid:null, comparisons,
+              done:true, good:true, insertAt:lowIndex, answer:lowIndex,
+              msg:`✓ ответ ${lowIndex}: слева всё меньше ${target}, справа всё больше — сюда и вставлять`});
+}
+
+function renderCells(s){
+  const box=$('cells'); box.innerHTML='';
+  if(!nums.length){
+    box.innerHTML='<div class="idx">массив пуст</div>';
+    return;
+  }
+  for(let currentIndex=0;currentIndex<nums.length;currentIndex++){
+    if(s.insertAt === currentIndex){
+      box.append(makeSlot());
+    }
+
+    const wrap=document.createElement('div'); wrap.className='ccell';
+
+    const pointer=document.createElement('div'); pointer.className='ptr';
+    const labels=[];
+    if(currentIndex === s.low){ labels.push('low'); }
+    if(currentIndex === s.high){ labels.push('high'); }
+    pointer.textContent = labels.join(' ');
+
+    const cell=document.createElement('div'); cell.className='cell';
+    cell.textContent=nums[currentIndex];
+    const inRange = currentIndex >= s.low && currentIndex <= s.high;
+    if(s.foundIndex === currentIndex){
+      cell.classList.add('found');
+    } else if(s.mid === currentIndex){
+      cell.classList.add('middle');
+    } else if(inRange){
+      cell.classList.add('inRange');
+    } else {
+      cell.classList.add('out');
+    }
+
+    const idx=document.createElement('div');
+    idx.className='idx' + (s.mid === currentIndex ? ' on' : '');
+    idx.textContent=currentIndex;
+    wrap.append(pointer,cell,idx); box.append(wrap);
+  }
+
+  if(s.insertAt === nums.length){
+    box.append(makeSlot());
+  }
+}
+
+function makeSlot(){
+  const wrap=document.createElement('div'); wrap.className='ccell';
+  const pointer=document.createElement('div'); pointer.className='ptr';
+  pointer.textContent='';
+  const slot=document.createElement('div'); slot.className='cell slot';
+  slot.textContent='▾';
+  const idx=document.createElement('div'); idx.className='idx here';
+  idx.textContent='сюда';
+  wrap.append(pointer,slot,idx);
+  return wrap;
+}
+
+function renderState(s){
+  $('lowVal').textContent = s.low;
+  $('highVal').textContent = s.high;
+  $('midVal').textContent = s.mid === null || s.mid === undefined ? '—' : s.mid;
+  $('stepsVal').textContent = s.comparisons;
+  $('answerVal').textContent = s.answer === undefined ? '—' : s.answer;
+}
+
+function renderCode(active){
+  $('code').innerHTML = CODE.map(c=>
+    `<span class="ln ${c.line===active?'active':''}">${c.t || ' '}</span>`).join('');
+}
+
+function show(idx){
+  cur=Math.max(0,Math.min(idx,steps.length-1));
+  const s=steps[cur];
+  renderCells(s); renderState(s); renderCode(s.line);
+  const cls = s.good ? 'good'
+            : s.line === 'moveLow' || s.line === 'moveHigh' ? 'comp' : 'op';
+  $('status').innerHTML=`<span class="${cls}">${s.msg}</span>`;
+  $('stepInfo').textContent=`шаг ${cur+1} / ${steps.length}`;
+  $('progressBar').style.width = ((cur+1)/steps.length*100) + '%';
+  $('prev').disabled=cur===0; $('next').disabled=cur===steps.length-1;
+}
+
+function checkSorted(){
+  const warn=$('warn');
+  let sorted=true;
+  for(let currentIndex=1;currentIndex<nums.length;currentIndex++){
+    if(nums[currentIndex] <= nums[currentIndex-1]){ sorted=false; }
+  }
+  if(sorted){
+    warn.classList.remove('on');
+    warn.innerHTML='';
+  } else {
+    warn.classList.add('on');
+    warn.innerHTML='Массив не отсортирован по возрастанию (или в нём есть повторы). Это предусловие: метод его не проверяет. Шаги ниже честно показывают, что произойдёт — ответ будет неверным.';
+  }
+}
+
+function build(){
+  stopPlay();
+  nums = $('numsIn').value.split(',')
+      .map(part=>part.trim())
+      .filter(part=>part.length>0)
+      .map(Number)
+      .filter(value=>Number.isFinite(value));
+  $('numsIn').value = nums.join(', ');
+  target = Number($('targetIn').value) || 0;
+  checkSorted();
+  buildSteps(); show(0);
+}
+function stopPlay(){ if(timer){clearInterval(timer);timer=null;$('play').textContent='▶ Авто';} }
+function togglePlay(){
+  if(timer){stopPlay();return;}
+  if(cur>=steps.length-1) show(0);
+  $('play').textContent='⏸ Пауза';
+  timer=setInterval(()=>{ if(cur>=steps.length-1){stopPlay();return;} show(cur+1); },800);
+}
+
+$('build').onclick=build;
+$('next').onclick=()=>{stopPlay();show(cur+1);};
+$('prev').onclick=()=>{stopPlay();show(cur-1);};
+$('play').onclick=togglePlay;
+$('reset').onclick=()=>{stopPlay();show(0);};
+document.querySelectorAll('.preset .btn').forEach(button=>{
+  button.onclick=()=>{
+    $('numsIn').value=button.dataset.nums;
+    $('targetIn').value=button.dataset.target;
+    build();
+    window.scrollTo({top:0, behavior:'smooth'});
+  };
+});
+document.addEventListener('keydown',event=>{
+  if(event.target.tagName==='INPUT') return;
+  if(event.key==='ArrowRight'){stopPlay();show(cur+1);}
+  if(event.key==='ArrowLeft'){stopPlay();show(cur-1);}
+  if(event.key===' '){event.preventDefault();togglePlay();}
+});
+build();
+</script>
+</body>
+</html>
