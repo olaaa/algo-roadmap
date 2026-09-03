@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Maximum Depth of Binary Tree — визуализация рекурсии</title>
+<style>
+  :root{
+    --bg:#0f1117; --panel:#171a23; --cell:#232733; --line:#2e3342;
+    --txt:#e6e8ee; --muted:#8b90a0; --accent:#4f8cff; --cur:#38bdf8; --comp:#fbbf24;
+    --ok:#34d399; --miss:#fb7185; --code:#c7d0e0;
+    --mono:"JetBrains Mono",Consolas,Menlo,monospace;
+    --sans:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--txt);font-family:var(--sans);
+       min-height:100vh;padding:16px 18px 28px}
+  h1{font-size:17px;font-weight:600;margin:0 0 2px;text-align:center}
+  .sub{color:var(--muted);font-size:12.5px;margin:0 auto 14px;max-width:860px;text-align:center}
+
+  .layout{display:grid;grid-template-columns:minmax(0,1fr) 264px;gap:14px;
+          max-width:1320px;margin:0 auto;align-items:start}
+  .stage{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px 18px}
+  .side{position:sticky;top:12px;display:flex;flex-direction:column;gap:12px}
+
+  .setup{display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end}
+  .setup label{display:flex;flex-direction:column;gap:4px;font-size:11.5px;color:var(--muted)}
+  .setup input[type=text]{font-family:var(--mono);font-size:14px;background:var(--cell);
+       border:1px solid var(--line);color:var(--txt);border-radius:8px;padding:7px 10px;width:340px}
+  .btn{font-family:var(--sans);font-size:13px;font-weight:500;cursor:pointer;
+       background:var(--cell);border:1px solid var(--line);color:var(--txt);
+       border-radius:8px;padding:8px 13px;transition:.15s}
+  .btn:hover{border-color:var(--accent)}
+  .btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+  .btn:disabled{opacity:.4;cursor:not-allowed}
+
+  .controls{position:sticky;top:12px;z-index:5;display:flex;gap:9px;justify-content:center;
+            align-items:center;flex-wrap:wrap;margin:14px 0 4px;padding:8px 10px;
+            background:rgba(23,26,35,.96);border:1px solid var(--line);border-radius:10px}
+  .step-info{color:var(--muted);font-size:12px;font-family:var(--mono);min-width:88px;text-align:center}
+  .progress{height:3px;background:var(--cell);border-radius:2px;margin:6px 0 2px;overflow:hidden}
+  .progress i{display:block;height:100%;background:var(--accent);width:0;transition:width .15s}
+
+  .treewrap{margin:14px 0 4px;overflow:auto}
+  .treelab{font-family:var(--mono);font-size:11.5px;color:var(--muted);margin-bottom:7px;text-align:center}
+  svg{display:block;margin:0 auto}
+  .edge{stroke:var(--line);stroke-width:2}
+  .edge.walked{stroke:var(--accent)}
+  .node circle{fill:var(--cell);stroke:var(--line);stroke-width:2;transition:.2s}
+  .node.active circle{fill:rgba(56,189,248,.3);stroke:var(--cur)}
+  .node.done circle{fill:rgba(52,211,153,.22);stroke:var(--ok)}
+  .node.instack circle{stroke:var(--accent);fill:rgba(79,140,255,.16)}
+  .node text.val{fill:var(--txt);font-family:var(--mono);font-size:13px;text-anchor:middle}
+  .node text.res{fill:var(--ok);font-family:var(--mono);font-size:11px;text-anchor:middle}
+  .nullmark{fill:var(--muted);font-family:var(--mono);font-size:10px;text-anchor:middle}
+
+  .state{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:14px 0 4px}
+  .card{background:#0b0d13;border:1px solid var(--line);border-radius:10px;
+        padding:9px 16px;min-width:120px;text-align:center}
+  .card .cap{font-family:var(--mono);font-size:11px;color:var(--muted);margin-bottom:4px}
+  .card .val{font-family:var(--mono);font-size:20px;font-weight:700}
+  .card.depth .val{color:var(--accent)}
+  .card.calls .val{color:var(--comp)}
+  .card.answer .val{color:var(--ok)}
+
+  .stackbox{background:#0b0d13;border:1px solid var(--line);border-radius:10px;
+            padding:10px 12px;margin-top:12px;font-family:var(--mono);font-size:12px;
+            min-height:56px;line-height:1.7}
+  .stackbox .cap{color:var(--muted);font-size:11px;margin-bottom:5px}
+  .frame{display:inline-block;padding:1px 8px;border-radius:6px;margin:2px 4px 2px 0;
+         background:rgba(79,140,255,.16);border:1px solid var(--accent)}
+  .frame.top{background:rgba(56,189,248,.28);border-color:var(--cur)}
+
+  .status{min-height:24px;text-align:center;font-family:var(--mono);font-size:13px;margin:12px 0 2px}
+  .status .op{color:var(--code)} .status .good{color:var(--ok)} .status .comp{color:var(--comp)}
+
+  .codebox{background:#0b0d13;border:1px solid var(--line);border-radius:10px;
+           padding:12px 14px;font-family:var(--mono);font-size:12px;line-height:1.65;
+           overflow:auto;max-height:280px;margin-top:12px}
+  .codebox .ln{display:block;padding:0 6px;border-radius:4px;color:var(--code);white-space:pre}
+  .codebox .ln.active{background:rgba(79,140,255,.2)}
+  .kw{color:#c792ea}.num{color:#f78c6c}
+
+  .box{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+  .box h2{font-size:12px;margin:0 0 9px;color:var(--muted);font-weight:600;
+          text-transform:uppercase;letter-spacing:.04em}
+  .legend-item{display:flex;gap:8px;align-items:flex-start;font-size:12px;line-height:1.45;
+               margin-bottom:7px;color:var(--txt)}
+  .sw{flex:0 0 auto;width:13px;height:13px;border-radius:50%;border:2px solid;margin-top:2px}
+  .sw.act{border-color:var(--cur);background:rgba(56,189,248,.3)}
+  .sw.stk{border-color:var(--accent);background:rgba(79,140,255,.16)}
+  .sw.dn{border-color:var(--ok);background:rgba(52,211,153,.22)}
+  .note{font-size:11.5px;color:var(--muted);line-height:1.5}
+  .note code{font-family:var(--mono);color:var(--code)}
+  .note+.note{margin-top:7px}
+  .keys{font-size:11.5px;color:var(--muted);line-height:1.6}
+  .keys b{color:var(--txt);font-family:var(--mono);font-weight:600}
+
+  .presets{max-width:1320px;margin:14px auto 0;background:var(--panel);
+           border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+  .presets h2{font-size:12px;margin:0 0 9px;color:var(--muted);font-weight:600;
+              text-transform:uppercase;letter-spacing:.04em}
+  .preset{display:flex;gap:7px;flex-wrap:wrap}
+  .preset .btn{padding:6px 11px;font-family:var(--mono);font-size:12px}
+
+  @media (max-width:980px){
+    .layout{grid-template-columns:minmax(0,1fr)}
+    .side{position:static}
+  }
+</style>
+</head>
+<body>
+  <h1>Maximum Depth of Binary Tree — рекурсия сверху вниз, ответы снизу вверх</h1>
+  <div class="sub">Вниз идут вызовы, вверх возвращаются числа. Узел не может ответить, пока не ответили оба его потомка: его глубина — единица плюс большая из двух (LeetCode 104).</div>
+
+  <div class="layout">
+    <div class="stage">
+      <div class="setup">
+        <label>Дерево по уровням (null для пропущенного потомка)
+          <input id="treeIn" type="text" value="3, 9, 20, null, null, 15, 7">
+        </label>
+        <button class="btn primary" id="build">Построить</button>
+      </div>
+
+      <div class="controls">
+        <button class="btn" id="prev">◀ Назад</button>
+        <span class="step-info" id="stepInfo">шаг 0 / 0</span>
+        <button class="btn" id="next">Вперёд ▶</button>
+        <button class="btn" id="play">▶ Авто</button>
+        <button class="btn" id="reset">⟲ Сброс</button>
+      </div>
+      <div class="progress"><i id="progressBar"></i></div>
+
+      <div class="treewrap">
+        <div class="treelab">зелёное число рядом с узлом — уже вычисленная глубина его поддерева</div>
+        <div id="tree"></div>
+      </div>
+
+      <div class="state">
+        <div class="card depth">
+          <div class="cap">глубина вызова</div>
+          <div class="val" id="levelVal">—</div>
+        </div>
+        <div class="card calls">
+          <div class="cap">вызовов сделано</div>
+          <div class="val" id="callsVal">0</div>
+        </div>
+        <div class="card answer">
+          <div class="cap">ответ</div>
+          <div class="val" id="answerVal">—</div>
+        </div>
+      </div>
+
+      <div class="stackbox">
+        <div class="cap">стек вызовов — от корня к текущему узлу</div>
+        <div id="stackView"></div>
+      </div>
+
+      <div class="status" id="status"></div>
+      <div class="codebox" id="code"></div>
+    </div>
+
+    <div class="side">
+      <div class="box">
+        <h2>Цвета на схеме</h2>
+        <div class="legend-item"><span class="sw act"></span>узел, в который вошли прямо сейчас</div>
+        <div class="legend-item"><span class="sw stk"></span>узел в стеке: вызов начат, но ещё ждёт потомков</div>
+        <div class="legend-item"><span class="sw dn"></span>узел ответил, рядом его глубина</div>
+      </div>
+
+      <div class="box">
+        <h2>На что смотреть</h2>
+        <div class="note">Пустой потомок отмечен точкой и сразу отвечает нулём — это дно рекурсии.</div>
+        <div class="note">Число в карточке «глубина вызова» — сколько кадров сейчас в стеке. У цепочки оно равно числу узлов, у сбалансированного дерева — примерно логарифму.</div>
+        <div class="note">Единица прибавляется один раз на узел, уже после выбора большего из двух ответов.</div>
+      </div>
+
+      <div class="box">
+        <h2>Клавиши</h2>
+        <div class="keys">
+          <b>→</b> шаг вперёд<br>
+          <b>←</b> шаг назад<br>
+          <b>пробел</b> запустить и остановить
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="presets">
+    <h2>Готовые примеры</h2>
+    <div class="preset">
+      <button class="btn" data-tree="3, 9, 20, null, null, 15, 7">пример 1 из условия</button>
+      <button class="btn" data-tree="1, null, 2">пример 2 — только правый потомок</button>
+      <button class="btn" data-tree="7">один узел</button>
+      <button class="btn" data-tree="">пустое дерево</button>
+      <button class="btn" data-tree="1, 2, 3, 4, 5, 6, 7">полное дерево</button>
+      <button class="btn" data-tree="1, 2, null, 3, null, 4">перекос влево — цепочка</button>
+      <button class="btn" data-tree="1, 2, 3, 4, null, null, null, 5">левое поддерево глубже на два уровня</button>
+    </div>
+  </div>
+
+<script>
+const $ = id => document.getElementById(id);
+let nodes=[], root=null, steps=[], cur=0, timer=null;
+
+const CODE = [
+  {t:`<span class="kw">int</span> maxDepth(TreeNode root) {`, line:'enter'},
+  {t:`    <span class="kw">if</span> (root == <span class="kw">null</span>) {`, line:'nullCheck'},
+  {t:`        <span class="kw">return</span> <span class="num">0</span>;`, line:'nullReturn'},
+  {t:`    }`, line:'none'},
+  {t:`    <span class="kw">int</span> leftDepth = maxDepth(root.left);`, line:'left'},
+  {t:`    <span class="kw">int</span> rightDepth = maxDepth(root.right);`, line:'right'},
+  {t:`    <span class="kw">return</span> <span class="num">1</span> + Math.max(leftDepth, rightDepth);`, line:'return'},
+  {t:`}`, line:'none'},
+];
+
+/* Разбор строки «3, 9, 20, null, null, 15, 7» в дерево, как в TreeNode.fromLevelOrder. */
+function parseTree(text){
+  const values = text.split(',').map(part => part.trim())
+                     .filter(part => part.length > 0)
+                     .map(part => part === 'null' ? null : Number(part));
+  nodes = [];
+  if(!values.length || values[0] === null){ return null; }
+
+  const make = value => { const node = {id:nodes.length, value, left:null, right:null}; nodes.push(node); return node; };
+  const treeRoot = make(values[0]);
+  const parents = [treeRoot];
+  let position = 1;
+  let head = 0;
+  while(position < values.length && head < parents.length){
+    const parent = parents[head]; head++;
+    if(position < values.length){
+      const leftValue = values[position]; position++;
+      if(leftValue !== null){ parent.left = make(leftValue); parents.push(parent.left); }
+    }
+    if(position < values.length){
+      const rightValue = values[position]; position++;
+      if(rightValue !== null){ parent.right = make(rightValue); parents.push(parent.right); }
+    }
+  }
+  return treeRoot;
+}
+
+/* Координаты: x — порядковый номер в симметричном обходе, y — глубина. */
+function layout(node, depth, counter){
+  if(!node){ return counter; }
+  counter = layout(node.left, depth + 1, counter);
+  node.column = counter;
+  node.depth = depth;
+  counter++;
+  return layout(node.right, depth + 1, counter);
+}
+
+function buildSteps(){
+  steps=[];
+  let calls = 0;
+  const results = {};
+  const stack = [];
+
+  function walk(node, level){
+    if(node === null){
+      steps.push({line:'nullReturn', stack:[...stack], level, calls,
+                  results:{...results}, msg:`пустой потомок — рекурсия отвечает 0, это её дно`});
+      return 0;
+    }
+    calls++;
+    stack.push(node.id);
+    steps.push({line:'enter', stack:[...stack], level, calls, active:node.id,
+                results:{...results}, msg:`вошли в узел ${node.value}, глубина вызова ${level}`});
+
+    steps.push({line:'left', stack:[...stack], level, calls, active:node.id,
+                results:{...results}, msg:`спускаемся в левое поддерево узла ${node.value}`});
+    const leftDepth = walk(node.left, level + 1);
+
+    steps.push({line:'right', stack:[...stack], level, calls, active:node.id,
+                results:{...results}, msg:`левое поддерево узла ${node.value} ответило ${leftDepth}, идём в правое`});
+    const rightDepth = walk(node.right, level + 1);
+
+    const result = 1 + Math.max(leftDepth, rightDepth);
+    results[node.id] = result;
+    stack.pop();
+    steps.push({line:'return', stack:[...stack], level, calls, done:node.id,
+                results:{...results},
+                msg:`узел ${node.value}: 1 + max(${leftDepth}, ${rightDepth}) = ${result}`});
+    return result;
+  }
+
+  if(root === null){
+    steps.push({line:'nullCheck', stack:[], level:0, calls:0, results:{},
+                msg:'дерево пустое — root равен null'});
+    steps.push({line:'nullReturn', stack:[], level:0, calls:0, results:{}, done:true, answer:0,
+                msg:'✓ ответ 0: у пустого дерева глубины нет'});
+    return;
+  }
+
+  const answer = walk(root, 1);
+  steps.push({line:'return', stack:[], level:0, calls, results:{...results}, done:true, answer,
+              msg:`✓ ответ ${answer}: столько узлов на самом длинном пути от корня до листа`});
+}
+
+function renderTree(s){
+  const box = $('tree');
+  if(root === null){
+    box.innerHTML = '<div class="treelab">дерево пустое</div>';
+    return;
+  }
+  const columns = layout(root, 0, 0);
+  const gapX = 74, gapY = 78, padding = 34;
+  const width = Math.max(columns * gapX + padding, 320);
+  const height = (Math.max(...nodes.map(n => n.depth)) + 1) * gapY + padding;
+
+  const xOf = node => node.column * gapX + padding;
+  const yOf = node => node.depth * gapY + padding;
+
+  let svg = `<svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">`;
+
+  for(const node of nodes){
+    for(const child of [node.left, node.right]){
+      if(child){
+        const walked = s.results && (s.results[child.id] !== undefined || (s.stack || []).includes(child.id));
+        svg += `<line class="edge${walked ? ' walked' : ''}" x1="${xOf(node)}" y1="${yOf(node)}" x2="${xOf(child)}" y2="${yOf(child)}"/>`;
+      }
+    }
+  }
+  for(const node of nodes){
+    if(!node.left){ svg += `<text class="nullmark" x="${xOf(node) - 22}" y="${yOf(node) + 30}">·</text>`; }
+    if(!node.right){ svg += `<text class="nullmark" x="${xOf(node) + 22}" y="${yOf(node) + 30}">·</text>`; }
+  }
+  for(const node of nodes){
+    const inStack = (s.stack || []).includes(node.id);
+    const answered = s.results && s.results[node.id] !== undefined;
+    let cls = 'node';
+    if(s.active === node.id){ cls += ' active'; }
+    else if(answered){ cls += ' done'; }
+    else if(inStack){ cls += ' instack'; }
+
+    svg += `<g class="${cls}">`;
+    svg += `<circle cx="${xOf(node)}" cy="${yOf(node)}" r="19"/>`;
+    svg += `<text class="val" x="${xOf(node)}" y="${yOf(node) + 5}">${node.value}</text>`;
+    if(answered){
+      svg += `<text class="res" x="${xOf(node) + 27}" y="${yOf(node) - 14}">${s.results[node.id]}</text>`;
+    }
+    svg += `</g>`;
+  }
+  svg += '</svg>';
+  box.innerHTML = svg;
+}
+
+function renderStack(s){
+  const view = $('stackView');
+  const frames = s.stack || [];
+  if(!frames.length){
+    view.innerHTML = '<span class="note">стек пуст</span>';
+    return;
+  }
+  view.innerHTML = frames.map((id, position) =>
+    `<span class="frame${position === frames.length - 1 ? ' top' : ''}">maxDepth(${nodes[id].value})</span>`).join('');
+}
+
+function renderCode(active){
+  $('code').innerHTML = CODE.map(c =>
+    `<span class="ln ${c.line === active ? 'active' : ''}">${c.t || ' '}</span>`).join('');
+}
+
+function show(idx){
+  cur = Math.max(0, Math.min(idx, steps.length - 1));
+  const s = steps[cur];
+  renderTree(s); renderStack(s); renderCode(s.line);
+  $('levelVal').textContent = s.stack && s.stack.length ? s.stack.length : '—';
+  $('callsVal').textContent = s.calls;
+  $('answerVal').textContent = s.answer === undefined ? '—' : s.answer;
+  $('status').innerHTML = `<span class="${s.done ? 'good' : s.line === 'return' ? 'comp' : 'op'}">${s.msg}</span>`;
+  $('stepInfo').textContent = `шаг ${cur + 1} / ${steps.length}`;
+  $('progressBar').style.width = ((cur + 1) / steps.length * 100) + '%';
+  $('prev').disabled = cur === 0; $('next').disabled = cur === steps.length - 1;
+}
+
+function build(){
+  stopPlay();
+  root = parseTree($('treeIn').value);
+  buildSteps();
+  show(0);
+}
+function stopPlay(){ if(timer){ clearInterval(timer); timer=null; $('play').textContent='▶ Авто'; } }
+function togglePlay(){
+  if(timer){ stopPlay(); return; }
+  if(cur >= steps.length - 1){ show(0); }
+  $('play').textContent='⏸ Пауза';
+  timer = setInterval(() => { if(cur >= steps.length - 1){ stopPlay(); return; } show(cur + 1); }, 700);
+}
+
+$('build').onclick = build;
+$('next').onclick = () => { stopPlay(); show(cur + 1); };
+$('prev').onclick = () => { stopPlay(); show(cur - 1); };
+$('play').onclick = togglePlay;
+$('reset').onclick = () => { stopPlay(); show(0); };
+document.querySelectorAll('.preset .btn').forEach(button => {
+  button.onclick = () => {
+    $('treeIn').value = button.dataset.tree;
+    build();
+    window.scrollTo({top:0, behavior:'smooth'});
+  };
+});
+document.addEventListener('keydown', event => {
+  if(event.target.tagName === 'INPUT'){ return; }
+  if(event.key === 'ArrowRight'){ stopPlay(); show(cur + 1); }
+  if(event.key === 'ArrowLeft'){ stopPlay(); show(cur - 1); }
+  if(event.key === ' '){ event.preventDefault(); togglePlay(); }
+});
+build();
+</script>
+</body>
+</html>
