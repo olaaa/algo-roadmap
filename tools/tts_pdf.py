@@ -78,12 +78,18 @@ hr.sep { border:none; border-top:2px solid #4f8cff; margin:0; page-break-before:
 
 /* Служебные вставки для синтеза речи: в тексте есть, глазу почти не видны. */
 .tts { color:#cdd3dd }
+img { max-width:100%; display:block; margin:8px auto }
 """
 
 
 def md_to_html(path: Path) -> str:
-    return subprocess.run(['pandoc', str(path), '-f', 'gfm', '-t', 'html5'],
+    html = subprocess.run(['pandoc', str(path), '-f', 'gfm', '-t', 'html5'],
                           capture_output=True, text=True, check=True).stdout
+    # Картинки в .md заданы относительно самого файла (img/имя.svg); WeasyPrint
+    # получает HTML строкой и относительный путь разрешить не может — делаем абсолютный.
+    base = path.resolve().parent
+    return re.sub(r'<img src="(?!https?:|/)([^"]+)"',
+                  lambda m: f'<img src="{(base / m.group(1)).as_uri()}"', html)
 
 
 def in_code_block(node) -> bool:
