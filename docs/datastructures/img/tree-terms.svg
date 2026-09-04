@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 464" width="760" height="464" font-family="system-ui, -apple-system, Segoe UI, sans-serif">
+  <rect width="760" height="464" fill="#fbfcfe"/>
+  <text x="380" y="32" text-anchor="middle" font-size="17" font-weight="600" fill="#1c2333">Узел, корень, лист, поддерево</text>
+  <text x="380" y="54" text-anchor="middle" font-size="13" fill="#6b7280">Дерево [3, 9, 20, null, null, 15, 7]</text>
+  <rect x="410" y="190" width="260" height="212" rx="14" fill="#fff7e6" stroke="#d97706" stroke-width="1.5" stroke-dasharray="6 4"/>
+  <text x="540" y="420" text-anchor="middle" font-size="13" fill="#b45309">правое поддерево корня = поддерево узла 20</text>
+  <line x1="359" y1="133" x2="241" y2="221" stroke="#9aa3b5" stroke-width="2.5" stroke-linecap="round"/>
+  <line x1="401" y1="133" x2="519" y2="221" stroke="#9aa3b5" stroke-width="2.5" stroke-linecap="round"/>
+  <line x1="525" y1="258" x2="475" y2="332" stroke="#9aa3b5" stroke-width="2.5" stroke-linecap="round"/>
+  <line x1="555" y1="258" x2="605" y2="332" stroke="#9aa3b5" stroke-width="2.5" stroke-linecap="round"/>
+  <circle cx="380" cy="118" r="26" fill="#e8f0ff" stroke="#4f8cff" stroke-width="2"/>
+  <text x="380" y="124" text-anchor="middle" font-size="18" font-family="Consolas, monospace" fill="#1c2333">3</text>
+  <circle cx="220" cy="236" r="26" fill="#e8f0ff" stroke="#4f8cff" stroke-width="2"/>
+  <text x="220" y="242" text-anchor="middle" font-size="18" font-family="Consolas, monospace" fill="#1c2333">9</text>
+  <circle cx="540" cy="236" r="26" fill="#e8f0ff" stroke="#4f8cff" stroke-width="2"/>
+  <text x="540" y="242" text-anchor="middle" font-size="18" font-family="Consolas, monospace" fill="#1c2333">20</text>
+  <circle cx="460" cy="354" r="26" fill="#e8f0ff" stroke="#4f8cff" stroke-width="2"/>
+  <text x="460" y="360" text-anchor="middle" font-size="18" font-family="Consolas, monospace" fill="#1c2333">15</text>
+  <circle cx="620" cy="354" r="26" fill="#e8f0ff" stroke="#4f8cff" stroke-width="2"/>
+  <text x="620" y="360" text-anchor="middle" font-size="18" font-family="Consolas, monospace" fill="#1c2333">7</text>
+  <text x="380" y="76" text-anchor="middle" font-size="13" fill="#4f8cff" font-weight="600">корень</text>
+  <text x="220" y="282" text-anchor="middle" font-size="13" fill="#34a97a" font-weight="600">лист</text>
+  <text x="460" y="394" text-anchor="middle" font-size="13" fill="#34a97a" font-weight="600">лист</text>
+  <text x="620" y="394" text-anchor="middle" font-size="13" fill="#34a97a" font-weight="600">лист</text>
+  <line x1="70" y1="118" x2="150" y2="118" stroke="#d8dde8" stroke-width="1" stroke-dasharray="3 3"/>
+  <text x="70" y="110" font-size="12" fill="#6b7280">глубина 1</text>
+  <line x1="70" y1="236" x2="150" y2="236" stroke="#d8dde8" stroke-width="1" stroke-dasharray="3 3"/>
+  <text x="70" y="228" font-size="12" fill="#6b7280">глубина 2</text>
+  <line x1="70" y1="354" x2="150" y2="354" stroke="#d8dde8" stroke-width="1" stroke-dasharray="3 3"/>
+  <text x="70" y="346" font-size="12" fill="#6b7280">глубина 3</text>
+  <circle cx="60" cy="440" r="9" fill="#e8f0ff" stroke="#4f8cff" stroke-width="1.5"/>
+  <text x="78" y="445" font-size="13" fill="#1c2333">узел со значением</text>
+  <circle cx="240.4" cy="440" r="9" fill="#fff7e6" stroke="#d97706" stroke-width="1.5"/>
+  <text x="258.4" y="445" font-size="13" fill="#1c2333">поддерево: узел и всё, что растёт из него вниз</text>
+</svg>
