@@ -111,7 +111,7 @@
 </head>
 <body>
   <h1>Maximum Depth of Binary Tree — рекурсия сверху вниз, ответы снизу вверх</h1>
-  <div class="sub">Вниз идут вызовы, вверх возвращаются числа. Узел не может ответить, пока не ответили оба его потомка: его глубина — единица плюс большая из двух (LeetCode 104).</div>
+  <div class="sub">Вниз идут вызовы, вверх возвращаются числа. Узел не может ответить, пока не ответили оба его потомка: глубина дерева с корнем в нём — единица плюс большая из двух глубин поддеревьев (LeetCode 104).</div>
 
   <div class="layout">
     <div class="stage">
@@ -132,7 +132,7 @@
       <div class="progress"><i id="progressBar"></i></div>
 
       <div class="treewrap">
-        <div class="treelab">зелёное число рядом с узлом — уже вычисленная глубина его поддерева</div>
+        <div class="treelab">зелёное число рядом с узлом — уже вычисленная глубина дерева с корнем в нём</div>
         <div id="tree"></div>
       </div>
 
@@ -165,7 +165,7 @@
         <h2>Цвета на схеме</h2>
         <div class="legend-item"><span class="sw act"></span>узел, в который вошли прямо сейчас</div>
         <div class="legend-item"><span class="sw stk"></span>узел в стеке: вызов начат, но ещё ждёт потомков</div>
-        <div class="legend-item"><span class="sw dn"></span>узел ответил, рядом его глубина</div>
+        <div class="legend-item"><span class="sw dn"></span>узел ответил, рядом глубина дерева с корнем в нём</div>
       </div>
 
       <div class="box">
