@@ -24,10 +24,13 @@
   <text x="620" y="394" text-anchor="middle" font-size="13" fill="#34a97a" font-weight="600">лист</text>
   <line x1="70" y1="118" x2="150" y2="118" stroke="#d8dde8" stroke-width="1" stroke-dasharray="3 3"/>
   <text x="70" y="110" font-size="12" fill="#6b7280">глубина 1</text>
+  <text x="70" y="136" font-size="12" fill="#6b7280">до 2⁰ = 1 узла</text>
   <line x1="70" y1="236" x2="150" y2="236" stroke="#d8dde8" stroke-width="1" stroke-dasharray="3 3"/>
   <text x="70" y="228" font-size="12" fill="#6b7280">глубина 2</text>
+  <text x="70" y="254" font-size="12" fill="#6b7280">до 2¹ = 2 узлов</text>
   <line x1="70" y1="354" x2="150" y2="354" stroke="#d8dde8" stroke-width="1" stroke-dasharray="3 3"/>
   <text x="70" y="346" font-size="12" fill="#6b7280">глубина 3</text>
+  <text x="70" y="372" font-size="12" fill="#6b7280">до 2² = 4 узлов</text>
   <circle cx="60" cy="440" r="9" fill="#e8f0ff" stroke="#4f8cff" stroke-width="1.5"/>
   <text x="78" y="445" font-size="13" fill="#1c2333">узел со значением</text>
   <circle cx="240.4" cy="440" r="9" fill="#fff7e6" stroke="#d97706" stroke-width="1.5"/>
