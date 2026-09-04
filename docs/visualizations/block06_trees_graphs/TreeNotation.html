@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Запись дерева по уровням — визуализация fromLevelOrder</title>
+<style>
+  :root{
+    --bg:#0f1117; --panel:#171a23; --cell:#232733; --line:#2e3342;
+    --txt:#e6e8ee; --muted:#8b90a0; --accent:#4f8cff; --cur:#38bdf8; --comp:#fbbf24;
+    --ok:#34d399; --miss:#fb7185; --code:#c7d0e0;
+    --mono:"JetBrains Mono",Consolas,Menlo,monospace;
+    --sans:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--txt);font-family:var(--sans);
+       min-height:100vh;padding:16px 18px 28px}
+  h1{font-size:17px;font-weight:600;margin:0 0 2px;text-align:center}
+  .sub{color:var(--muted);font-size:12.5px;margin:0 auto 14px;max-width:880px;text-align:center}
+
+  .layout{display:grid;grid-template-columns:minmax(0,1fr) 264px;gap:14px;
+          max-width:1320px;margin:0 auto;align-items:start}
+  .stage{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px 18px}
+  .side{position:sticky;top:12px;display:flex;flex-direction:column;gap:12px}
+
+  .setup{display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end}
+  .setup label{display:flex;flex-direction:column;gap:4px;font-size:11.5px;color:var(--muted)}
+  .setup input[type=text]{font-family:var(--mono);font-size:14px;background:var(--cell);
+       border:1px solid var(--line);color:var(--txt);border-radius:8px;padding:7px 10px;width:360px}
+  .btn{font-family:var(--sans);font-size:13px;font-weight:500;cursor:pointer;
+       background:var(--cell);border:1px solid var(--line);color:var(--txt);
+       border-radius:8px;padding:8px 13px;transition:.15s}
+  .btn:hover{border-color:var(--accent)}
+  .btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+  .btn:disabled{opacity:.4;cursor:not-allowed}
+
+  .controls{position:sticky;top:12px;z-index:5;display:flex;gap:9px;justify-content:center;
+            align-items:center;flex-wrap:wrap;margin:14px 0 4px;padding:8px 10px;
+            background:rgba(23,26,35,.96);border:1px solid var(--line);border-radius:10px}
+  .step-info{color:var(--muted);font-size:12px;font-family:var(--mono);min-width:88px;text-align:center}
+  .progress{height:3px;background:var(--cell);border-radius:2px;margin:6px 0 2px;overflow:hidden}
+  .progress i{display:block;height:100%;background:var(--accent);width:0;transition:width .15s}
+
+  .arrwrap{margin:14px 0 6px}
+  .arrlab{font-family:var(--mono);font-size:11.5px;color:var(--muted);margin-bottom:7px;text-align:center}
+  .cells{display:flex;gap:5px;flex-wrap:wrap;justify-content:center}
+  .ccell{display:flex;flex-direction:column;align-items:center;gap:3px}
+  .cell{min-width:46px;height:38px;padding:0 8px;border-radius:8px;background:var(--cell);
+        border:2px solid var(--line);display:flex;align-items:center;justify-content:center;
+        font-family:var(--mono);font-size:13px;transition:.2s}
+  .cell.read{opacity:.35}
+  .cell.now{border-color:var(--cur);background:rgba(56,189,248,.28)}
+  .cell.nullcell{color:var(--muted);font-size:11px}
+  .idx{font-family:var(--mono);font-size:10px;color:var(--muted)}
+  .idx.on{color:var(--cur)}
+
+  .treewrap{margin:10px 0 4px;overflow:auto}
+  svg{display:block;margin:0 auto}
+  .edge{stroke:var(--line);stroke-width:2}
+  .edge.fresh{stroke:var(--ok)}
+  .node circle{fill:var(--cell);stroke:var(--line);stroke-width:2;transition:.2s}
+  .node.waiting circle{stroke:var(--comp);fill:rgba(251,191,36,.14)}
+  .node.taken circle{stroke:var(--cur);fill:rgba(56,189,248,.28)}
+  .node.fresh circle{stroke:var(--ok);fill:rgba(52,211,153,.24)}
+  .node text{fill:var(--txt);font-family:var(--mono);font-size:13px;text-anchor:middle}
+  .nullmark{fill:var(--muted);font-family:var(--mono);font-size:10px;text-anchor:middle}
+
+  .queuebox{background:#0b0d13;border:1px solid var(--line);border-radius:10px;
+            padding:10px 12px;margin-top:10px;font-family:var(--mono);font-size:12px;
+            min-height:54px;line-height:1.7}
+  .queuebox .cap{color:var(--muted);font-size:11px;margin-bottom:5px;font-family:var(--sans)}
+  .chip{display:inline-block;padding:1px 9px;border-radius:6px;margin:2px 5px 2px 0;
+        background:rgba(251,191,36,.16);border:1px solid var(--comp)}
+  .chip.first{background:rgba(56,189,248,.28);border-color:var(--cur)}
+
+  .status{min-height:24px;text-align:center;font-family:var(--mono);font-size:13px;margin:12px 0 2px}
+  .status .op{color:var(--code)} .status .good{color:var(--ok)} .status .comp{color:var(--comp)}
+
+  .codebox{background:#0b0d13;border:1px solid var(--line);border-radius:10px;
+           padding:12px 14px;font-family:var(--mono);font-size:12px;line-height:1.65;
+           overflow:auto;max-height:300px;margin-top:12px}
+  .codebox .ln{display:block;padding:0 6px;border-radius:4px;color:var(--code);white-space:pre}
+  .codebox .ln.active{background:rgba(79,140,255,.2)}
+  .kw{color:#c792ea}.num{color:#f78c6c}
+
+  .box{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+  .box h2{font-size:12px;margin:0 0 9px;color:var(--muted);font-weight:600;
+          text-transform:uppercase;letter-spacing:.04em}
+  .legend-item{display:flex;gap:8px;align-items:flex-start;font-size:12px;line-height:1.45;
+               margin-bottom:7px;color:var(--txt)}
+  .sw{flex:0 0 auto;width:13px;height:13px;border-radius:50%;border:2px solid;margin-top:2px}
+  .sw.wait{border-color:var(--comp);background:rgba(251,191,36,.14)}
+  .sw.take{border-color:var(--cur);background:rgba(56,189,248,.28)}
+  .sw.new{border-color:var(--ok);background:rgba(52,211,153,.24)}
+  .sw.done{border-color:var(--line);background:var(--cell)}
+  .note{font-size:11.5px;color:var(--muted);line-height:1.5}
+  .note code{font-family:var(--mono);color:var(--code)}
+  .note+.note{margin-top:7px}
+  .keys{font-size:11.5px;color:var(--muted);line-height:1.6}
+  .keys b{color:var(--txt);font-family:var(--mono);font-weight:600}
+
+  .presets{max-width:1320px;margin:14px auto 0;background:var(--panel);
+           border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+  .presets h2{font-size:12px;margin:0 0 9px;color:var(--muted);font-weight:600;
+              text-transform:uppercase;letter-spacing:.04em}
+  .preset{display:flex;gap:7px;flex-wrap:wrap}
+  .preset .btn{padding:6px 11px;font-family:var(--mono);font-size:12px}
+
+  @media (max-width:980px){
+    .layout{grid-template-columns:minmax(0,1fr)}
+    .side{position:static}
+  }
+</style>
+</head>
+<body>
+  <h1>Запись дерева по уровням — как из массива вырастает дерево</h1>
+  <div class="sub">Числа идут парами: каждая пара — левый и правый потомок одного узла. Узлы получают свою пару по очереди появления, а <code>null</code> пару не получает. Метод <code>TreeNode.fromLevelOrder</code> делает ровно это.</div>
+
+  <div class="layout">
+    <div class="stage">
+      <div class="setup">
+        <label>Запись дерева (через запятую, null для пропуска)
+          <input id="valuesIn" type="text" value="3, 9, 20, null, null, 15, 7">
+        </label>
+        <button class="btn primary" id="build">Построить</button>
+      </div>
+
+      <div class="controls">
+        <button class="btn" id="prev">◀ Назад</button>
+        <span class="step-info" id="stepInfo">шаг 0 / 0</span>
+        <button class="btn" id="next">Вперёд ▶</button>
+        <button class="btn" id="play">▶ Авто</button>
+        <button class="btn" id="reset">⟲ Сброс</button>
+      </div>
+      <div class="progress"><i id="progressBar"></i></div>
+
+      <div class="arrwrap">
+        <div class="arrlab">массив из условия — снизу индекс ячейки</div>
+        <div class="cells" id="cells"></div>
+      </div>
+
+      <div class="queuebox">
+        <div class="cap">кому ещё не выдали детей — первый в списке следующий на очереди</div>
+        <div id="queueView"></div>
+      </div>
+
+      <div class="treewrap">
+        <div id="tree"></div>
+      </div>
+
+      <div class="status" id="status"></div>
+      <div class="codebox" id="code"></div>
+    </div>
+
+    <div class="side">
+      <div class="box">
+        <h2>Цвета на схеме</h2>
+        <div class="legend-item"><span class="sw take"></span>узел, которому сейчас выдают детей</div>
+        <div class="legend-item"><span class="sw new"></span>узел, только что созданный из прочитанного значения</div>
+        <div class="legend-item"><span class="sw wait"></span>узел ждёт своей очереди на выдачу детей</div>
+        <div class="legend-item"><span class="sw done"></span>узел обслужен: детей ему уже выдали</div>
+      </div>
+
+      <div class="box">
+        <h2>На что смотреть</h2>
+        <div class="note">Значения читаются строго слева направо и никогда не возвращаются назад — прочитанные ячейки тускнеют.</div>
+        <div class="note"><code>null</code> занимает ячейку, но узла не создаёт и в список ожидающих не попадает. Поэтому его детей в массиве нет.</div>
+        <div class="note">Разбор кончается, когда кончился массив. Узлы, оставшиеся в списке, детей не получат — это листья.</div>
+      </div>
+
+      <div class="box">
+        <h2>Клавиши</h2>
+        <div class="keys">
+          <b>→</b> шаг вперёд<br>
+          <b>←</b> шаг назад<br>
+          <b>пробел</b> запустить и остановить
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="presets">
+    <h2>Готовые примеры</h2>
+    <div class="preset">
+      <button class="btn" data-values="3, 9, 20, null, null, 15, 7">пример из условия 104</button>
+      <button class="btn" data-values="1, null, 2, null, 3">пропуски внутри записи</button>
+      <button class="btn" data-values="1, 2, 3, 4, 5, 6, 7">полное дерево</button>
+      <button class="btn" data-values="1, 2">массив кончился на левом потомке</button>
+      <button class="btn" data-values="5, null, null">хвостовые null ничего не меняют</button>
+      <button class="btn" data-values="1, 2, 3, 4, null, null, null, 5">глубже слева</button>
+      <button class="btn" data-values="7">один узел</button>
+      <button class="btn" data-values="">пустая запись</button>
+    </div>
+  </div>
+
+<script>
+const $ = id => document.getElementById(id);
+let values=[], nodes=[], root=null, steps=[], cur=0, timer=null;
+
+const CODE = [
+  {t:`TreeNode root = <span class="kw">new</span> TreeNode(values[<span class="num">0</span>]);`, line:'root'},
+  {t:`Queue&lt;TreeNode&gt; parents = <span class="kw">new</span> ArrayDeque&lt;&gt;();`, line:'root'},
+  {t:`parents.add(root);`, line:'root'},
+  {t:``, line:'none'},
+  {t:`<span class="kw">int</span> position = <span class="num">1</span>;`, line:'root'},
+  {t:`<span class="kw">while</span> (position &lt; values.length) {`, line:'while'},
+  {t:`    TreeNode parent = parents.remove();`, line:'take'},
+  {t:``, line:'none'},
+  {t:`    Integer leftValue = values[position];`, line:'left'},
+  {t:`    position++;`, line:'left'},
+  {t:`    <span class="kw">if</span> (leftValue != <span class="kw">null</span>) {`, line:'left'},
+  {t:`        parent.left = <span class="kw">new</span> TreeNode(leftValue);`, line:'leftAdd'},
+  {t:`        parents.add(parent.left);`, line:'leftAdd'},
+  {t:`    }`, line:'none'},
+  {t:``, line:'none'},
+  {t:`    <span class="kw">if</span> (position &lt; values.length) {`, line:'right'},
+  {t:`        Integer rightValue = values[position];`, line:'right'},
+  {t:`        position++;`, line:'right'},
+  {t:`        <span class="kw">if</span> (rightValue != <span class="kw">null</span>) {`, line:'right'},
+  {t:`            parent.right = <span class="kw">new</span> TreeNode(rightValue);`, line:'rightAdd'},
+  {t:`            parents.add(parent.right);`, line:'rightAdd'},
+  {t:`        }`, line:'none'},
+  {t:`    }`, line:'none'},
+  {t:`}`, line:'end'},
+  {t:`<span class="kw">return</span> root;`, line:'end'},
+];
+
+/* Разбор записи и запись шагов — та же логика, что в TreeNode.fromLevelOrder. */
+function buildSteps(){
+  steps=[]; nodes=[]; root=null;
+
+  values = $('valuesIn').value.split(',')
+      .map(part => part.trim())
+      .filter(part => part.length > 0)
+      .map(part => part === 'null' ? null : Number(part));
+  $('valuesIn').value = values.map(v => v === null ? 'null' : v).join(', ');
+
+  if(values.length === 0 || values[0] === null){
+    steps.push({line:'root', position:0, queue:[], created:[], done:true,
+                msg:'запись пустая — дерева нет, метод вернёт null'});
+    return;
+  }
+
+  const make = value => { const node = {id:nodes.length, value, left:null, right:null}; nodes.push(node); return node; };
+  root = make(values[0]);
+  const queue = [root];
+  let position = 1;
+
+  steps.push({line:'root', position, queue:[...queue], created:[root.id], fresh:[root.id],
+              msg:`первое значение ${root.value} — это корень, кладём его в список ожидающих`});
+
+  while(position < values.length){
+    if(queue.length === 0){
+      /* В Java здесь parents.remove() бросает NoSuchElementException. */
+      steps.push({line:'take', position, queue:[], created:nodes.map(n => n.id), done:true, reading:position,
+                  msg:`✗ значения с индекса ${position} остались, а выдавать их некому: список ожидающих пуст. Запись некорректна — метод бросит исключение`});
+      return;
+    }
+    const parent = queue.shift();
+    steps.push({line:'take', position, queue:[...queue], created:nodes.map(n => n.id), taken:parent.id,
+                msg:`берём из списка узел ${parent.value} — сейчас ему выдадут двух потомков`});
+
+    const leftValue = values[position];
+    const leftIndex = position;
+    position++;
+    if(leftValue !== null){
+      parent.left = make(leftValue);
+      queue.push(parent.left);
+      steps.push({line:'leftAdd', position, queue:[...queue], created:nodes.map(n => n.id),
+                  taken:parent.id, fresh:[parent.left.id], reading:leftIndex,
+                  msg:`индекс ${leftIndex}: значение ${leftValue} — левый потомок узла ${parent.value}, дописываем его в список`});
+    } else {
+      steps.push({line:'left', position, queue:[...queue], created:nodes.map(n => n.id),
+                  taken:parent.id, reading:leftIndex,
+                  msg:`индекс ${leftIndex}: null — левого потомка у узла ${parent.value} нет, в список ничего не идёт`});
+    }
+
+    if(position < values.length){
+      const rightValue = values[position];
+      const rightIndex = position;
+      position++;
+      if(rightValue !== null){
+        parent.right = make(rightValue);
+        queue.push(parent.right);
+        steps.push({line:'rightAdd', position, queue:[...queue], created:nodes.map(n => n.id),
+                    taken:parent.id, fresh:[parent.right.id], reading:rightIndex,
+                    msg:`индекс ${rightIndex}: значение ${rightValue} — правый потомок узла ${parent.value}, дописываем его в список`});
+      } else {
+        steps.push({line:'right', position, queue:[...queue], created:nodes.map(n => n.id),
+                    taken:parent.id, reading:rightIndex,
+                    msg:`индекс ${rightIndex}: null — правого потомка у узла ${parent.value} нет`});
+      }
+    } else {
+      steps.push({line:'right', position, queue:[...queue], created:nodes.map(n => n.id), taken:parent.id,
+                  msg:`значения кончились — правого потомка узел ${parent.value} не получит`});
+    }
+  }
+
+  const leftovers = queue.map(node => node.value).join(', ');
+  steps.push({line:'end', position, queue:[...queue], created:nodes.map(n => n.id), done:true,
+              msg: queue.length
+                   ? `✓ массив кончился. В списке остались ${leftovers} — детей им не выдадут, это листья`
+                   : `✓ разбор закончен: и массив, и список пусты`});
+}
+
+/* Координаты: x — номер в симметричном обходе итогового дерева, y — глубина. */
+function layout(node, depth, counter){
+  if(!node){ return counter; }
+  counter = layout(node.left, depth + 1, counter);
+  node.column = counter;
+  node.depth = depth;
+  counter++;
+  return layout(node.right, depth + 1, counter);
+}
+
+function renderCells(s){
+  const box = $('cells'); box.innerHTML = '';
+  if(!values.length){
+    box.innerHTML = '<div class="idx">запись пустая</div>';
+    return;
+  }
+  values.forEach((value, index) => {
+    const wrap = document.createElement('div'); wrap.className = 'ccell';
+    const cell = document.createElement('div');
+    cell.className = 'cell' + (value === null ? ' nullcell' : '');
+    cell.textContent = value === null ? 'null' : value;
+    if(s.reading === index){ cell.classList.add('now'); }
+    else if(index < s.position){ cell.classList.add('read'); }
+    const idx = document.createElement('div');
+    idx.className = 'idx' + (s.reading === index ? ' on' : '');
+    idx.textContent = index;
+    wrap.append(cell, idx); box.append(wrap);
+  });
+}
+
+function renderQueue(s){
+  const view = $('queueView');
+  if(!s.queue || !s.queue.length){
+    view.innerHTML = '<span class="note">список пуст</span>';
+    return;
+  }
+  view.innerHTML = s.queue.map((node, position) =>
+    `<span class="chip${position === 0 ? ' first' : ''}">${node.value}</span>`).join('');
+}
+
+function renderTree(s){
+  const box = $('tree');
+  const shown = new Set(s.created || []);
+  if(!root || !shown.size){
+    box.innerHTML = '<div class="arrlab">дерева пока нет</div>';
+    return;
+  }
+  layout(root, 0, 0);
+  const visible = nodes.filter(node => shown.has(node.id));
+  const gapX = 66, gapY = 74, padding = 32;
+  const width = Math.max((Math.max(...visible.map(n => n.column)) + 1) * gapX + padding, 320);
+  const height = (Math.max(...visible.map(n => n.depth)) + 1) * gapY + padding;
+  const xOf = node => node.column * gapX + padding;
+  const yOf = node => node.depth * gapY + padding;
+
+  let svg = `<svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">`;
+  for(const node of visible){
+    for(const child of [node.left, node.right]){
+      if(child && shown.has(child.id)){
+        const fresh = (s.fresh || []).includes(child.id);
+        svg += `<line class="edge${fresh ? ' fresh' : ''}" x1="${xOf(node)}" y1="${yOf(node)}" x2="${xOf(child)}" y2="${yOf(child)}"/>`;
+      }
+    }
+  }
+  for(const node of visible){
+    const inQueue = (s.queue || []).some(waiting => waiting.id === node.id);
+    let cls = 'node';
+    if((s.fresh || []).includes(node.id)){ cls += ' fresh'; }
+    else if(s.taken === node.id){ cls += ' taken'; }
+    else if(inQueue){ cls += ' waiting'; }
+    svg += `<g class="${cls}">`;
+    svg += `<circle cx="${xOf(node)}" cy="${yOf(node)}" r="18"/>`;
+    svg += `<text x="${xOf(node)}" y="${yOf(node) + 5}">${node.value}</text>`;
+    svg += `</g>`;
+  }
+  svg += '</svg>';
+  box.innerHTML = svg;
+}
+
+function renderCode(active){
+  $('code').innerHTML = CODE.map(c =>
+    `<span class="ln ${c.line === active ? 'active' : ''}">${c.t || ' '}</span>`).join('');
+}
+
+function show(idx){
+  cur = Math.max(0, Math.min(idx, steps.length - 1));
+  const s = steps[cur];
+  renderCells(s); renderQueue(s); renderTree(s); renderCode(s.line);
+  $('status').innerHTML = `<span class="${s.done ? 'good' : s.line === 'take' ? 'comp' : 'op'}">${s.msg}</span>`;
+  $('stepInfo').textContent = `шаг ${cur + 1} / ${steps.length}`;
+  $('progressBar').style.width = ((cur + 1) / steps.length * 100) + '%';
+  $('prev').disabled = cur === 0; $('next').disabled = cur === steps.length - 1;
+}
+
+function build(){ stopPlay(); buildSteps(); show(0); }
+function stopPlay(){ if(timer){ clearInterval(timer); timer = null; $('play').textContent = '▶ Авто'; } }
+function togglePlay(){
+  if(timer){ stopPlay(); return; }
+  if(cur >= steps.length - 1){ show(0); }
+  $('play').textContent = '⏸ Пауза';
+  timer = setInterval(() => { if(cur >= steps.length - 1){ stopPlay(); return; } show(cur + 1); }, 900);
+}
+
+$('build').onclick = build;
+$('next').onclick = () => { stopPlay(); show(cur + 1); };
+$('prev').onclick = () => { stopPlay(); show(cur - 1); };
+$('play').onclick = togglePlay;
+$('reset').onclick = () => { stopPlay(); show(0); };
+document.querySelectorAll('.preset .btn').forEach(button => {
+  button.onclick = () => {
+    $('valuesIn').value = button.dataset.values;
+    build();
+    window.scrollTo({top:0, behavior:'smooth'});
+  };
+});
+document.addEventListener('keydown', event => {
+  if(event.target.tagName === 'INPUT'){ return; }
+  if(event.key === 'ArrowRight'){ stopPlay(); show(cur + 1); }
+  if(event.key === 'ArrowLeft'){ stopPlay(); show(cur - 1); }
+  if(event.key === ' '){ event.preventDefault(); togglePlay(); }
+});
+build();
+</script>
+</body>
+</html>

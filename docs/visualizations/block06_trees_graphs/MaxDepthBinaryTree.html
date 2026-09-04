@@ -214,7 +214,11 @@ const CODE = [
   {t:`}`, line:'none'},
 ];
 
-/* Разбор строки «3, 9, 20, null, null, 15, 7» в дерево, как в TreeNode.fromLevelOrder. */
+/*
+ * Разбор строки «3, 9, 20, null, null, 15, 7» в дерево, как в TreeNode.fromLevelOrder.
+ * Одно отличие: некорректный хвост записи (значения остались, раздавать некому)
+ * здесь молча отбрасывается, а в Java метод бросает исключение.
+ */
 function parseTree(text){
   const values = text.split(',').map(part => part.trim())
                      .filter(part => part.length > 0)
@@ -229,10 +233,11 @@ function parseTree(text){
   let head = 0;
   while(position < values.length && head < parents.length){
     const parent = parents[head]; head++;
-    if(position < values.length){
-      const leftValue = values[position]; position++;
-      if(leftValue !== null){ parent.left = make(leftValue); parents.push(parent.left); }
-    }
+    // Ячейка под левое значение есть всегда, её гарантирует условие цикла;
+    // в самой ячейке может лежать null, тогда потомка нет
+    const leftValue = values[position]; position++;
+    if(leftValue !== null){ parent.left = make(leftValue); parents.push(parent.left); }
+    // А ячейки под правое значение может не быть вовсе: массив мог кончиться на левом
     if(position < values.length){
       const rightValue = values[position]; position++;
       if(rightValue !== null){ parent.right = make(rightValue); parents.push(parent.right); }
