@@ -18,46 +18,46 @@ import java.util.Queue;
 public class TreeTraversals {
 
     /* Прямой порядок: узел записывается при входе, до обоих поддеревьев. */
-    public static void preOrder(TreeNode node, List<Integer> visited) {
+    public static void preOrder(TreeNode node, List<Integer> traversalOrder) {
         if (node == null) {
             return;
         }
-        visited.add(node.val);
-        preOrder(node.left, visited);
-        preOrder(node.right, visited);
+        traversalOrder.add(node.val);
+        preOrder(node.left, traversalOrder);
+        preOrder(node.right, traversalOrder);
     }
 
     /* Симметричный порядок: узел записывается между левым и правым поддеревом. */
-    public static void inOrder(TreeNode node, List<Integer> visited) {
+    public static void inOrder(TreeNode node, List<Integer> traversalOrder) {
         if (node == null) {
             return;
         }
-        inOrder(node.left, visited);
-        visited.add(node.val);
-        inOrder(node.right, visited);
+        inOrder(node.left, traversalOrder);
+        traversalOrder.add(node.val);
+        inOrder(node.right, traversalOrder);
     }
 
     /* Обратный порядок: узел записывается при возврате, после обоих поддеревьев. */
-    public static void postOrder(TreeNode node, List<Integer> visited) {
+    public static void postOrder(TreeNode node, List<Integer> traversalOrder) {
         if (node == null) {
             return;
         }
-        postOrder(node.left, visited);
-        postOrder(node.right, visited);
-        visited.add(node.val);
+        postOrder(node.left, traversalOrder);
+        postOrder(node.right, traversalOrder);
+        traversalOrder.add(node.val);
     }
 
     /* Обход в ширину: очередь хранит узлы, чьих потомков ещё не видели. */
     public static List<Integer> levelOrder(TreeNode root) {
-        List<Integer> visited = new ArrayList<>();
+        List<Integer> traversalOrder = new ArrayList<>();
         if (root == null) {
-            return visited;
+            return traversalOrder;
         }
         Queue<TreeNode> pending = new ArrayDeque<>();
         pending.add(root);
         while (!pending.isEmpty()) {
             TreeNode node = pending.remove();
-            visited.add(node.val);
+            traversalOrder.add(node.val);
             if (node.left != null) {
                 pending.add(node.left);
             }
@@ -65,7 +65,7 @@ public class TreeTraversals {
                 pending.add(node.right);
             }
         }
-        return visited;
+        return traversalOrder;
     }
 
     public static void main(String[] args) {

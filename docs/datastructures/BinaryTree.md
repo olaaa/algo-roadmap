@@ -81,34 +81,34 @@ public class TreeNode {
 
 *Рис. 4. Обратный порядок (post-order): узел посещается при возврате, после обоих поддеревьев. Порядок `4, 5, 2, 6, 7, 3, 1`*
 
-В коде это одна и та же функция, в которой строка «посетить узел» стоит на одном из трёх мест:
+В коде это одна и та же функция, в которой строка «посетить узел» стоит на одном из трёх мест. Список `traversalOrder` — накопитель результата: значения в том порядке, в каком узлы посещались.
 
 ```java
-static void preOrder(TreeNode node, List<Integer> visited) {
+static void preOrder(TreeNode node, List<Integer> traversalOrder) {
     if (node == null) {
         return;
     }
-    visited.add(node.val);            // до поддеревьев — прямой порядок
-    preOrder(node.left, visited);
-    preOrder(node.right, visited);
+    traversalOrder.add(node.val);            // до поддеревьев — прямой порядок
+    preOrder(node.left, traversalOrder);
+    preOrder(node.right, traversalOrder);
 }
 
-static void inOrder(TreeNode node, List<Integer> visited) {
+static void inOrder(TreeNode node, List<Integer> traversalOrder) {
     if (node == null) {
         return;
     }
-    inOrder(node.left, visited);
-    visited.add(node.val);            // между поддеревьями — симметричный
-    inOrder(node.right, visited);
+    inOrder(node.left, traversalOrder);
+    traversalOrder.add(node.val);            // между поддеревьями — симметричный
+    inOrder(node.right, traversalOrder);
 }
 
-static void postOrder(TreeNode node, List<Integer> visited) {
+static void postOrder(TreeNode node, List<Integer> traversalOrder) {
     if (node == null) {
         return;
     }
-    postOrder(node.left, visited);
-    postOrder(node.right, visited);
-    visited.add(node.val);            // после поддеревьев — обратный
+    postOrder(node.left, traversalOrder);
+    postOrder(node.right, traversalOrder);
+    traversalOrder.add(node.val);            // после поддеревьев — обратный
 }
 ```
 
@@ -118,27 +118,41 @@ static void postOrder(TreeNode node, List<Integer> visited) {
 
 Стек здесь неявный — стек вызовов. Глубина рекурсии равна высоте дерева, и на цепочке из `10⁴` узлов это `10⁴` кадров; на JBR 25 с настройками по умолчанию проходит, на `2 · 10⁴` уже нет (проверено в `MaxDepthBinaryTree`). Если рекурсия недопустима, тот же обход пишется с явным `ArrayDeque` в роли стека — см. [`Stack.md`](Stack.md), раздел «Рекурсия и явный стек — это одно и то же».
 
+### Почему в дереве нет множества посещённых узлов
+
+В обходах графов есть множество `visited`, в которое заглядывают перед заходом в вершину: «уже были — не идём». Оно нужно, потому что в графе к одной вершине могут вести несколько путей, а при цикле обход без него не остановится вовсе. В коде выше такой проверки нет, и это не упущение: в дереве у каждого узла ровно один родитель, значит, к нему ведёт ровно один путь от корня, и рекурсия встречает его ровно один раз. Дерево гарантирует то, что в графе приходится обеспечивать множеством.
+
+Поэтому накопитель результата и назван `traversalOrder`, а не `visited`: слово `visited` занято графовым множеством с проверкой, а здесь список только пишется и ни на что не влияет.
+
+Проверить разницу можно на том же `preOrder`. Возьмём дерево `[1, 2, 3, 4]` и добавим второе ребро к узлу `4`: пусть `3.left` тоже указывает на него.
+
+![Второе ребро к узлу превращает дерево в граф](img/tree-second-edge.svg)
+
+*Рис. 5. Слева дерево: у узла `4` один родитель, `preOrder` даёт `1, 2, 4, 3`. Справа то же с ребром `3 → 4`: у узла `4` два родителя, и `preOrder` посещает его дважды — `1, 2, 4, 3, 4`. Жёлтые номера — порядок посещения, красный — повторное*
+
+Код `preOrder` при этом не менялся: он не проверяет, был ли уже в узле, потому что в дереве это невозможно. Стоило появиться второму пути к узлу — и накопитель честно записал его второй раз. Если же лишнее ребро направить вверх, к предку (например `4.left = 2`), рекурсия не остановится вовсе: `2 → 4 → 2 → 4 …` до `StackOverflowError`. Вот тогда и появляется `visited` в графовом смысле — множество, в которое заглядывают перед заходом; это тема обходов графов, см. [`Pattern_GraphTraversal.md`](../problems/block06_trees_graphs/Pattern_GraphTraversal.md).
+
 ### Обход в ширину (BFS): по уровням
 
 Обход в ширину идёт слоями: сначала корень, потом все узлы глубины 2 слева направо, потом все узлы глубины 3, и так далее.
 
 ![Обход в ширину](img/bfs-levels.svg)
 
-*Рис. 5. Обход в ширину: уровень за уровнем, внутри уровня слева направо. Порядок `1, 2, 3, 4, 5, 6, 7`*
+*Рис. 6. Обход в ширину: уровень за уровнем, внутри уровня слева направо. Порядок `1, 2, 3, 4, 5, 6, 7`*
 
 Одной линией вокруг дерева такой порядок не нарисуешь: между `3` и `4` нет ребра, а обход перескакивает. Поэтому здесь нужна очередь — она хранит узлы, чьих потомков ещё не смотрели:
 
 ```java
 static List<Integer> levelOrder(TreeNode root) {
-    List<Integer> visited = new ArrayList<>();
+    List<Integer> traversalOrder = new ArrayList<>();
     if (root == null) {
-        return visited;
+        return traversalOrder;
     }
     Queue<TreeNode> pending = new ArrayDeque<>();
     pending.add(root);
     while (!pending.isEmpty()) {
         TreeNode node = pending.remove();
-        visited.add(node.val);
+        traversalOrder.add(node.val);
         if (node.left != null) {
             pending.add(node.left);
         }
@@ -146,7 +160,7 @@ static List<Integer> levelOrder(TreeNode root) {
             pending.add(node.right);
         }
     }
-    return visited;
+    return traversalOrder;
 }
 ```
 
@@ -220,5 +234,5 @@ level-order : [1, 2, 3, 4, 5, 6, 7]
 - [`Queue.md`](Queue.md) — очередь, на которой держится обход в ширину
 - [`Stack.md`](Stack.md) — стек, рекурсия и явный стек
 - [`TreeNotation.md`](../problems/block06_trees_graphs/TreeNotation.md) — как дерево записано в условии задачи
-- [`Pattern_GraphTraversal.md`](../problems/block06_trees_graphs/Pattern_GraphTraversal.md) — обходы на графах: `visited`, кратчайший путь (черновик)
+- [`Pattern_GraphTraversal.md`](../problems/block06_trees_graphs/Pattern_GraphTraversal.md) — обходы на графах: `traversalOrder`, кратчайший путь (черновик)
 - [`glossary.md`](../glossary.md) — поддерево; прямой, симметричный и обратный порядок обхода
