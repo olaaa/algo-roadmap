@@ -16,12 +16,14 @@ public class MaxDepthBinaryTreeIterative {
 
     public static int maxDepth(TreeNode root) {
 // последним зашел, первым вышел
-        Deque<TreeNode> pendingStack = new ArrayDeque<TreeNode>();
-        pendingStack.push(root);
+//        Deque<TreeNode> pendingStack = new ArrayDeque<TreeNode>();
+//        pendingStack.push(root);
+//
+//        while (root.left != null) {
+//
+//        }
 
-        while (root.left != null) {
-
-        }
+        return 1;
     }
 
     public static void main(String[] args) {

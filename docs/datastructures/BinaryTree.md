@@ -12,6 +12,8 @@
 
 *Рис. 1. Узел, корень, лист и поддерево на дереве `[3, 9, 20, null, null, 15, 7]`*
 
+Обозначения: `n` — число узлов в дереве; `k` — номер текущего уровня, считая с единицы (у корня `k = 1`); `h` — число уровней в дереве, то есть его высота.
+
 ```
 на глубине k помещается до 2ᵏ⁻¹ узлов
 полное дерево высоты h содержит 2ʰ − 1 узлов
@@ -204,6 +206,7 @@ level-order : [1, 2, 3, 4, 5, 6, 7]
 
 - [`MaxDepthBinaryTree.md`](../problems/block06_trees_graphs/MaxDepthBinaryTree.md) — обход в глубину в обратном порядке: высота считается снизу вверх.
 - [`TreeNotation.md`](../problems/block06_trees_graphs/TreeNotation.md) — запись по уровням; `fromLevelOrder` и `toLevelOrder` в `TreeNode` — обход в ширину.
+- [`LevelOrderTraversal.md`](../problems/block06_trees_graphs/LevelOrderTraversal.md) — обход в ширину как задача: тот же цикл с очередью плюс граница уровня через размер очереди.
 - `src/demo/TreeTraversals.java` — четыре обхода на одном дереве с проверками.
 
 ## Типичные вопросы на собеседовании
