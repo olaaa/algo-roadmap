@@ -128,7 +128,7 @@
 </head>
 <body>
   <h1>Binary Tree Level Order Traversal — очередь и граница уровня</h1>
-  <div class="sub">Очередь отдаёт узлы по уровням сама. Граница уровня — размер очереди в начале витка: снимаем ровно столько узлов, а их потомки, дописанные в хвост, остаются на следующий виток (LeetCode 102).</div>
+  <div class="sub">Очередь отдаёт узлы по уровням сама. Граница уровня — размер очереди в начале итерации внешнего цикла: снимаем ровно столько узлов, а их потомки, дописанные в хвост, остаются на следующую итерацию (LeetCode 102).</div>
 
   <div class="layout">
     <div class="stage">
@@ -149,7 +149,7 @@
       <div class="progress"><i id="progressBar"></i></div>
 
       <div class="treewrap">
-        <div class="treelab">жёлтая полоса — уровень, который собирается на этом витке</div>
+        <div class="treelab">жёлтая полоса — уровень, который собирается на этой итерации внешнего цикла</div>
         <div id="tree"></div>
       </div>
 
@@ -192,7 +192,7 @@
 
       <div class="box">
         <h2>На что смотреть</h2>
-        <div class="note">В начале витка в очереди лежит ровно один уровень. Число <code>nodesOnLevel</code> снимается в этот момент и дальше не меняется, хотя очередь растёт.</div>
+        <div class="note">В начале итерации внешнего цикла в очереди лежит ровно один уровень. Число <code>nodesOnLevel</code> снимается в этот момент и дальше не меняется, хотя очередь растёт.</div>
         <div class="note">Черта в очереди — граница между узлами текущего уровня и потомками, которые уже дописаны в хвост. Внутренний цикл не заходит за черту.</div>
         <div class="note">Потомки разных родителей оказываются рядом в очереди и попадают в один уровень.</div>
       </div>
@@ -300,7 +300,7 @@ function buildSteps(){
     const levelValues = [];
     levels.push(levelValues);
     steps.push(snap({line:'size', size:nodesOnLevel, taken:0, depth, open:true,
-                     msg:`виток ${depth + 1}: в очереди ${nodesOnLevel} — это весь уровень, снимаем nodesOnLevel = ${nodesOnLevel}`}));
+                     msg:`итерация ${depth + 1}: в очереди ${nodesOnLevel} — это весь уровень, снимаем nodesOnLevel = ${nodesOnLevel}`}));
     for(let taken = 0; taken < nodesOnLevel; taken++){
       const node = queue.shift();
       levelValues.push(node.value);
