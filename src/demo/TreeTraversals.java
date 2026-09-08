@@ -68,6 +68,16 @@ public class TreeTraversals {
         return traversalOrder;
     }
 
+    /**
+     * Все четыре обхода запускаются на одном дереве {@code [1, 2, 3, 4, 5, 6, 7]}:
+     * <pre>
+     *           1
+     *         /   \
+     *        2     3
+     *       / \   / \
+     *      4   5 6   7
+     * </pre>
+     */
     public static void main(String[] args) {
         TreeNode root = TreeNode.fromLevelOrder(1, 2, 3, 4, 5, 6, 7);
 

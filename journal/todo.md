@@ -50,10 +50,8 @@
       LevelOrderTraversal (102) [~] код написан (11/11 PASS, +виз.), разбор
           готов; Lela выбрала 102 (111 Minimum Depth — возможное продолжение,
           BFS с ранним выходом).
-      [ ] СРАЗУ ПОСЛЕ задачи на обход в ширину: Lela разбирает методы
-          src/demo/TreeTraversals.java — preOrder, inOrder, postOrder,
-          levelOrder (сейчас отложены намеренно, чтобы разбирать BFS
-          на задаче, а не на демо-классе).
+      [x] Lela разобрала методы src/demo/TreeTraversals.java — preOrder,
+          inOrder, postOrder, levelOrder (09.09).
       [ ] Следом — упражнение с явным стеком (пункт выше).
       [ ] LELA САМА пишет isSymmetric без рекурсии, на явной структуре
           данных (это follow-up из условия 101). Как и с maxDepth: Клоду
