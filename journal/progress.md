@@ -1255,3 +1255,8 @@
   Заменено в TreeTraversals, LevelOrderTraversal (класс, разбор,
   визуализация), MaxDepthBinaryTreeIterative, BinaryTree.md, heuristics.md
   и в черновике Pattern_GraphTraversal.md. Все три класса прогнаны: 28/28.
+- ЗАМЕЧАНИЕ LELA: элемент стека «узел + его глубина» нельзя называть
+  «парой» — по-русски пара это два однородных предмета, а «снять пару
+  со стека» читается как «снять два элемента». Заменено на «узел вместе
+  с его глубиной» / «запись NodeAtDepth» в MaxDepthBinaryTree.md (раздел
+  про стек), Javadoc MaxDepthBinaryTreeIterative и todo.
