@@ -169,7 +169,7 @@
       </div>
 
       <div class="stackbox">
-        <div class="cap">очередь pending — голова слева; жёлтые ячейки — текущий уровень, за чертой — уже дописанные потомки</div>
+        <div class="cap">очередь nodesToVisit — голова слева; жёлтые ячейки — текущий уровень, за чертой — уже дописанные потомки</div>
         <div id="queueView"></div>
       </div>
 
@@ -231,19 +231,19 @@ const CODE = [
   {t:`    <span class="kw">if</span> (root == <span class="kw">null</span>) {`, line:'nullCheck'},
   {t:`        <span class="kw">return</span> levels;`, line:'nullCheck'},
   {t:`    }`, line:'none'},
-  {t:`    Queue&lt;TreeNode&gt; pending = <span class="kw">new</span> ArrayDeque&lt;&gt;();`, line:'enter'},
-  {t:`    pending.add(root);`, line:'enter'},
-  {t:`    <span class="kw">while</span> (!pending.isEmpty()) {`, line:'while'},
-  {t:`        <span class="kw">int</span> nodesOnLevel = pending.size();`, line:'size'},
+  {t:`    Queue&lt;TreeNode&gt; nodesToVisit = <span class="kw">new</span> ArrayDeque&lt;&gt;();`, line:'enter'},
+  {t:`    nodesToVisit.add(root);`, line:'enter'},
+  {t:`    <span class="kw">while</span> (!nodesToVisit.isEmpty()) {`, line:'while'},
+  {t:`        <span class="kw">int</span> nodesOnLevel = nodesToVisit.size();`, line:'size'},
   {t:`        List&lt;Integer&gt; levelValues = <span class="kw">new</span> ArrayList&lt;&gt;(nodesOnLevel);`, line:'size'},
   {t:`        <span class="kw">for</span> (<span class="kw">int</span> taken = <span class="num">0</span>; taken &lt; nodesOnLevel; taken++) {`, line:'for'},
-  {t:`            TreeNode node = pending.remove();`, line:'take'},
+  {t:`            TreeNode node = nodesToVisit.remove();`, line:'take'},
   {t:`            levelValues.add(node.val);`, line:'take'},
   {t:`            <span class="kw">if</span> (node.left != <span class="kw">null</span>) {`, line:'children'},
-  {t:`                pending.add(node.left);`, line:'children'},
+  {t:`                nodesToVisit.add(node.left);`, line:'children'},
   {t:`            }`, line:'none'},
   {t:`            <span class="kw">if</span> (node.right != <span class="kw">null</span>) {`, line:'children'},
-  {t:`                pending.add(node.right);`, line:'children'},
+  {t:`                nodesToVisit.add(node.right);`, line:'children'},
   {t:`            }`, line:'none'},
   {t:`        }`, line:'none'},
   {t:`        levels.add(levelValues);`, line:'close'},

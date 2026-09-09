@@ -50,30 +50,30 @@
 ```java
 // обход в глубину: стек
 void dfs(Node start) {
-    Deque<Node> pending = new ArrayDeque<>();
-    pending.push(start);
-    while (!pending.isEmpty()) {
-        Node current = pending.pop();
+    Deque<Node> nodesToVisit = new ArrayDeque<>();
+    nodesToVisit.push(start);
+    while (!nodesToVisit.isEmpty()) {
+        Node current = nodesToVisit.pop();
         if (!visited.add(current)) {
             continue;
         }
         for (Node next : current.neighbours()) {
-            pending.push(next);
+            nodesToVisit.push(next);
         }
     }
 }
 
 // обход в ширину: очередь. Отличаются только тип контейнера и имена методов
 void bfs(Node start) {
-    Queue<Node> pending = new ArrayDeque<>();
-    pending.offer(start);
-    while (!pending.isEmpty()) {
-        Node current = pending.poll();
+    Queue<Node> nodesToVisit = new ArrayDeque<>();
+    nodesToVisit.offer(start);
+    while (!nodesToVisit.isEmpty()) {
+        Node current = nodesToVisit.poll();
         if (!visited.add(current)) {
             continue;
         }
         for (Node next : current.neighbours()) {
-            pending.offer(next);
+            nodesToVisit.offer(next);
         }
     }
 }

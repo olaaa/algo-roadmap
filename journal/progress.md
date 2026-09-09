@@ -1237,3 +1237,21 @@
   уровня на дереве, карточки nodesOnLevel/taken, ответ по уровням. Логика
   сверена с Java через Node на 8 кейсах; в браузере не смотрела.
 - BinaryTree.md: ссылка на задачу в «Где это в проекте».
+
+## 2026-09-09 — maxDepth на явном стеке
+
+- Lela разобрала demo.TreeTraversals; в Javadoc main() добавлено дерево [1..7].
+- MaxDepthBinaryTreeIterative: Lela написала обход (pop, push right, push left)
+  и завела карту глубин по node.val; застряла на подсчёте ответа. Поймано
+  и объяснено: (1) размер стека — не глубина, в стеке узлы разных уровней;
+  (2) ключ node.val не уникален ([-100, 100, -100]), нужен сам узел.
+  Сначала довела её вариант (Map<TreeNode, Integer>, 12/12 PASS), затем
+  по просьбе Lela заменила на стек пар record NodeAtDepth(node, depth):
+  память O(h) вместо O(n), карта не нужна. 12/12 PASS, цепочка 20 000
+  проходит — та, на которой рекурсивный вариант падает.
+- ПЕРЕИМЕНОВАНИЕ по замечанию Lela: pending / pendingStack → nodesToVisit.
+  Причина: «pending» — прилагательное без существительного, не говорит,
+  что именно ожидает. Правило именования нарушалось в трёх классах сразу.
+  Заменено в TreeTraversals, LevelOrderTraversal (класс, разбор,
+  визуализация), MaxDepthBinaryTreeIterative, BinaryTree.md, heuristics.md
+  и в черновике Pattern_GraphTraversal.md. Все три класса прогнаны: 28/28.

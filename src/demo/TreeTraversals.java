@@ -53,16 +53,16 @@ public class TreeTraversals {
         if (root == null) {
             return traversalOrder;
         }
-        Queue<TreeNode> pending = new ArrayDeque<>();
-        pending.add(root);
-        while (!pending.isEmpty()) {
-            TreeNode node = pending.remove();
+        Queue<TreeNode> nodesToVisit = new ArrayDeque<>();
+        nodesToVisit.add(root);
+        while (!nodesToVisit.isEmpty()) {
+            TreeNode node = nodesToVisit.remove();
             traversalOrder.add(node.val);
             if (node.left != null) {
-                pending.add(node.left);
+                nodesToVisit.add(node.left);
             }
             if (node.right != null) {
-                pending.add(node.right);
+                nodesToVisit.add(node.right);
             }
         }
         return traversalOrder;

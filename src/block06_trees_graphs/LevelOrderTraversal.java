@@ -24,26 +24,26 @@ public class LevelOrderTraversal {
             return levels;
         }
 
-        Queue<TreeNode> pending = new ArrayDeque<>();
-        pending.add(root);
-        while (!pending.isEmpty()) {
+        Queue<TreeNode> nodesToVisit = new ArrayDeque<>();
+        nodesToVisit.add(root);
+        while (!nodesToVisit.isEmpty()) {
             /*
              * В начале итерации внешнего цикла в очереди лежит ровно один уровень целиком:
              * потомки снятых узлов дописываются в хвост и в этот счёт не входят.
              */
-            int nodesOnLevel = pending.size();
+            int nodesOnLevel = nodesToVisit.size();
             List<Integer> levelValues = new ArrayList<>(nodesOnLevel);
 // итерация по элементам одного уровня
             for (int taken = 0; taken < nodesOnLevel; taken++) {
-                TreeNode node = pending.remove(); // модификация очереди
+                TreeNode node = nodesToVisit.remove(); // модификация очереди
                 levelValues.add(node.val);
 // порядок: внутри уровня слева направо
                 if (node.left != null) {
                     // добавляем в очередь во время итерации по ней
-                    pending.add(node.left);
+                    nodesToVisit.add(node.left);
                 }
                 if (node.right != null) {
-                    pending.add(node.right);
+                    nodesToVisit.add(node.right);
                 }
             }
             levels.add(levelValues);
