@@ -78,6 +78,7 @@ hr.sep { border:none; border-top:2px solid #4f8cff; margin:0; page-break-before:
 
 /* Служебные вставки для синтеза речи: в тексте есть, глазу почти не видны. */
 .tts { color:#cdd3dd }
+sup { font-size:70%; line-height:0; vertical-align:super }
 img { max-width:100%; display:block; margin:8px auto }
 """
 
@@ -290,6 +291,7 @@ SUPERSCRIPTS = {
     '5': '⁵', '6': '⁶', '7': '⁷', '8': '⁸', '9': '⁹',
     '-': '⁻', '+': '⁺',
     'n': 'ⁿ', 'k': 'ᵏ', 'm': 'ᵐ', 'i': 'ⁱ', 'j': 'ʲ', 'x': 'ˣ', 'p': 'ᵖ',
+    'h': 'ʰ',
 }
 POWER = re.compile(r'\^(-?[0-9A-Za-z]+)')
 
@@ -320,6 +322,62 @@ def superscript_powers(soup) -> int:
     return raised
 
 
+RAISED_CHARS = ''.join(SUPERSCRIPTS.values())
+RAISED_LETTERS = ''.join(raised for plain, raised in SUPERSCRIPTS.items() if plain.isalpha())
+LETTER_POWER = re.compile(f'[{RAISED_CHARS}]*[{RAISED_LETTERS}][{RAISED_CHARS}]*')
+
+
+PLAIN_SUPERSCRIPTS = {raised: plain for plain, raised in SUPERSCRIPTS.items()}
+
+
+def voice_powers(soup) -> int:
+    """Числовую степень (10⁴) синтез читает верно — «в четвёртой степени».
+    Букву в степени он пропускает, а «⁻¹» рядом с ней всё равно читает как
+    «в первой степени»: «2ᵏ⁻¹» звучало как «два в первой степени», а с
+    подсказкой после — «два в первой степени в степени ка минус 1».
+    Поэтому показатель с буквой вообще не оставляем надстрочными символами:
+    он идёт обычными знаками внутри <sup> (глазу — то же самое), а между
+    основанием и показателем ставится подсказка «в степени». В текстовом слое
+    получается «2 в степени k-1». Код не трогаем."""
+    voiced = 0
+    for node in list(soup.find_all(string=True)):
+        if in_code_block(node):
+            continue
+        text = str(node)
+        if not LETTER_POWER.search(text):
+            continue
+        pieces = []
+        position = 0
+        for match in LETTER_POWER.finditer(text):
+            start, end = match.span()
+            pieces.append(NavigableString(text[position:start] + ' '))
+            hint = soup.new_tag('span')
+            hint['class'] = 'tts'
+            # Пробел внутри подсказки: одинокий пробел между двумя тегами
+            # при извлечении текста теряется, и выходит «в степениk».
+            hint.string = 'в степени' + NBSP
+            pieces.append(hint)
+            sup = soup.new_tag('sup')
+            for ch in match.group():
+                plain = PLAIN_SUPERSCRIPTS[ch]
+                sup.append(NavigableString(plain))
+                # Минус после буквы («k-1») синтез не читает — слышно «кей один».
+                if plain in ('-', '+'):
+                    sign = soup.new_tag('span')
+                    sign['class'] = 'tts'
+                    sign.string = ('минус' if plain == '-' else 'плюс') + NBSP
+                    sup.append(sign)
+            pieces.append(sup)
+            voiced += 1
+            position = end
+            if position < len(text) and not text[position].isspace():
+                pieces.append(NavigableString(' '))
+        if position < len(text):
+            pieces.append(NavigableString(text[position:]))
+        node.replace_with(*pieces)
+    return voiced
+
+
 def verify(pdf_path: Path) -> None:
     """На глаз подсказки в PDF не проверить — смотрим текстовый слой."""
     from pypdf import PdfReader
@@ -343,6 +401,7 @@ def build(sources: list[Path], output: Path) -> None:
     soup = BeautifulSoup(body, 'html.parser')
     in_code = normalize_minus_in_code(soup)
     raised = superscript_powers(soup)
+    powers = voice_powers(soup)
     minuses, arrows = voice_symbols(soup)
     glued = glue_inline_code(soup)
     block_dots = stops_in_text_blocks(soup)
@@ -358,6 +417,7 @@ def build(sources: list[Path], output: Path) -> None:
     print(f'стрелок озвучено  : {arrows}')
     print(f'минусов в коде    : {in_code} (приведены к дефису)')
     print(f'степеней поднято  : {raised} (знак ^ убран)')
+    print(f'степеней озвучено : {powers} (с буквой в показателе)')
     print(f'пробелов склеено  : {glued}')
     print(f'точек в блоках    : {block_dots}')
     print(f'точек в прозе     : {dots}')
