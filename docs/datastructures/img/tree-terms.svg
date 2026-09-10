@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 464" width="760" height="464" font-family="system-ui, -apple-system, Segoe UI, sans-serif">
-  <rect width="760" height="464" fill="#fbfcfe"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 488" width="760" height="488" font-family="system-ui, -apple-system, Segoe UI, sans-serif">
+  <rect width="760" height="488" fill="#fbfcfe"/>
   <text x="380" y="32" text-anchor="middle" font-size="17" font-weight="600" fill="#1c2333">Узел, корень, лист, поддерево</text>
   <text x="380" y="54" text-anchor="middle" font-size="13" fill="#6b7280">Дерево [3, 9, 20, null, null, 15, 7]</text>
   <rect x="410" y="190" width="260" height="212" rx="14" fill="#fff7e6" stroke="#d97706" stroke-width="1.5" stroke-dasharray="6 4"/>
@@ -35,4 +35,10 @@
   <text x="78" y="445" font-size="13" fill="#1c2333">узел со значением</text>
   <circle cx="240.4" cy="440" r="9" fill="#fff7e6" stroke="#d97706" stroke-width="1.5"/>
   <text x="258.4" y="445" font-size="13" fill="#1c2333">поддерево: узел и всё, что растёт из него вниз</text>
+  <text x="414" y="104" font-size="12" fill="#7c3aed" font-weight="600">высота 3</text>
+  <text x="254" y="254" font-size="12" fill="#7c3aed" font-weight="600">высота 1</text>
+  <text x="574" y="222" font-size="12" fill="#7c3aed" font-weight="600">высота 2</text>
+  <text x="426" y="340" text-anchor="end" font-size="12" fill="#7c3aed" font-weight="600">высота 1</text>
+  <text x="654" y="340" font-size="12" fill="#7c3aed" font-weight="600">высота 1</text>
+  <text x="60" y="472" font-size="12" fill="#7c3aed">высота узла — число узлов от него вниз до самого дальнего листа; у корня равна высоте дерева</text>
 </svg>
