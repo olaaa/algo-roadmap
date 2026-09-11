@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 520" width="760" height="520" font-family="system-ui, -apple-system, Segoe UI, sans-serif">
+  <defs>
+    <marker id="arrowBlue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#2563eb"/></marker>
+    <marker id="arrowPurple" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#7c3aed"/></marker>
+  </defs>
+  <rect width="760" height="520" fill="#fbfcfe"/>
+  <text x="380" y="30" text-anchor="middle" font-size="17" font-weight="600" fill="#1c2333">Глубина и высота узла «2»</text>
+  <text x="380" y="52" text-anchor="middle" font-size="13" fill="#6b7280">Дерево [1, 2, 3, null, 4, null, null, 5]</text>
+
+  <rect x="150" y="160" width="220" height="290" rx="14" fill="#fff7e6" stroke="#d97706" stroke-width="1.5" stroke-dasharray="6 4"/>
+  <text x="260" y="470" text-anchor="middle" font-size="13" fill="#b45309">поддерево узла «2»: глубина 3</text>
+
+  <line x1="360" y1="115" x2="240" y2="185" stroke="#c5ccd9" stroke-width="2.5" stroke-linecap="round"/>
+  <line x1="400" y1="115" x2="520" y2="185" stroke="#c5ccd9" stroke-width="2.5" stroke-linecap="round"/>
+  <line x1="235" y1="222" x2="290" y2="285" stroke="#c5ccd9" stroke-width="2.5" stroke-linecap="round"/>
+  <line x1="290" y1="322" x2="255" y2="385" stroke="#c5ccd9" stroke-width="2.5" stroke-linecap="round"/>
+
+  <circle cx="380" cy="100" r="24" fill="#e8f0ff" stroke="#4f8cff" stroke-width="2"/>
+  <text x="380" y="106" text-anchor="middle" font-size="18" font-family="Consolas, monospace" fill="#1c2333">1</text>
+  <circle cx="220" cy="200" r="24" fill="#fff7e6" stroke="#d97706" stroke-width="3"/>
+  <text x="220" y="206" text-anchor="middle" font-size="18" font-family="Consolas, monospace" fill="#1c2333">2</text>
+  <circle cx="540" cy="200" r="24" fill="#f3f4f6" stroke="#c5ccd9" stroke-width="2"/>
+  <text x="540" y="206" text-anchor="middle" font-size="18" font-family="Consolas, monospace" fill="#9aa3b5">3</text>
+  <circle cx="305" cy="300" r="24" fill="#e8f0ff" stroke="#4f8cff" stroke-width="2"/>
+  <text x="305" y="306" text-anchor="middle" font-size="18" font-family="Consolas, monospace" fill="#1c2333">4</text>
+  <circle cx="240" cy="400" r="24" fill="#e8f0ff" stroke="#4f8cff" stroke-width="2"/>
+  <text x="240" y="406" text-anchor="middle" font-size="18" font-family="Consolas, monospace" fill="#1c2333">5</text>
+
+  <text x="380" y="66" text-anchor="middle" font-size="13" fill="#4f8cff" font-weight="600">корень</text>
+  <text x="182" y="206" text-anchor="end" font-size="13" fill="#b45309" font-weight="600">этот узел</text>
+  <text x="240" y="442" text-anchor="middle" font-size="13" fill="#4f8cff" font-weight="600">лист</text>
+
+  <path d="M 352 92 C 300 100, 250 130, 228 172" fill="none" stroke="#2563eb" stroke-width="3" marker-end="url(#arrowBlue)"/>
+  <text x="60" y="120" font-size="13" fill="#2563eb" font-weight="600">глубина узла «2» = 2</text>
+  <text x="60" y="138" font-size="12" fill="#2563eb">от корня вниз: узлы «1», «2»</text>
+
+  <path d="M 262 388 C 320 360, 340 310, 335 290 C 330 270, 290 240, 248 224" fill="none" stroke="#7c3aed" stroke-width="3" marker-end="url(#arrowPurple)"/>
+  <text x="400" y="330" font-size="13" fill="#7c3aed" font-weight="600">высота узла «2» = 3</text>
+  <text x="400" y="348" font-size="12" fill="#7c3aed">от листа вверх: узлы «5», «4», «2»</text>
+  <text x="400" y="372" font-size="12" fill="#b45309">то же число — глубина поддерева узла «2»:</text>
+  <text x="400" y="390" font-size="12" fill="#b45309">в рамке три уровня, maxDepth(узел «2») = 3</text>
+
+  <text x="60" y="503" font-size="12" fill="#6b7280">Глубина — сколько узлов над узлом, от корня. Высота — сколько под ним, от дальнего листа.</text>
+</svg>

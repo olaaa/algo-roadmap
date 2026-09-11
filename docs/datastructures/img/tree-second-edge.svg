@@ -2,9 +2,9 @@
   <rect width="760" height="372" fill="#fbfcfe"/>
   <defs><marker id="red" markerWidth="9" markerHeight="7" refX="8" refY="3.5" orient="auto"><path d="M0,0 L9,3.5 L0,7 z" fill="#e5484d"/></marker></defs>
   <text x="380" y="32" text-anchor="middle" font-size="17" font-weight="600" fill="#1c2333">Одно лишнее ребро — и дерево становится графом</text>
-  <text x="380" y="54" text-anchor="middle" font-size="13" fill="#6b7280">Слева дерево [1, 2, 3, 4]; справа то же, но узел 3 тоже ссылается на 4</text>
+  <text x="380" y="54" text-anchor="middle" font-size="13" fill="#6b7280">Слева дерево [1, 2, 3, 4]; справа то же, но узел «3» тоже ссылается на «4»</text>
   <line x1="380" y1="70" x2="380" y2="370" stroke="#d8dde8" stroke-width="1" stroke-dasharray="4 4"/>
-  <text x="170" y="86" text-anchor="middle" font-size="14" font-weight="600" fill="#1c2333">Дерево: у узла 4 один родитель</text>
+  <text x="170" y="86" text-anchor="middle" font-size="14" font-weight="600" fill="#1c2333">Дерево: у узла «4» один родитель</text>
   <line x1="153" y1="160" x2="117" y2="200" stroke="#9aa3b5" stroke-width="2.5" stroke-linecap="round"/>
   <line x1="187" y1="160" x2="223" y2="200" stroke="#9aa3b5" stroke-width="2.5" stroke-linecap="round"/>
   <line x1="88" y1="243" x2="72" y2="277" stroke="#9aa3b5" stroke-width="2.5" stroke-linecap="round"/>
@@ -25,7 +25,7 @@
   <circle cx="88" cy="276" r="13" fill="#fde68a" stroke="#d97706" stroke-width="1.5"/>
   <text x="88" y="280.5" text-anchor="middle" font-size="12.5" font-weight="600" font-family="Consolas, monospace" fill="#1c2333">3</text>
   <text x="170" y="352" text-anchor="middle" font-size="13" font-family="Consolas, monospace" fill="#1c2333">preOrder: 1, 2, 4, 3</text>
-  <text x="560" y="86" text-anchor="middle" font-size="14" font-weight="600" fill="#1c2333">Граф: у узла 4 два родителя</text>
+  <text x="560" y="86" text-anchor="middle" font-size="14" font-weight="600" fill="#1c2333">Граф: у узла «4» два родителя</text>
   <line x1="543" y1="160" x2="507" y2="200" stroke="#9aa3b5" stroke-width="2.5" stroke-linecap="round"/>
   <line x1="577" y1="160" x2="613" y2="200" stroke="#9aa3b5" stroke-width="2.5" stroke-linecap="round"/>
   <line x1="507" y1="240" x2="543" y2="280" stroke="#9aa3b5" stroke-width="2.5" stroke-linecap="round"/>
