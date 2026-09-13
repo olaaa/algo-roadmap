@@ -37,8 +37,9 @@
   <path d="M 262 388 C 320 360, 340 310, 335 290 C 330 270, 290 240, 248 224" fill="none" stroke="#7c3aed" stroke-width="3" marker-end="url(#arrowPurple)"/>
   <text x="400" y="330" font-size="13" fill="#7c3aed" font-weight="600">высота узла «2» = 3</text>
   <text x="400" y="348" font-size="12" fill="#7c3aed">от листа вверх: узлы «5», «4», «2»</text>
-  <text x="400" y="372" font-size="12" fill="#b45309">то же число — глубина поддерева узла «2»:</text>
-  <text x="400" y="390" font-size="12" fill="#b45309">в рамке три уровня, maxDepth(узел «2») = 3</text>
+  <text x="400" y="372" font-size="12" fill="#b45309">то же число — глубина поддерева узла «2»,</text>
+  <text x="400" y="390" font-size="12" fill="#b45309">то есть глубина листа «5» внутри рамки,</text>
+  <text x="400" y="408" font-size="12" fill="#b45309">считая от «2»: узлы «2», «4», «5»</text>
 
   <text x="60" y="503" font-size="12" fill="#6b7280">Глубина — сколько узлов над узлом, от корня. Высота — сколько под ним, от дальнего листа.</text>
 </svg>
