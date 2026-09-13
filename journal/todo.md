@@ -111,7 +111,12 @@
       Из docs/datastructures/img/ ничего не удаляем.
 - [ ] HashMap / HashSet — хеширование, коллизии, treeify, equals+hashCode
 - [ ] ArrayList vs LinkedList — рост массива, когда что брать
+- [x] BinarySearchTree — правило порядка, поиск за O(h), симметричный обход
+      как сортировка, цепочка против сбалансированного, сборка из
+      отсортированного массива; demo/BinarySearchTreeDemo 13/13 PASS (13.09).
+      Возможные задачи сверх плана: 700, 98, 108, 230 — если Lela захочет.
 - [ ] TreeMap / TreeSet — красно-чёрное дерево, навигационные методы
+      (опирается на BinarySearchTree.md)
 - [ ] PriorityQueue отдельным файлом (куча, siftUp/siftDown) — если понадобится глубже
 
 ## Разобрать позже — вопросы Lela по ходу чтения
