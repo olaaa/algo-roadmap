@@ -158,14 +158,16 @@ def arrow_word(text: str, position: int, inside_inline_code: bool) -> str:
     return MAPPING_ARROW_WORD
 
 
-def voice_symbols(soup) -> tuple[int, int]:
-    """Ставит слово-подсказку рядом с минусом и стрелкой. Код не трогает."""
-    minuses = arrows = 0
+def voice_symbols(soup) -> tuple[int, int, int]:
+    """Ставит слово-подсказку рядом с минусом, стрелкой и знаком «примерно
+    равно» (его синтез тоже молчит: «h ≈ log₂ n» читалось как «аш лог два эн»).
+    Код не трогает."""
+    minuses = arrows = approx = 0
     for node in list(soup.find_all(string=True)):
         if in_code_block(node):
             continue
         text = str(node).replace(TYPOGRAPHIC_MINUS, '-')
-        if ' - ' not in text and '→' not in text:
+        if ' - ' not in text and '→' not in text and '≈' not in text:
             if text != str(node):
                 node.replace_with(NavigableString(text))
             continue
@@ -173,7 +175,7 @@ def voice_symbols(soup) -> tuple[int, int]:
         inside_inline_code = node.find_parent('code') is not None
         pieces = []
         position = 0
-        for match in re.finditer(r'(?<=\s)-(?=\s)|→', text):
+        for match in re.finditer(r'(?<=\s)-(?=\s)|→|≈', text):
             start, end = match.span()
             if start > position:
                 pieces.append(NavigableString(text[position:start]))
@@ -181,6 +183,9 @@ def voice_symbols(soup) -> tuple[int, int]:
             if symbol == '-':
                 word = 'минус'
                 minuses += 1
+            elif symbol == '≈':
+                word = 'примерно равно'
+                approx += 1
             else:
                 word = arrow_word(text, start, inside_inline_code)
                 arrows += 1
@@ -197,7 +202,7 @@ def voice_symbols(soup) -> tuple[int, int]:
         if position < len(text):
             pieces.append(NavigableString(text[position:]))
         node.replace_with(*pieces)
-    return minuses, arrows
+    return minuses, arrows, approx
 
 
 def glue_inline_code(soup) -> int:
@@ -402,7 +407,7 @@ def build(sources: list[Path], output: Path) -> None:
     in_code = normalize_minus_in_code(soup)
     raised = superscript_powers(soup)
     powers = voice_powers(soup)
-    minuses, arrows = voice_symbols(soup)
+    minuses, arrows, approx = voice_symbols(soup)
     glued = glue_inline_code(soup)
     block_dots = stops_in_text_blocks(soup)
     dots = add_stops(soup)
@@ -415,6 +420,7 @@ def build(sources: list[Path], output: Path) -> None:
 
     print(f'минусов озвучено  : {minuses}')
     print(f'стрелок озвучено  : {arrows}')
+    print(f'знаков ≈ озвучено : {approx}')
     print(f'минусов в коде    : {in_code} (приведены к дефису)')
     print(f'степеней поднято  : {raised} (знак ^ убран)')
     print(f'степеней озвучено : {powers} (с буквой в показателе)')

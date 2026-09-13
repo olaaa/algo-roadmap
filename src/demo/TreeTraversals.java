@@ -2,10 +2,7 @@ package demo;
 
 import block06_trees_graphs.TreeNode;
 
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Queue;
+import java.util.*;
 
 /**
  * Четыре порядка обхода двоичного дерева на одном и том же дереве
