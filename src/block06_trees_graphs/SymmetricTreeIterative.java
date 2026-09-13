@@ -58,6 +58,67 @@ public class SymmetricTreeIterative {
         return true;
     }
 
+    /**
+     * Вариант Lela: стек узлов без записи-пары. Пара — это два соседних
+     * элемента стека, снимаются по два. В {@code ArrayDeque} нельзя положить
+     * {@code null}, поэтому пара потомков проверяется ДО укладки: оба null —
+     * класть нечего, ровно один null — не зеркально, оба есть — кладутся
+     * рядом. Проверка одна и та же для внешней и для внутренней пары.
+     */
+    public static boolean isSymmetricNodeStack(TreeNode root) {
+        Deque<TreeNode> nodesToVisit = new ArrayDeque<>();
+        if (isLeaf(root)) {
+            return true;
+        }
+        if (hasExactlyOneChild(root.left, root.right)) {
+            return false;
+        }
+        nodesToVisit.push(root.right);
+        nodesToVisit.push(root.left); // левый извлечём первым
+
+        while (!nodesToVisit.isEmpty()) {
+            TreeNode leftSubtree = nodesToVisit.pop();
+            TreeNode rightSubtree = nodesToVisit.pop();
+            if (leftSubtree.val != rightSubtree.val) {
+                return false;
+            }
+            /* Внешняя пара потомков: левое у левого, правое у правого. */
+            if (!pushPairOrFail(nodesToVisit, leftSubtree.left, rightSubtree.right)) {
+                return false;
+            }
+            /* Внутренняя пара потомков: правое у левого, левое у правого. */
+            if (!pushPairOrFail(nodesToVisit, leftSubtree.right, rightSubtree.left)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /*
+     * Кладёт пару в стек, если оба узла есть. Возвращает false, когда пара
+     * заведомо не зеркальна — узел есть только с одной стороны. Пара из двух
+     * null — зеркальна, класть нечего, true.
+     */
+    private static boolean pushPairOrFail(Deque<TreeNode> nodesToVisit, TreeNode left, TreeNode right) {
+        if (left == null && right == null) {
+            return true;
+        }
+        if (hasExactlyOneChild(left, right)) {
+            return false;
+        }
+        nodesToVisit.push(right);
+        nodesToVisit.push(left);
+        return true;
+    }
+
+    private static boolean hasExactlyOneChild(TreeNode leftChild, TreeNode rightChild) {
+        return (leftChild == null) || (rightChild == null);
+    }
+
+    private static boolean isLeaf(TreeNode node) {
+        return node.left == null && node.right == null;
+    }
+
     public static void main(String[] args) {
         record TestCase(TreeNode root, boolean expected, String name) {
         }
@@ -77,6 +138,7 @@ public class SymmetricTreeIterative {
                         "потомки на разных сторонах, но зеркально"),
                 new TestCase(TreeNode.fromLevelOrder(1, 2, 2, 3, 4, 4, 5), false,
                         "внешняя пара 3 и 5 не совпадает"),
+//                на этом падал мой код на continue
                 new TestCase(TreeNode.fromLevelOrder(1, 2, 2, 3, 4, 5, 3), false,
                         "внешняя пара совпадает, внутренняя 4 и 5 нет"),
                 new TestCase(TreeNode.fromLevelOrder(1, 2, null), false,
@@ -90,6 +152,9 @@ public class SymmetricTreeIterative {
             check(actual == testCase.expected(),
                     testCase.name() + " -> " + actual
                             + " (ожидалось " + testCase.expected() + ")");
+            boolean actualNodeStack = isSymmetricNodeStack(testCase.root());
+            check(actualNodeStack == testCase.expected(),
+                    "стек узлов: " + testCase.name() + " -> " + actualNodeStack);
         }
 
         /*
@@ -110,8 +175,10 @@ public class SymmetricTreeIterative {
             rightTail = rightTail.right;
         }
         check(isSymmetric(root), "галочка глубиной " + depth + " из 999 узлов: симметрична");
+        check(isSymmetricNodeStack(root), "стек узлов: галочка симметрична");
         rightTail.val = -1;
         check(!isSymmetric(root), "та же галочка с одним изменённым листом: не симметрична");
+        check(!isSymmetricNodeStack(root), "стек узлов: галочка с изменённым листом не симметрична");
     }
 
     private static void check(boolean ok, String name) {
