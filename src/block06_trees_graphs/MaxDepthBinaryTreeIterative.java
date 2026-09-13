@@ -32,16 +32,16 @@ public class MaxDepthBinaryTreeIterative {
 
         int maxDepth = 0;
         while (!nodesToVisit.isEmpty()) {
-            NodeAtDepth current = nodesToVisit.pop();
+            NodeAtDepth current = nodesToVisit.pop(); //  забираем
             maxDepth = Math.max(maxDepth, current.depth());
 
             int childDepth = current.depth() + 1;
             if (current.node().right != null) {
-                nodesToVisit.push(new NodeAtDepth(current.node().right, childDepth));
+                nodesToVisit.push(new NodeAtDepth(current.node().right, childDepth)); // кладём
             }
             /* Левый кладётся последним, поэтому снимется первым: спуск идёт влево. */
             if (current.node().left != null) {
-                nodesToVisit.push(new NodeAtDepth(current.node().left, childDepth));
+                nodesToVisit.push(new NodeAtDepth(current.node().left, childDepth)); // кладём
             }
         }
         return maxDepth;

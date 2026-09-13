@@ -5,72 +5,57 @@ import java.util.Deque;
 
 /**
  * LeetCode 101 — Symmetric Tree (Easy), follow-up из условия: то же, что
- * {@link SymmetricTree}, но без рекурсии — на явной структуре данных.
+ * {@link SymmetricTree}, но без рекурсии — на явном стеке.
  * <p>
- * Каркас: тесты те же, что у рекурсивного решения. Реализацию пишет Lela.
+ * В стеке лежат пары узлов из противоположных половин дерева, которые ещё
+ * предстоит сравнить. Снятая пара сравнивается, и, если совпала, в стек
+ * кладутся две пары её потомков: внешняя и внутренняя — те же, что рекурсия
+ * передавала в два вызова {@code isMirror}. Время O(n), память O(h).
  *
  * @see <a href="../../docs/problems/block06_trees_graphs/SymmetricTree.md">SymmetricTree.md</a>
  */
 public class SymmetricTreeIterative {
 
+    /* Пара узлов, которые должны оказаться зеркальными. Любой из них может быть null. */
+    private record MirrorPair(TreeNode left, TreeNode right) {
+    }
+
     /**
-     * The number of nodes in the tree is in the range [1, 1000].
-     *
-     * @param root не может быть null
-     *             <pre>
-     *                                               1
-     *                                        /             \
-     *                                       2               2
-     *                                    /     \         /     \
-     *                                   3       4       4       3
-     *                                  / \     / \     / \     / \
-     *                                 5   6   7   8   8   7   6   5
-     *                         </pre>
+     * По условию в дереве от 1 до 1000 узлов, поэтому root не проверяется на null.
+     * <pre>
+     *                       1
+     *                /             \
+     *               2               2
+     *            /     \         /     \
+     *           3       4       4       3
+     *          / \     / \     / \     / \
+     *         5   6   7   8   8   7   6   5
+     * </pre>
      */
     public static boolean isSymmetric(TreeNode root) {
-// region Root
-        Deque<TreeNode> nodesToVisit = new ArrayDeque<>();
-        if (isLeaf(root)) {
-            return true;
-        }
-        if (hasExactlyOneChild(root.left, root.right)) {
-            return false;
-        }
+        Deque<MirrorPair> pairsToCompare = new ArrayDeque<>();
+        pairsToCompare.push(new MirrorPair(root.left, root.right));
 
-        nodesToVisit.push(root.right);
-        nodesToVisit.push(root.left); // левый извлечем первым
-// endregion
-        while (!nodesToVisit.isEmpty()) {
-            TreeNode leftSubtree = nodesToVisit.pop();
-            TreeNode rightSubtree = nodesToVisit.pop();
+        while (!pairsToCompare.isEmpty()) {
+            MirrorPair current = pairsToCompare.pop();
+            TreeNode left = current.left();
+            TreeNode right = current.right();
 
-// проверки не имеют смысла, если текущие узлы неравны
-            if (leftSubtree.val == rightSubtree.val) {
-// null-ы нельзя класть в стек, поэтому выполняем проверки
-                if ((rightSubtree.right == null) && (leftSubtree.left == null)) {
-                    continue;
-                }
-
-                if ((rightSubtree.right == null) || (leftSubtree.left == null)) {
-                    return false;
-                }
-                // после проверок можем класть в стек оба потомка и не получать NPE
-                nodesToVisit.push(rightSubtree.right);
-                nodesToVisit.push(leftSubtree.left);
-            } else {
+            if (left == null && right == null) {
+                continue;
+            }
+            if (left == null || right == null) {
                 return false;
             }
+            if (left.val != right.val) {
+                return false;
+            }
+
+            /* Внешняя пара: левое у левого и правое у правого; внутренняя — наоборот. */
+            pairsToCompare.push(new MirrorPair(left.left, right.right));
+            pairsToCompare.push(new MirrorPair(left.right, right.left));
         }
-
         return true;
-    }
-
-    private static boolean hasExactlyOneChild(TreeNode leftChild, TreeNode rightChild) {
-        return (leftChild == null) || (rightChild == null);
-    }
-
-    private static boolean isLeaf(TreeNode node) {
-        return node.left == null && node.right == null;
     }
 
     public static void main(String[] args) {
