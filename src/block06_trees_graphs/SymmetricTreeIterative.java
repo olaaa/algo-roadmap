@@ -16,8 +16,12 @@ import java.util.Deque;
  */
 public class SymmetricTreeIterative {
 
-    /* Пара узлов, которые должны оказаться зеркальными. Любой из них может быть null. */
-    private record MirrorPair(TreeNode left, TreeNode right) {
+    /*
+     * Пара узлов, которые должны оказаться зеркальными: корень поддерева слева
+     * от оси симметрии и корень поддерева справа от неё. Это НЕ два потомка
+     * одного узла — в общем случае у них разные родители. Любой может быть null.
+     */
+    private record MirrorPair(TreeNode leftSubtree, TreeNode rightSubtree) {
     }
 
     /**
@@ -38,22 +42,26 @@ public class SymmetricTreeIterative {
 
         while (!pairsToCompare.isEmpty()) {
             MirrorPair current = pairsToCompare.pop();
-            TreeNode left = current.left();
-            TreeNode right = current.right();
+            TreeNode leftSubtree = current.leftSubtree();
+            TreeNode rightSubtree = current.rightSubtree();
 
-            if (left == null && right == null) {
+            if (leftSubtree == null && rightSubtree == null) {
                 continue;
             }
-            if (left == null || right == null) {
+            if (leftSubtree == null || rightSubtree == null) {
                 return false;
             }
-            if (left.val != right.val) {
+            if (leftSubtree.val != rightSubtree.val) {
                 return false;
             }
 
-            /* Внешняя пара: левое у левого и правое у правого; внутренняя — наоборот. */
-            pairsToCompare.push(new MirrorPair(left.left, right.right));
-            pairsToCompare.push(new MirrorPair(left.right, right.left));
+            /*
+             * Потомки образуют две новые пары по разные стороны оси: внешняя —
+             * левый потомок левого поддерева с правым потомком правого;
+             * внутренняя — правый потомок левого с левым потомком правого.
+             */
+            pairsToCompare.push(new MirrorPair(leftSubtree.left, rightSubtree.right));
+            pairsToCompare.push(new MirrorPair(leftSubtree.right, rightSubtree.left));
         }
         return true;
     }
@@ -70,7 +78,7 @@ public class SymmetricTreeIterative {
         if (isLeaf(root)) {
             return true;
         }
-        if (hasExactlyOneChild(root.left, root.right)) {
+        if (exactlyOneMissing(root.left, root.right)) {
             return false;
         }
         nodesToVisit.push(root.right);
@@ -99,20 +107,21 @@ public class SymmetricTreeIterative {
      * заведомо не зеркальна — узел есть только с одной стороны. Пара из двух
      * null — зеркальна, класть нечего, true.
      */
-    private static boolean pushPairOrFail(Deque<TreeNode> nodesToVisit, TreeNode left, TreeNode right) {
-        if (left == null && right == null) {
+    private static boolean pushPairOrFail(Deque<TreeNode> nodesToVisit,
+                                          TreeNode leftSubtree, TreeNode rightSubtree) {
+        if (leftSubtree == null && rightSubtree == null) {
             return true;
         }
-        if (hasExactlyOneChild(left, right)) {
+        if (exactlyOneMissing(leftSubtree, rightSubtree)) {
             return false;
         }
-        nodesToVisit.push(right);
-        nodesToVisit.push(left);
+        nodesToVisit.push(rightSubtree);
+        nodesToVisit.push(leftSubtree);
         return true;
     }
 
-    private static boolean hasExactlyOneChild(TreeNode leftChild, TreeNode rightChild) {
-        return (leftChild == null) || (rightChild == null);
+    private static boolean exactlyOneMissing(TreeNode leftSubtree, TreeNode rightSubtree) {
+        return (leftSubtree == null) || (rightSubtree == null);
     }
 
     private static boolean isLeaf(TreeNode node) {

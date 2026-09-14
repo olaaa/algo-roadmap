@@ -180,7 +180,7 @@ isSymmetric(1)
 Идея. Рекурсивный `isMirror` каждый раз получает **два узла** из противоположных половин дерева и сравнивает их друг с другом. Значит, единица работы здесь — не узел, а пара узлов, и в явный стек кладутся пары. Стек хранит пары, которые ещё предстоит сравнить. Снятая пара сравнивается; если совпала — в стек кладутся две новые пары из её потомков, ровно те, что рекурсия передавала в два вызова `isMirror`: внешняя (левое у левого, правое у правого) и внутренняя (правое у левого, левое у правого). Стек опустел, ни одна пара не провалилась — дерево симметрично.
 
 ```java
-private record MirrorPair(TreeNode left, TreeNode right) {
+private record MirrorPair(TreeNode leftSubtree, TreeNode rightSubtree) {
 }
 
 public static boolean isSymmetric(TreeNode root) {
@@ -189,21 +189,21 @@ public static boolean isSymmetric(TreeNode root) {
 
     while (!pairsToCompare.isEmpty()) {
         MirrorPair current = pairsToCompare.pop();
-        TreeNode left = current.left();
-        TreeNode right = current.right();
+        TreeNode leftSubtree = current.leftSubtree();
+        TreeNode rightSubtree = current.rightSubtree();
 
-        if (left == null && right == null) {
+        if (leftSubtree == null && rightSubtree == null) {
             continue;
         }
-        if (left == null || right == null) {
+        if (leftSubtree == null || rightSubtree == null) {
             return false;
         }
-        if (left.val != right.val) {
+        if (leftSubtree.val != rightSubtree.val) {
             return false;
         }
 
-        pairsToCompare.push(new MirrorPair(left.left, right.right));
-        pairsToCompare.push(new MirrorPair(left.right, right.left));
+        pairsToCompare.push(new MirrorPair(leftSubtree.left, rightSubtree.right));
+        pairsToCompare.push(new MirrorPair(leftSubtree.right, rightSubtree.left));
     }
     return true;
 }
@@ -215,10 +215,10 @@ public static boolean isSymmetric(TreeNode root) {
 
 | Переменная | Что хранит | Зачем она нужна |
 |---|---|---|
-| `MirrorPair` | запись из двух узлов, которые должны оказаться зеркальными | единица сравнения; в записи любой из узлов может быть `null`, а в `ArrayDeque` напрямую `null` положить нельзя |
+| `MirrorPair` | запись из двух узлов, которые должны оказаться зеркальными: корень поддерева слева от оси и корень поддерева справа | единица сравнения; в записи любой из узлов может быть `null`, а в `ArrayDeque` напрямую `null` положить нельзя |
 | `pairsToCompare` | стек пар, которые ещё предстоит сравнить | замена стека вызовов: у рекурсии там лежали ещё не завершённые вызовы `isMirror`, здесь — ещё не сравнённые пары |
 | `current` | пара, снятая на этой итерации | её узлы сравниваются, её потомки образуют две новые пары |
-| `left`, `right` | узлы снятой пары, по одному с каждой стороны | имена как у параметров `isMirror`; из них собираются внешняя и внутренняя пары |
+| `leftSubtree`, `rightSubtree` | узлы снятой пары: корень поддерева слева от оси и корень поддерева справа. Это не потомки одного узла — в общем случае у них разные родители | имена те же, что у параметров `isMirror`, и по той же причине: `left`/`right` читались бы как два потомка одного родителя, а это другая, неверная проверка; из них собираются внешняя и внутренняя пары |
 
 ### Разбор по шагам
 
@@ -273,7 +273,7 @@ public static boolean isSymmetricNodeStack(TreeNode root) {
     if (isLeaf(root)) {
         return true;
     }
-    if (hasExactlyOneChild(root.left, root.right)) {
+    if (exactlyOneMissing(root.left, root.right)) {
         return false;
     }
     nodesToVisit.push(root.right);
@@ -295,15 +295,16 @@ public static boolean isSymmetricNodeStack(TreeNode root) {
     return true;
 }
 
-private static boolean pushPairOrFail(Deque<TreeNode> nodesToVisit, TreeNode left, TreeNode right) {
-    if (left == null && right == null) {
+private static boolean pushPairOrFail(Deque<TreeNode> nodesToVisit,
+                                      TreeNode leftSubtree, TreeNode rightSubtree) {
+    if (leftSubtree == null && rightSubtree == null) {
         return true;
     }
-    if (hasExactlyOneChild(left, right)) {
+    if (exactlyOneMissing(leftSubtree, rightSubtree)) {
         return false;
     }
-    nodesToVisit.push(right);
-    nodesToVisit.push(left);
+    nodesToVisit.push(rightSubtree);
+    nodesToVisit.push(leftSubtree);
     return true;
 }
 ```
