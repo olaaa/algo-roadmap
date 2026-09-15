@@ -184,11 +184,11 @@ private record MirrorPair(TreeNode leftSubtree, TreeNode rightSubtree) {
 }
 
 public static boolean isSymmetric(TreeNode root) {
-    Deque<MirrorPair> pairsToCompare = new ArrayDeque<>();
-    pairsToCompare.push(new MirrorPair(root.left, root.right));
+    Deque<MirrorPair> nodesToVisit = new ArrayDeque<>();
+    nodesToVisit.push(new MirrorPair(root.left, root.right));
 
-    while (!pairsToCompare.isEmpty()) {
-        MirrorPair current = pairsToCompare.pop();
+    while (!nodesToVisit.isEmpty()) {
+        MirrorPair current = nodesToVisit.pop();
         TreeNode leftSubtree = current.leftSubtree();
         TreeNode rightSubtree = current.rightSubtree();
 
@@ -202,8 +202,8 @@ public static boolean isSymmetric(TreeNode root) {
             return false;
         }
 
-        pairsToCompare.push(new MirrorPair(leftSubtree.left, rightSubtree.right));
-        pairsToCompare.push(new MirrorPair(leftSubtree.right, rightSubtree.left));
+        nodesToVisit.push(new MirrorPair(leftSubtree.left, rightSubtree.right));
+        nodesToVisit.push(new MirrorPair(leftSubtree.right, rightSubtree.left));
     }
     return true;
 }
@@ -216,7 +216,7 @@ public static boolean isSymmetric(TreeNode root) {
 | Переменная | Что хранит | Зачем она нужна |
 |---|---|---|
 | `MirrorPair` | запись из двух узлов, которые должны оказаться зеркальными: корень поддерева слева от оси и корень поддерева справа | единица сравнения; в записи любой из узлов может быть `null`, а в `ArrayDeque` напрямую `null` положить нельзя |
-| `pairsToCompare` | стек пар, которые ещё предстоит сравнить | замена стека вызовов: у рекурсии там лежали ещё не завершённые вызовы `isMirror`, здесь — ещё не сравнённые пары |
+| `nodesToVisit` | стек пар, которые ещё предстоит сравнить | замена стека вызовов: у рекурсии там лежали ещё не завершённые вызовы `isMirror`, здесь — ещё не сравнённые пары |
 | `current` | пара, снятая на этой итерации | её узлы сравниваются, её потомки образуют две новые пары |
 | `leftSubtree`, `rightSubtree` | узлы снятой пары: корень поддерева слева от оси и корень поддерева справа. Это не потомки одного узла — в общем случае у них разные родители | имена те же, что у параметров `isMirror`, и по той же причине: `left`/`right` читались бы как два потомка одного родителя, а это другая, неверная проверка; из них собираются внешняя и внутренняя пары |
 
@@ -285,17 +285,17 @@ public static boolean isSymmetricNodeStack(TreeNode root) {
         if (leftSubtree.val != rightSubtree.val) {
             return false;
         }
-        if (!pushPairOrFail(nodesToVisit, leftSubtree.left, rightSubtree.right)) {
+        if (!pushPairIfBothPresent(nodesToVisit, leftSubtree.left, rightSubtree.right)) {
             return false;
         }
-        if (!pushPairOrFail(nodesToVisit, leftSubtree.right, rightSubtree.left)) {
+        if (!pushPairIfBothPresent(nodesToVisit, leftSubtree.right, rightSubtree.left)) {
             return false;
         }
     }
     return true;
 }
 
-private static boolean pushPairOrFail(Deque<TreeNode> nodesToVisit,
+private static boolean pushPairIfBothPresent(Deque<TreeNode> nodesToVisit,
                                       TreeNode leftSubtree, TreeNode rightSubtree) {
     if (leftSubtree == null && rightSubtree == null) {
         return true;
@@ -309,7 +309,7 @@ private static boolean pushPairOrFail(Deque<TreeNode> nodesToVisit,
 }
 ```
 
-`pushPairOrFail` — те же три исхода, что у снятой пары в первом варианте: оба `null` — пара зеркальна, класть нечего, `true`; ровно один `null` — не зеркальна, `false`; оба есть — кладём, сравнение значений будет при снятии. Пара корня проверяется до цикла отдельно, потому что в стек её тоже надо положить. Вызов один и тот же для внешней и для внутренней пары — два блока подряд, как два вызова в `isMirror`; ни один не должен обрывать итерацию раньше другого.
+`pushPairIfBothPresent` — те же три исхода, что у снятой пары в первом варианте: оба `null` — пара зеркальна, класть нечего, `true`; ровно один `null` — не зеркальна, `false`; оба есть — кладём, сравнение значений будет при снятии. Пара корня проверяется до цикла отдельно, потому что в стек её тоже надо положить. Вызов один и тот же для внешней и для внутренней пары — два блока подряд, как два вызова в `isMirror`; ни один не должен обрывать итерацию раньше другого.
 
 Разбор по шагам на дереве `[1, 2, 2, 3, 4, 4, 5]`:
 

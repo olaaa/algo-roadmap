@@ -37,11 +37,11 @@ public class SymmetricTreeIterative {
      * </pre>
      */
     public static boolean isSymmetric(TreeNode root) {
-        Deque<MirrorPair> pairsToCompare = new ArrayDeque<>();
-        pairsToCompare.push(new MirrorPair(root.left, root.right));
+        Deque<MirrorPair> nodesToVisit = new ArrayDeque<>();
+        nodesToVisit.push(new MirrorPair(root.left, root.right));
 
-        while (!pairsToCompare.isEmpty()) {
-            MirrorPair current = pairsToCompare.pop();
+        while (!nodesToVisit.isEmpty()) {
+            MirrorPair current = nodesToVisit.pop();
             TreeNode leftSubtree = current.leftSubtree();
             TreeNode rightSubtree = current.rightSubtree();
 
@@ -60,8 +60,8 @@ public class SymmetricTreeIterative {
              * левый потомок левого поддерева с правым потомком правого;
              * внутренняя — правый потомок левого с левым потомком правого.
              */
-            pairsToCompare.push(new MirrorPair(leftSubtree.left, rightSubtree.right));
-            pairsToCompare.push(new MirrorPair(leftSubtree.right, rightSubtree.left));
+            nodesToVisit.push(new MirrorPair(leftSubtree.left, rightSubtree.right));
+            nodesToVisit.push(new MirrorPair(leftSubtree.right, rightSubtree.left));
         }
         return true;
     }
@@ -85,19 +85,25 @@ public class SymmetricTreeIterative {
         nodesToVisit.push(root.left); // левый извлечём первым
 
         while (!nodesToVisit.isEmpty()) {
+            /* В варианте с рекурсией у isMirror два параметра, поэтому здесь снимаем со стека два узла. */
             TreeNode leftSubtree = nodesToVisit.pop();
             TreeNode rightSubtree = nodesToVisit.pop();
             if (leftSubtree.val != rightSubtree.val) {
                 return false;
             }
+
             /* Внешняя пара потомков: левое у левого, правое у правого. */
-            if (!pushPairOrFail(nodesToVisit, leftSubtree.left, rightSubtree.right)) {
+            if (!pushPairIfBothPresent(nodesToVisit, leftSubtree.left, rightSubtree.right)) {
                 return false;
             }
             /* Внутренняя пара потомков: правое у левого, левое у правого. */
-            if (!pushPairOrFail(nodesToVisit, leftSubtree.right, rightSubtree.left)) {
+            if (!pushPairIfBothPresent(nodesToVisit, leftSubtree.right, rightSubtree.left)) {
                 return false;
             }
+            /*
+             * В варианте с рекурсией метод isMirror дважды вызывает сам себя,
+             * поэтому здесь тоже кладём в стек две пары.
+             */
         }
         return true;
     }
@@ -107,7 +113,7 @@ public class SymmetricTreeIterative {
      * заведомо не зеркальна — узел есть только с одной стороны. Пара из двух
      * null — зеркальна, класть нечего, true.
      */
-    private static boolean pushPairOrFail(Deque<TreeNode> nodesToVisit,
+    private static boolean pushPairIfBothPresent(Deque<TreeNode> nodesToVisit,
                                           TreeNode leftSubtree, TreeNode rightSubtree) {
         if (leftSubtree == null && rightSubtree == null) {
             return true;
