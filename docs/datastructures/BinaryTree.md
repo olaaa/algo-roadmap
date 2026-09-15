@@ -365,6 +365,6 @@ n, второе 1; у полного дерева наоборот, log n про
 - [`Queue.md`](Queue.md) — очередь, на которой держится обход в ширину
 - [`Stack.md`](Stack.md) — стек, рекурсия и явный стек
 - [`TreeNotation.md`](../problems/block06_trees_graphs/TreeNotation.md) — как дерево записано в условии задачи
-- [`Pattern_GraphTraversal.md`](../problems/block06_trees_graphs/Pattern_GraphTraversal.md) — обходы на графах:
-  `traversalOrder`, кратчайший путь (черновик)
+- [`Pattern_GraphTraversal.md`](../problems/block06_trees_graphs/Pattern_GraphTraversal.md) — обзор блока 6: какой обход
+  для какой задачи
 - [`glossary.md`](../glossary.md) — поддерево; прямой, симметричный и обратный порядок обхода

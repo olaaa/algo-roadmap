@@ -104,7 +104,7 @@ poll-поток  -> 1 2 3 4 5             // а вот это уже по воз
 
 ## Где очередь нужна в алгоритмах
 
-Главное применение в задачах на собеседовании — **обход в ширину (breadth-first search, BFS)**. Очередь хранит фронт волны: снимаем вершину с головы, кладём её непосещённых соседей в хвост. Именно FIFO гарантирует, что вершины обрабатываются по слоям и первый найденный путь оказывается кратчайшим по числу рёбер — на стеке это свойство теряется. Код и разбор — в [`Pattern_GraphTraversal.md`](../problems/block06_trees_graphs/Pattern_GraphTraversal.md).
+Главное применение в задачах на собеседовании — **обход в ширину (breadth-first search, BFS)**. Очередь хранит фронт волны: снимаем вершину с головы, кладём её непосещённых соседей в хвост. Именно FIFO гарантирует, что вершины обрабатываются по слоям и первый найденный путь оказывается кратчайшим по числу рёбер — на стеке это свойство теряется. На дереве это обход по уровням: код и разбор — в [`LevelOrderTraversal.md`](../problems/block06_trees_graphs/LevelOrderTraversal.md), та же очередь собирает дерево из записи в условии — [`TreeNotation.md`](../problems/block06_trees_graphs/TreeNotation.md); обзор обходов блока — [`Pattern_GraphTraversal.md`](../problems/block06_trees_graphs/Pattern_GraphTraversal.md).
 
 Второе применение — скользящее окно и обработка потока задач, где важен порядок поступления.
 
@@ -128,6 +128,6 @@ poll-поток  -> 1 2 3 4 5             // а вот это уже по воз
 ## См. также
 
 - [`Deque.md`](Deque.md) — двусторонняя очередь, `ArrayDeque` изнутри, сравнение с `Queue`
-- [`Pattern_GraphTraversal.md`](../problems/block06_trees_graphs/Pattern_GraphTraversal.md) — обходы графа DFS и BFS: код, кратчайший путь, `visited`
+- [`Pattern_GraphTraversal.md`](../problems/block06_trees_graphs/Pattern_GraphTraversal.md) — обзор обходов дерева: когда очередь, когда стек
 - Задача с использованием стека: [`docs/problems/block02_strings_stack/ValidParentheses.md`](../problems/block02_strings_stack/ValidParentheses.md)
 - Официальная документация: <https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/Queue.html>

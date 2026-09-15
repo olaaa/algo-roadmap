@@ -265,5 +265,5 @@ public class TreeNode {
 ## См. также
 
 - [`MaxDepthBinaryTree.md`](MaxDepthBinaryTree.md) — первая задача блока, где эта запись встречается
-- [`Pattern_GraphTraversal.md`](Pattern_GraphTraversal.md) — обзор обходов в глубину и в ширину (черновик, будет переписан)
+- [`Pattern_GraphTraversal.md`](Pattern_GraphTraversal.md) — обзор блока: обходы в глубину и в ширину, какой когда
 - [`docs/datastructures/Queue.md`](../../datastructures/Queue.md) — очередь, на которой держится и разбор записи, и сам обход в ширину

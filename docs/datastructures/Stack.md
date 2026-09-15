@@ -139,7 +139,7 @@ ArrayDeque       toString = [3, 2, 1]     (peek = 3)
 
 Зачем переписывать: рекурсия падает с `StackOverflowError` на глубоких структурах (длинный список, вырожденное дерево), а размер явного стека ограничен только кучей.
 
-Классический пример такой переписки — обход графа в глубину. Там же видно, что стек задаёт не только способ учёта, но и саму стратегию обхода: замени его на очередь — и обход в глубину станет обходом в ширину. Код с обеими версиями, разбор порядка соседей и того, почему `visited` проверяется при снятии, — в [`Pattern_GraphTraversal.md`](../problems/block06_trees_graphs/Pattern_GraphTraversal.md).
+Классический пример такой переписки — обход дерева в глубину. Там же видно, что стек задаёт не только способ учёта, но и саму стратегию обхода: замени его на очередь — и обход в глубину станет обходом в ширину. Обе версии с кодом и трассировками — в разделах «Дополнение» разборов [`MaxDepthBinaryTree.md`](../problems/block06_trees_graphs/MaxDepthBinaryTree.md) и [`SymmetricTree.md`](../problems/block06_trees_graphs/SymmetricTree.md); обзор обходов блока — [`Pattern_GraphTraversal.md`](../problems/block06_trees_graphs/Pattern_GraphTraversal.md). Здесь стек играет другую роль, чем в блоке 2: там он хранил незакрытые скобки и сам был ответом, здесь он хранит узлы, куда ещё предстоит зайти.
 
 ## Монотонный стек
 
@@ -220,6 +220,6 @@ static int[] nextGreater(int[] nums) {
 
 - [`Deque.md`](Deque.md) — интерфейс, через который стек реализуется, и устройство `ArrayDeque`
 - [`Queue.md`](Queue.md) — противоположная дисциплина, FIFO
-- [`Pattern_GraphTraversal.md`](../problems/block06_trees_graphs/Pattern_GraphTraversal.md) — обходы графа DFS и BFS: код, порядок соседей, `visited`
+- [`Pattern_GraphTraversal.md`](../problems/block06_trees_graphs/Pattern_GraphTraversal.md) — обзор обходов дерева: в глубину и в ширину, две роли стека
 - Задача на стеке: [`ValidParentheses.md`](../problems/block02_strings_stack/ValidParentheses.md)
 - Официальная документация `Deque`: <https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/Deque.html>
