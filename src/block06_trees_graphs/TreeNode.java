@@ -55,7 +55,7 @@ public class TreeNode {
         nodesToVisit.add(root);
 
         int position = 1;
-        while (position < values.length) {
+        while (position < values.length) { // ⚠️ цикл по массиву, а не очереди
             TreeNode parent = nodesToVisit.remove();
 
             /*
