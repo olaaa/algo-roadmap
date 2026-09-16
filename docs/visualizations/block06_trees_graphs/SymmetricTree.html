@@ -243,15 +243,15 @@ function parseTree(text){
   if(!values.length || values[0] === null){ return null; }
   const make = value => { const node = {id:nodes.length, value, left:null, right:null}; nodes.push(node); return node; };
   const treeRoot = make(values[0]);
-  const parents = [treeRoot];
+  const nodesToVisit = [treeRoot];
   let position = 1, head = 0;
-  while(position < values.length && head < parents.length){
-    const parent = parents[head]; head++;
+  while(position < values.length && head < nodesToVisit.length){
+    const parent = nodesToVisit[head]; head++;
     const leftValue = values[position]; position++;
-    if(leftValue !== null){ parent.left = make(leftValue); parents.push(parent.left); }
+    if(leftValue !== null){ parent.left = make(leftValue); nodesToVisit.push(parent.left); }
     if(position < values.length){
       const rightValue = values[position]; position++;
-      if(rightValue !== null){ parent.right = make(rightValue); parents.push(parent.right); }
+      if(rightValue !== null){ parent.right = make(rightValue); nodesToVisit.push(parent.right); }
     }
   }
   return treeRoot;

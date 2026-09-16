@@ -43,7 +43,7 @@ public class TreeNode {
      * <p>
      * Запись, в которой значения остались, а раздавать их уже некому
      * (например {@code [1, null, null, 5]}), считается ошибкой:
-     * {@code parents.remove()} бросит {@link NoSuchElementException}.
+     * {@code nodesToVisit.remove()} бросит {@link NoSuchElementException}.
      */
     public static TreeNode fromLevelOrder(Integer... values) {
         if (values.length == 0 || values[0] == null) {
@@ -51,12 +51,12 @@ public class TreeNode {
         }
 
         TreeNode root = new TreeNode(values[0]);
-        Queue<TreeNode> parents = new ArrayDeque<>();
-        parents.add(root);
+        Queue<TreeNode> nodesToVisit = new ArrayDeque<>();
+        nodesToVisit.add(root);
 
         int position = 1;
         while (position < values.length) {
-            TreeNode parent = parents.remove();
+            TreeNode parent = nodesToVisit.remove();
 
             /*
              * Ячейка под левого потомка есть всегда — это гарантирует условие
@@ -66,7 +66,7 @@ public class TreeNode {
             position++;
             if (leftValue != null) {
                 parent.left = new TreeNode(leftValue);
-                parents.add(parent.left);
+                nodesToVisit.add(parent.left);
             }
 
             /* А ячейки под правого может не быть вовсе: массив мог кончиться на левом. */
@@ -75,7 +75,7 @@ public class TreeNode {
                 position++;
                 if (rightValue != null) {
                     parent.right = new TreeNode(rightValue);
-                    parents.add(parent.right);
+                    nodesToVisit.add(parent.right);
                 }
             }
         }
@@ -94,18 +94,18 @@ public class TreeNode {
         }
 
         values.add(root.val);
-        Queue<TreeNode> parents = new ArrayDeque<>();
-        parents.add(root);
+        Queue<TreeNode> nodesToVisit = new ArrayDeque<>();
+        nodesToVisit.add(root);
 
         /* У каждого непустого узла записываются оба потомка — значение или null. */
-        while (!parents.isEmpty()) {
-            TreeNode parent = parents.remove();
+        while (!nodesToVisit.isEmpty()) {
+            TreeNode parent = nodesToVisit.remove();
             for (TreeNode child : new TreeNode[]{parent.left, parent.right}) {
                 if (child == null) {
                     values.add(null);
                 } else {
                     values.add(child.val);
-                    parents.add(child);
+                    nodesToVisit.add(child);
                 }
             }
         }

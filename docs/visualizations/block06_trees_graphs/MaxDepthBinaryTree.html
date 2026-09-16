@@ -228,19 +228,19 @@ function parseTree(text){
 
   const make = value => { const node = {id:nodes.length, value, left:null, right:null}; nodes.push(node); return node; };
   const treeRoot = make(values[0]);
-  const parents = [treeRoot];
+  const nodesToVisit = [treeRoot];
   let position = 1;
   let head = 0;
-  while(position < values.length && head < parents.length){
-    const parent = parents[head]; head++;
+  while(position < values.length && head < nodesToVisit.length){
+    const parent = nodesToVisit[head]; head++;
     // Ячейка под левое значение есть всегда, её гарантирует условие цикла;
     // в самой ячейке может лежать null, тогда потомка нет
     const leftValue = values[position]; position++;
-    if(leftValue !== null){ parent.left = make(leftValue); parents.push(parent.left); }
+    if(leftValue !== null){ parent.left = make(leftValue); nodesToVisit.push(parent.left); }
     // А ячейки под правое значение может не быть вовсе: массив мог кончиться на левом
     if(position < values.length){
       const rightValue = values[position]; position++;
-      if(rightValue !== null){ parent.right = make(rightValue); parents.push(parent.right); }
+      if(rightValue !== null){ parent.right = make(rightValue); nodesToVisit.push(parent.right); }
     }
   }
   return treeRoot;
