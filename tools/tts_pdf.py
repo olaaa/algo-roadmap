@@ -448,7 +448,9 @@ def verify(pdf_path: Path) -> None:
 def build(sources: list[Path], output: Path) -> None:
     body = '\n<hr class="sep">\n'.join(md_to_html(path) for path in sources)
     # Ссылки на локальные .md в PDF никуда не ведут — оставляем текст.
-    body = re.sub(r'<a href="(?!https?:)[^"]*">(.*?)</a>', r'\1', body, flags=re.S)
+    # pandoc переносит строку где придётся, в том числе между `<a` и `href`,
+    # поэтому пробел здесь \s, а не литерал: иначе часть ссылок оставалась живой.
+    body = re.sub(r'<a\s[^>]*?href="(?!https?:)[^"]*"[^>]*>(.*?)</a>', r'\1', body, flags=re.S)
 
     soup = BeautifulSoup(body, 'html.parser')
     in_code = normalize_minus_in_code(soup)
