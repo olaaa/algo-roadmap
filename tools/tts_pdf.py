@@ -37,6 +37,15 @@ ENDINGS = '.!?:…»'
 BLOCKS = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'li', 'td', 'th', 'dt', 'dd']
 NBSP = ' '
 TYPOGRAPHIC_MINUS = '−'
+# Высота страницы за вычетом полей (297 - 16 - 18 мм) делённая на строку кода
+# (10.5 pt при интервале 1.45), с запасом на рамку и отступы блока.
+LINES_PER_PAGE = 45
+
+# Ячейка таблицы из одного тире («нечего показать») синтезом не произносится
+# вовсе — слушателю кажется, что колонку пропустили. Рядом идёт слово.
+DASH_CELL_WORD = 'нет'
+DASHES = '\u2014\u2013\u2212-'
+
 MAPPING_ARROW_WORD = 'соответствует'
 PATH_ARROW_WORD = 'затем'
 LOGIC_ARROW_WORD = 'значит'
@@ -61,10 +70,17 @@ ul, ol { margin:9px 0; padding-left:24px }
 li { margin:5px 0 }
 code { font-family:"DejaVu Sans Mono",monospace; font-size:11pt; background:#eef1f6;
        padding:1px 4px; border-radius:3px; color:#1f3355 }
+/* Размер и интервал задаются НА САМОМ pre, а не только на вложенном code:
+   строку в блоке распирает строчный «упор» родителя, и при 13 pt от body
+   блок кода занимал в полтора раза больше места, чем показывал глазом. */
 pre { background:#f6f8fb; border:1px solid #dde2ec; border-left:3px solid #4f8cff;
       border-radius:4px; padding:11px 14px; margin:11px 0; page-break-inside:avoid;
+      font-size:10.5pt; line-height:1.45;
       /* Длинная строка кода переносится, а не уезжает за край страницы. */
       white-space:pre-wrap; overflow-wrap:break-word }
+/* Блок, который не помещается на страницу целиком, разрывать МОЖНО: иначе он
+   уезжает на следующую страницу, а на прежней остаётся один заголовок. */
+pre.tall { page-break-inside:auto }
 pre code { background:none; padding:0; font-size:10.5pt; line-height:1.45; color:#1b2430;
            white-space:pre-wrap; overflow-wrap:break-word }
 table { border-collapse:collapse; width:100%; margin:12px 0; font-size:11.5pt;
@@ -244,6 +260,19 @@ def glue_inline_code(soup) -> int:
     return fixed
 
 
+def mark_tall_blocks(soup) -> int:
+    """Блок кода выше страницы нельзя запрещать разрывать: WeasyPrint отодвинет
+    его на следующую страницу, там он всё равно не влезет и разорвётся, а на
+    прежней странице останется висеть один заголовок. Такому блоку разрыв
+    разрешаем. Порог — сколько строк помещается на пустой странице."""
+    marked = 0
+    for pre in soup.find_all('pre'):
+        if len(pre.get_text().split('\n')) > LINES_PER_PAGE:
+            pre['class'] = pre.get('class', []) + ['tall']
+            marked += 1
+    return marked
+
+
 def stops_in_text_blocks(soup) -> int:
     """Блоки без указания языка — это текст: примеры ввода-вывода и ASCII-схемы.
     Синтез читает их сплошняком, поэтому точка идёт в конец каждой строки."""
@@ -264,6 +293,24 @@ def stops_in_text_blocks(soup) -> int:
                 added += 1
             if number != len(lines) - 1:
                 code.append(NavigableString('\n'))
+    return added
+
+
+def voice_dash_cells(soup) -> int:
+    """Ячейка или пункт списка, где стоит одно тире, читается синтезом как
+    пустое место: тире не произносится, и слушателю кажется, что колонку
+    пропустили. Ставим рядом слово. Тире внутри фразы не трогаем — там оно
+    работает как знак препинания и слово только мешало бы."""
+    added = 0
+    for tag in soup.find_all(['td', 'th', 'li']):
+        text = tag.get_text().strip()
+        if not text or any(ch not in DASHES for ch in text):
+            continue
+        hint = soup.new_tag('span')
+        hint['class'] = 'tts'
+        hint.string = ' ' + DASH_CELL_WORD
+        tag.append(hint)
+        added += 1
     return added
 
 
@@ -409,7 +456,9 @@ def build(sources: list[Path], output: Path) -> None:
     powers = voice_powers(soup)
     minuses, arrows, approx = voice_symbols(soup)
     glued = glue_inline_code(soup)
+    tall = mark_tall_blocks(soup)
     block_dots = stops_in_text_blocks(soup)
+    dashes = voice_dash_cells(soup)
     dots = add_stops(soup)
 
     html = ('<!DOCTYPE html><html lang="ru"><head><meta charset="utf-8">'
@@ -425,6 +474,8 @@ def build(sources: list[Path], output: Path) -> None:
     print(f'степеней поднято  : {raised} (знак ^ убран)')
     print(f'степеней озвучено : {powers} (с буквой в показателе)')
     print(f'пробелов склеено  : {glued}')
+    print(f'блоков с разрывом : {tall} (выше страницы, разрыв разрешён)')
+    print(f'тире озвучено     : {dashes} (ячейки из одного тире)')
     print(f'точек в блоках    : {block_dots}')
     print(f'точек в прозе     : {dots}')
     verify(output)
