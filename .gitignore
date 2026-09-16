@@ -9,3 +9,6 @@ target/
 .idea/
 *.iml
 __pycache__/
+
+# Копии файлов, отправленных в чат: их кладёт сюда десктопное приложение Claude
+Claude outputs/
