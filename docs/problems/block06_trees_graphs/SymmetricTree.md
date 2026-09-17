@@ -273,11 +273,11 @@ public static boolean isSymmetricNodeStack(TreeNode root) {
     if (isLeaf(root)) {
         return true;
     }
-    if (exactlyOneMissing(root.left, root.right)) {
+    if (anySubtreeMissing(root.left, root.right)) {
         return false;
     }
     nodesToVisit.push(root.right);
-    nodesToVisit.push(root.left);
+    nodesToVisit.push(root.left); // левый извлечём первым
 
     while (!nodesToVisit.isEmpty()) {
         TreeNode leftSubtree = nodesToVisit.pop();
@@ -285,31 +285,50 @@ public static boolean isSymmetricNodeStack(TreeNode root) {
         if (leftSubtree.val != rightSubtree.val) {
             return false;
         }
-        if (!pushPairIfBothPresent(nodesToVisit, leftSubtree.left, rightSubtree.right)) {
-            return false;
-        }
-        if (!pushPairIfBothPresent(nodesToVisit, leftSubtree.right, rightSubtree.left)) {
-            return false;
+
+        MirrorPair[] mirrorPairs = new MirrorPair[]{
+                // Внешняя пара потомков: левое у левого, правое у правого.
+                MirrorPair.of(leftSubtree.left, rightSubtree.right),
+                // Внутренняя пара потомков: правое у левого, левое у правого.
+                MirrorPair.of(leftSubtree.right, rightSubtree.left)};
+
+        for (MirrorPair mirrorPair : mirrorPairs) {
+            TreeNode currLeftSubtree = mirrorPair.leftSubtree();
+            TreeNode currRightSubtree = mirrorPair.rightSubtree();
+            if (currLeftSubtree == null && currRightSubtree == null) {
+                continue; // класть в очередь нечего
+            }
+            if (anySubtreeMissing(currLeftSubtree, currRightSubtree)) {
+                return false;
+            } else {
+                nodesToVisit.push(currRightSubtree);
+                nodesToVisit.push(currLeftSubtree);
+            }
         }
     }
     return true;
 }
 
-private static boolean pushPairIfBothPresent(Deque<TreeNode> nodesToVisit,
-                                      TreeNode leftSubtree, TreeNode rightSubtree) {
-    if (leftSubtree == null && rightSubtree == null) {
-        return true;
-    }
-    if (exactlyOneMissing(leftSubtree, rightSubtree)) {
-        return false;
-    }
-    nodesToVisit.push(rightSubtree);
-    nodesToVisit.push(leftSubtree);
-    return true;
+private static boolean anySubtreeMissing(TreeNode leftSubtree, TreeNode rightSubtree) {
+    return (leftSubtree == null) || (rightSubtree == null);
 }
 ```
 
-`pushPairIfBothPresent` — те же три исхода, что у снятой пары в первом варианте: оба `null` — пара зеркальна, класть нечего, `true`; ровно один `null` — не зеркальна, `false`; оба есть — кладём, сравнение значений будет при снятии. Пара корня проверяется до цикла отдельно, потому что в стек её тоже надо положить. Вызов один и тот же для внешней и для внутренней пары — два блока подряд, как два вызова в `isMirror`; ни один не должен обрывать итерацию раньше другого.
+Проверка у внешней и у внутренней пары одна и та же, поэтому тело написано ОДИН раз, а различаются пары только тем, что лежит в массиве `mirrorPairs`. Массив из двух записей создаётся ровно затем, чтобы не писать одно и то же дважды, и живёт одну итерацию цикла. Тот же приём применён в `TreeNode.toLevelOrder`, где так же перебираются два поля узла; разобран в [`TreeNotation.md`](TreeNotation.md).
+
+Исходов у пары потомков три — те же, что у снятой пары в первом варианте: оба `null` — пара зеркальна, класть нечего, переходим к следующей паре; ровно один `null` — не зеркальна, `false`; оба есть — кладём, сравнение значений будет при снятии. Метод `anySubtreeMissing` при этом говорит «хотя бы одного поддерева нет», то есть шире, чем «ровно один»: случай «оба `null`» до него не доходит, его забирает `continue` строкой выше. Пара корня проверяется до цикла отдельно, потому что в стек её тоже надо положить.
+
+Цикл проходит ОБЕ пары, как `isMirror` дважды вызывает сам себя. Оборвать его раньше времени может только `return false` — то есть уже найденный ответ.
+
+#### Что делает каждая переменная
+
+| Переменная | Что хранит | Зачем она нужна |
+|---|---|---|
+| `nodesToVisit` | стек узлов; пара — два соседних элемента, левый лежит выше правого | хранит пары, которые предстоит сравнить; `null` в него не попадает, поэтому проверки переехали на момент укладки |
+| `leftSubtree`, `rightSubtree` | снятая со стека пара: корни поддеревьев по разные стороны оси | у них сравниваются значения, от них берутся потомки для следующих пар |
+| `mirrorPairs` | массив из двух пар потомков — внешней и внутренней | чтобы тело проверки было написано один раз; живёт одну итерацию цикла |
+| `mirrorPair` | очередная пара из этого массива | переменная цикла: сначала внешняя пара, потом внутренняя |
+| `currLeftSubtree`, `currRightSubtree` | два узла текущей пары потомков | по ним решается, что делать с парой: пропустить, вернуть `false` или положить в стек |
 
 Разбор по шагам на дереве `[1, 2, 2, 3, 4, 4, 5]`:
 

@@ -81,7 +81,7 @@ public class SymmetricTreeIterative {
         if (isLeaf(root)) {
             return true;
         }
-        if (exactlyOneMissing(root.left, root.right)) {
+        if (anySubtreeMissing(root.left, root.right)) {
             return false;
         }
         nodesToVisit.push(root.right);
@@ -100,20 +100,19 @@ public class SymmetricTreeIterative {
                     MirrorPair.of(leftSubtree.left, rightSubtree.right),
                     // Внутренняя пара потомков: правое у левого, левое у правого.
                     MirrorPair.of(leftSubtree.right, rightSubtree.left)};
-
+            /*
+             * В варианте с рекурсией метод isMirror() дважды вызывает сам себя,
+             * поэтому здесь тоже кладём в стек две пары.
+             */
             for (MirrorPair mirrorPair : mirrorPairs) {
                 TreeNode currLeftSubtree = mirrorPair.leftSubtree();
                 TreeNode currRightSubtree = mirrorPair.rightSubtree();
                 if (currLeftSubtree == null && currRightSubtree == null) {
                     continue; // класть в очередь нечего
                 }
-                if (exactlyOneMissing(currLeftSubtree, currRightSubtree)) {
+                if (anySubtreeMissing(currLeftSubtree, currRightSubtree)) {
                     return false;
                 } else {
-                    /*
-                     * В варианте с рекурсией метод isMirror дважды вызывает сам себя,
-                     * поэтому здесь тоже кладём в стек две пары.
-                     */
                     nodesToVisit.push(currRightSubtree);
                     nodesToVisit.push(currLeftSubtree);
                 }
@@ -128,7 +127,7 @@ public class SymmetricTreeIterative {
      * null — зеркальна, класть нечего, true.
      */
 
-    private static boolean exactlyOneMissing(TreeNode leftSubtree, TreeNode rightSubtree) {
+    private static boolean anySubtreeMissing(TreeNode leftSubtree, TreeNode rightSubtree) {
         return (leftSubtree == null) || (rightSubtree == null);
     }
 
