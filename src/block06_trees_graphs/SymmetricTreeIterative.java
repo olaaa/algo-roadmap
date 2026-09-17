@@ -22,6 +22,9 @@ public class SymmetricTreeIterative {
      * одного узла — в общем случае у них разные родители. Любой может быть null.
      */
     private record MirrorPair(TreeNode leftSubtree, TreeNode rightSubtree) {
+        public static MirrorPair of(TreeNode leftSubtree, TreeNode rightSubtree) {
+            return new MirrorPair(leftSubtree, rightSubtree);
+        }
     }
 
     /**
@@ -92,18 +95,29 @@ public class SymmetricTreeIterative {
                 return false;
             }
 
-            /* Внешняя пара потомков: левое у левого, правое у правого. */
-            if (!pushPairIfBothPresent(nodesToVisit, leftSubtree.left, rightSubtree.right)) {
-                return false;
+            MirrorPair[] mirrorPairs = new MirrorPair[]{
+                    // Внешняя пара потомков: левое у левого, правое у правого.
+                    MirrorPair.of(leftSubtree.left, rightSubtree.right),
+                    // Внутренняя пара потомков: правое у левого, левое у правого.
+                    MirrorPair.of(leftSubtree.right, rightSubtree.left)};
+
+            for (MirrorPair mirrorPair : mirrorPairs) {
+                TreeNode currLeftSubtree = mirrorPair.leftSubtree();
+                TreeNode currRightSubtree = mirrorPair.rightSubtree();
+                if (currLeftSubtree == null && currRightSubtree == null) {
+                    continue; // класть в очередь нечего
+                }
+                if (exactlyOneMissing(currLeftSubtree, currRightSubtree)) {
+                    return false;
+                } else {
+                    /*
+                     * В варианте с рекурсией метод isMirror дважды вызывает сам себя,
+                     * поэтому здесь тоже кладём в стек две пары.
+                     */
+                    nodesToVisit.push(currRightSubtree);
+                    nodesToVisit.push(currLeftSubtree);
+                }
             }
-            /* Внутренняя пара потомков: правое у левого, левое у правого. */
-            if (!pushPairIfBothPresent(nodesToVisit, leftSubtree.right, rightSubtree.left)) {
-                return false;
-            }
-            /*
-             * В варианте с рекурсией метод isMirror дважды вызывает сам себя,
-             * поэтому здесь тоже кладём в стек две пары.
-             */
         }
         return true;
     }
@@ -113,18 +127,6 @@ public class SymmetricTreeIterative {
      * заведомо не зеркальна — узел есть только с одной стороны. Пара из двух
      * null — зеркальна, класть нечего, true.
      */
-    private static boolean pushPairIfBothPresent(Deque<TreeNode> nodesToVisit,
-                                          TreeNode leftSubtree, TreeNode rightSubtree) {
-        if (leftSubtree == null && rightSubtree == null) {
-            return true;
-        }
-        if (exactlyOneMissing(leftSubtree, rightSubtree)) {
-            return false;
-        }
-        nodesToVisit.push(rightSubtree);
-        nodesToVisit.push(leftSubtree);
-        return true;
-    }
 
     private static boolean exactlyOneMissing(TreeNode leftSubtree, TreeNode rightSubtree) {
         return (leftSubtree == null) || (rightSubtree == null);
