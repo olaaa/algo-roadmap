@@ -124,7 +124,10 @@
       Возможные задачи сверх плана: 700, 98, 108, 230 — если Lela захочет.
 - [ ] TreeMap / TreeSet — красно-чёрное дерево, навигационные методы
       (опирается на BinarySearchTree.md)
-- [ ] PriorityQueue отдельным файлом (куча, siftUp/siftDown) — если понадобится глубже
+- [x] PriorityQueue — куча в массиве, подъём и спуск с тремя SVG, стоимость
+      операций, устройство в JDK 25 по src.zip, где куча живёт в самой Java
+      (Timer, ScheduledThreadPoolExecutor, DelayQueue, PriorityBlockingQueue)
+      и в банковском бэкенде; demo/PriorityQueueDemo 14/14 PASS (18.09)
 
 ## Разобрать позже — вопросы Lela по ходу чтения
 - [ ] БИНАРНЫЙ ПОИСК ПО ДИАПАЗОНУ ЗНАЧЕНИЙ («поиск по ответу»). В

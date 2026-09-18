@@ -571,10 +571,12 @@ WeasyPrint и BeautifulSoup, на Windows их нет. Шрифты DejaVu, ки
 
 ### Куда класть готовый PDF
 Готовый PDF кладётся В ДВА МЕСТА, обе копии обновляются одной сборкой:
-- `docs/pdf/blockNN_<тема>/<Имя>.pdf` в репозитории — зеркалит `docs/problems`
-  и `docs/visualizations`, имя файла совпадает с именем главного `.md`
-  (`docs/pdf/block06_trees_graphs/TreeNotation.pdf`). Отсюда PDF виден
-  на GitHub и открывается с любого устройства;
+- `docs/pdf/<та же папка, что у исходного .md>/<Имя>.pdf` в репозитории:
+  разбор задачи — `docs/pdf/blockNN_<тема>/`, справочник по структуре данных —
+  `docs/pdf/datastructures/`. Имя файла совпадает с именем главного `.md`
+  (`docs/pdf/block06_trees_graphs/TreeNotation.pdf`,
+  `docs/pdf/datastructures/PriorityQueue.pdf`). Отсюда PDF виден на GitHub
+  и открывается с любого устройства;
 - `C:\Users\Ola\Downloads\PDF4 natural reader\<Имя>.pdf` — рабочая копия,
   по привычному пути её открывает Natural Reader.
 

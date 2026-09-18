@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 512" width="760" height="512" font-family="system-ui, -apple-system, Segoe UI, sans-serif">
+  <rect width="760" height="512" fill="#fbfcfe"/>
+  <text x="380" y="32" text-anchor="middle" font-size="17" font-weight="600" fill="#1c2333">Куча: дерево сверху, массив снизу</text>
+  <text x="380" y="54" text-anchor="middle" font-size="13" fill="#6b7280">PriorityQueue после offer 5, 3, 8, 1, 9, 2</text>
+  <line x1="380" y1="132" x2="250" y2="192" stroke="#9aa3b5" stroke-width="2.5" stroke-linecap="round"/>
+  <line x1="380" y1="132" x2="510" y2="192" stroke="#9aa3b5" stroke-width="2.5" stroke-linecap="round"/>
+  <line x1="250" y1="232" x2="160" y2="292" stroke="#9aa3b5" stroke-width="2.5" stroke-linecap="round"/>
+  <line x1="250" y1="232" x2="340" y2="292" stroke="#9aa3b5" stroke-width="2.5" stroke-linecap="round"/>
+  <line x1="510" y1="232" x2="430" y2="292" stroke="#9aa3b5" stroke-width="2.5" stroke-linecap="round"/>
+  <circle cx="380" cy="112" r="26" fill="#e8f0ff" stroke="#4f8cff" stroke-width="2"/>
+  <text x="380" y="118" text-anchor="middle" font-size="18" font-family="Consolas, monospace" fill="#1c2333">1</text>
+  <text x="380" y="78" text-anchor="middle" font-size="12" fill="#6b7280">индекс 0</text>
+  <circle cx="250" cy="212" r="26" fill="#e8f0ff" stroke="#4f8cff" stroke-width="2"/>
+  <text x="250" y="218" text-anchor="middle" font-size="18" font-family="Consolas, monospace" fill="#1c2333">3</text>
+  <text x="250" y="178" text-anchor="middle" font-size="12" fill="#6b7280">индекс 1</text>
+  <circle cx="510" cy="212" r="26" fill="#fff7e6" stroke="#d97706" stroke-width="2"/>
+  <text x="510" y="218" text-anchor="middle" font-size="18" font-family="Consolas, monospace" fill="#1c2333">2</text>
+  <text x="510" y="178" text-anchor="middle" font-size="12" fill="#b45309" font-weight="600">индекс 2</text>
+  <circle cx="160" cy="312" r="26" fill="#e8f0ff" stroke="#4f8cff" stroke-width="2"/>
+  <text x="160" y="318" text-anchor="middle" font-size="18" font-family="Consolas, monospace" fill="#1c2333">5</text>
+  <text x="160" y="358" text-anchor="middle" font-size="12" fill="#6b7280">индекс 3</text>
+  <circle cx="340" cy="312" r="26" fill="#e8f0ff" stroke="#4f8cff" stroke-width="2"/>
+  <text x="340" y="318" text-anchor="middle" font-size="18" font-family="Consolas, monospace" fill="#1c2333">9</text>
+  <text x="340" y="358" text-anchor="middle" font-size="12" fill="#6b7280">индекс 4</text>
+  <circle cx="430" cy="312" r="26" fill="#fff7e6" stroke="#d97706" stroke-width="2"/>
+  <text x="430" y="318" text-anchor="middle" font-size="18" font-family="Consolas, monospace" fill="#1c2333">8</text>
+  <text x="430" y="358" text-anchor="middle" font-size="12" fill="#b45309" font-weight="600">индекс 5</text>
+  <text x="380" y="382" text-anchor="middle" font-size="13" fill="#34a97a" font-weight="600">каждый родитель не больше своих потомков</text>
+  <rect x="188" y="404" width="64" height="44" fill="#eef2f9" stroke="#9aa3b5" stroke-width="1.5"/>
+  <text x="220" y="432" text-anchor="middle" font-size="17" font-family="Consolas, monospace" fill="#1c2333">1</text>
+  <text x="220" y="466" text-anchor="middle" font-size="12" fill="#6b7280">0</text>
+  <rect x="252" y="404" width="64" height="44" fill="#eef2f9" stroke="#9aa3b5" stroke-width="1.5"/>
+  <text x="284" y="432" text-anchor="middle" font-size="17" font-family="Consolas, monospace" fill="#1c2333">3</text>
+  <text x="284" y="466" text-anchor="middle" font-size="12" fill="#6b7280">1</text>
+  <rect x="316" y="404" width="64" height="44" fill="#fff7e6" stroke="#d97706" stroke-width="1.5"/>
+  <text x="348" y="432" text-anchor="middle" font-size="17" font-family="Consolas, monospace" fill="#1c2333">2</text>
+  <text x="348" y="466" text-anchor="middle" font-size="12" fill="#b45309" font-weight="600">2</text>
+  <rect x="380" y="404" width="64" height="44" fill="#eef2f9" stroke="#9aa3b5" stroke-width="1.5"/>
+  <text x="412" y="432" text-anchor="middle" font-size="17" font-family="Consolas, monospace" fill="#1c2333">5</text>
+  <text x="412" y="466" text-anchor="middle" font-size="12" fill="#6b7280">3</text>
+  <rect x="444" y="404" width="64" height="44" fill="#eef2f9" stroke="#9aa3b5" stroke-width="1.5"/>
+  <text x="476" y="432" text-anchor="middle" font-size="17" font-family="Consolas, monospace" fill="#1c2333">9</text>
+  <text x="476" y="466" text-anchor="middle" font-size="12" fill="#6b7280">4</text>
+  <rect x="508" y="404" width="64" height="44" fill="#fff7e6" stroke="#d97706" stroke-width="1.5"/>
+  <text x="540" y="432" text-anchor="middle" font-size="17" font-family="Consolas, monospace" fill="#1c2333">8</text>
+  <text x="540" y="466" text-anchor="middle" font-size="12" fill="#b45309" font-weight="600">5</text>
+  <text x="170" y="432" text-anchor="end" font-size="13" fill="#6b7280">массив</text>
+  <text x="170" y="466" text-anchor="end" font-size="12" fill="#6b7280">индексы</text>
+  <text x="380" y="496" text-anchor="middle" font-size="13" fill="#b45309" font-weight="600">узел «2» стоит на индексе 2, его левый потомок «8» — на индексе 2 · 2 + 1 = 5</text>
+</svg>
