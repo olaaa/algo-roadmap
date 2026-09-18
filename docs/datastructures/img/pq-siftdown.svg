@@ -1,56 +1,51 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 320" width="760" height="320" font-family="system-ui, -apple-system, Segoe UI, sans-serif">
-  <rect width="760" height="320" fill="#fbfcfe"/>
-  <text x="380" y="32" text-anchor="middle" font-size="17" font-weight="600" fill="#1c2333">Спуск: poll снимает корень и опускает последний элемент</text>
-  <text x="380" y="54" text-anchor="middle" font-size="13" fill="#6b7280">куча была [1, 3, 2, 5, 9, 8], после poll станет [2, 3, 8, 5, 9]</text>
-  <line x1="135" y1="122" x2="83" y2="152" stroke="#9aa3b5" stroke-width="2" stroke-linecap="round"/>
-  <line x1="135" y1="122" x2="187" y2="152" stroke="#9aa3b5" stroke-width="2" stroke-linecap="round"/>
-  <line x1="83" y1="180" x2="57" y2="210" stroke="#9aa3b5" stroke-width="2" stroke-linecap="round"/>
-  <line x1="83" y1="180" x2="109" y2="210" stroke="#9aa3b5" stroke-width="2" stroke-linecap="round"/>
-  <line x1="187" y1="180" x2="161" y2="210" stroke="#9aa3b5" stroke-width="2" stroke-linecap="round"/>
-  <circle cx="135" cy="108" r="19" fill="#ffe4e6" stroke="#e0567a" stroke-width="2"/>
-  <text x="135" y="114" text-anchor="middle" font-size="16" font-family="Consolas, monospace" fill="#1c2333">1</text>
-  <circle cx="83" cy="166" r="19" fill="#e8f0ff" stroke="#4f8cff" stroke-width="2"/>
-  <text x="83" y="172" text-anchor="middle" font-size="16" font-family="Consolas, monospace" fill="#1c2333">3</text>
-  <circle cx="187" cy="166" r="19" fill="#e8f0ff" stroke="#4f8cff" stroke-width="2"/>
-  <text x="187" y="172" text-anchor="middle" font-size="16" font-family="Consolas, monospace" fill="#1c2333">2</text>
-  <circle cx="57" cy="224" r="19" fill="#e8f0ff" stroke="#4f8cff" stroke-width="2"/>
-  <text x="57" y="230" text-anchor="middle" font-size="16" font-family="Consolas, monospace" fill="#1c2333">5</text>
-  <circle cx="109" cy="224" r="19" fill="#e8f0ff" stroke="#4f8cff" stroke-width="2"/>
-  <text x="109" y="230" text-anchor="middle" font-size="16" font-family="Consolas, monospace" fill="#1c2333">9</text>
-  <circle cx="161" cy="224" r="19" fill="#fff7e6" stroke="#d97706" stroke-width="2"/>
-  <text x="161" y="230" text-anchor="middle" font-size="16" font-family="Consolas, monospace" fill="#1c2333">8</text>
-  <text x="135" y="272" text-anchor="middle" font-size="13" fill="#6b7280">poll забирает корень «1»,</text>
-  <text x="135" y="292" text-anchor="middle" font-size="13" fill="#6b7280">на его место — последний «8»</text>
-  <line x1="380" y1="122" x2="328" y2="152" stroke="#9aa3b5" stroke-width="2" stroke-linecap="round"/>
-  <line x1="380" y1="122" x2="432" y2="152" stroke="#9aa3b5" stroke-width="2" stroke-linecap="round"/>
-  <line x1="328" y1="180" x2="302" y2="210" stroke="#9aa3b5" stroke-width="2" stroke-linecap="round"/>
-  <line x1="328" y1="180" x2="354" y2="210" stroke="#9aa3b5" stroke-width="2" stroke-linecap="round"/>
-  <circle cx="380" cy="108" r="19" fill="#fff7e6" stroke="#d97706" stroke-width="2"/>
-  <text x="380" y="114" text-anchor="middle" font-size="16" font-family="Consolas, monospace" fill="#1c2333">8</text>
-  <circle cx="328" cy="166" r="19" fill="#e8f0ff" stroke="#4f8cff" stroke-width="2"/>
-  <text x="328" y="172" text-anchor="middle" font-size="16" font-family="Consolas, monospace" fill="#1c2333">3</text>
-  <circle cx="432" cy="166" r="19" fill="#bbf7d0" stroke="#34a97a" stroke-width="2"/>
-  <text x="432" y="172" text-anchor="middle" font-size="16" font-family="Consolas, monospace" fill="#1c2333">2</text>
-  <circle cx="302" cy="224" r="19" fill="#e8f0ff" stroke="#4f8cff" stroke-width="2"/>
-  <text x="302" y="230" text-anchor="middle" font-size="16" font-family="Consolas, monospace" fill="#1c2333">5</text>
-  <circle cx="354" cy="224" r="19" fill="#e8f0ff" stroke="#4f8cff" stroke-width="2"/>
-  <text x="354" y="230" text-anchor="middle" font-size="16" font-family="Consolas, monospace" fill="#1c2333">9</text>
-  <text x="380" y="272" text-anchor="middle" font-size="13" fill="#6b7280">меньший из потомков — «2»,</text>
-  <text x="380" y="292" text-anchor="middle" font-size="13" fill="#6b7280">«8» больше и опускается</text>
-  <line x1="625" y1="122" x2="573" y2="152" stroke="#9aa3b5" stroke-width="2" stroke-linecap="round"/>
-  <line x1="625" y1="122" x2="677" y2="152" stroke="#9aa3b5" stroke-width="2" stroke-linecap="round"/>
-  <line x1="573" y1="180" x2="547" y2="210" stroke="#9aa3b5" stroke-width="2" stroke-linecap="round"/>
-  <line x1="573" y1="180" x2="599" y2="210" stroke="#9aa3b5" stroke-width="2" stroke-linecap="round"/>
-  <circle cx="625" cy="108" r="19" fill="#e8f0ff" stroke="#4f8cff" stroke-width="2"/>
-  <text x="625" y="114" text-anchor="middle" font-size="16" font-family="Consolas, monospace" fill="#1c2333">2</text>
-  <circle cx="573" cy="166" r="19" fill="#e8f0ff" stroke="#4f8cff" stroke-width="2"/>
-  <text x="573" y="172" text-anchor="middle" font-size="16" font-family="Consolas, monospace" fill="#1c2333">3</text>
-  <circle cx="677" cy="166" r="19" fill="#fff7e6" stroke="#d97706" stroke-width="2"/>
-  <text x="677" y="172" text-anchor="middle" font-size="16" font-family="Consolas, monospace" fill="#1c2333">8</text>
-  <circle cx="547" cy="224" r="19" fill="#e8f0ff" stroke="#4f8cff" stroke-width="2"/>
-  <text x="547" y="230" text-anchor="middle" font-size="16" font-family="Consolas, monospace" fill="#1c2333">5</text>
-  <circle cx="599" cy="224" r="19" fill="#e8f0ff" stroke="#4f8cff" stroke-width="2"/>
-  <text x="599" y="230" text-anchor="middle" font-size="16" font-family="Consolas, monospace" fill="#1c2333">9</text>
-  <text x="625" y="272" text-anchor="middle" font-size="13" fill="#6b7280">у «8» потомков больше нет —</text>
-  <text x="625" y="292" text-anchor="middle" font-size="13" fill="#6b7280">спуск закончен</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 244" width="760" height="244" font-family="system-ui, -apple-system, Segoe UI, sans-serif">
+  <rect width="760" height="244" fill="#fbfcfe"/>
+  <text x="135" y="36" text-anchor="middle" font-size="15" font-weight="600" fill="#1c2333">1</text>
+  <line x1="135" y1="102" x2="83" y2="132" stroke="#9aa3b5" stroke-width="2" stroke-linecap="round"/>
+  <line x1="135" y1="102" x2="187" y2="132" stroke="#9aa3b5" stroke-width="2" stroke-linecap="round"/>
+  <line x1="83" y1="160" x2="57" y2="190" stroke="#9aa3b5" stroke-width="2" stroke-linecap="round"/>
+  <line x1="83" y1="160" x2="109" y2="190" stroke="#9aa3b5" stroke-width="2" stroke-linecap="round"/>
+  <line x1="187" y1="160" x2="161" y2="190" stroke="#9aa3b5" stroke-width="2" stroke-linecap="round"/>
+  <circle cx="135" cy="88" r="19" fill="#ffe4e6" stroke="#e0567a" stroke-width="2"/>
+  <text x="135" y="94" text-anchor="middle" font-size="16" font-family="Consolas, monospace" fill="#1c2333">1</text>
+  <circle cx="83" cy="146" r="19" fill="#e8f0ff" stroke="#4f8cff" stroke-width="2"/>
+  <text x="83" y="152" text-anchor="middle" font-size="16" font-family="Consolas, monospace" fill="#1c2333">3</text>
+  <circle cx="187" cy="146" r="19" fill="#e8f0ff" stroke="#4f8cff" stroke-width="2"/>
+  <text x="187" y="152" text-anchor="middle" font-size="16" font-family="Consolas, monospace" fill="#1c2333">2</text>
+  <circle cx="57" cy="204" r="19" fill="#e8f0ff" stroke="#4f8cff" stroke-width="2"/>
+  <text x="57" y="210" text-anchor="middle" font-size="16" font-family="Consolas, monospace" fill="#1c2333">5</text>
+  <circle cx="109" cy="204" r="19" fill="#e8f0ff" stroke="#4f8cff" stroke-width="2"/>
+  <text x="109" y="210" text-anchor="middle" font-size="16" font-family="Consolas, monospace" fill="#1c2333">9</text>
+  <circle cx="161" cy="204" r="19" fill="#fff7e6" stroke="#d97706" stroke-width="2"/>
+  <text x="161" y="210" text-anchor="middle" font-size="16" font-family="Consolas, monospace" fill="#1c2333">8</text>
+  <text x="380" y="36" text-anchor="middle" font-size="15" font-weight="600" fill="#1c2333">2</text>
+  <line x1="380" y1="102" x2="328" y2="132" stroke="#9aa3b5" stroke-width="2" stroke-linecap="round"/>
+  <line x1="380" y1="102" x2="432" y2="132" stroke="#9aa3b5" stroke-width="2" stroke-linecap="round"/>
+  <line x1="328" y1="160" x2="302" y2="190" stroke="#9aa3b5" stroke-width="2" stroke-linecap="round"/>
+  <line x1="328" y1="160" x2="354" y2="190" stroke="#9aa3b5" stroke-width="2" stroke-linecap="round"/>
+  <circle cx="380" cy="88" r="19" fill="#fff7e6" stroke="#d97706" stroke-width="2"/>
+  <text x="380" y="94" text-anchor="middle" font-size="16" font-family="Consolas, monospace" fill="#1c2333">8</text>
+  <circle cx="328" cy="146" r="19" fill="#e8f0ff" stroke="#4f8cff" stroke-width="2"/>
+  <text x="328" y="152" text-anchor="middle" font-size="16" font-family="Consolas, monospace" fill="#1c2333">3</text>
+  <circle cx="432" cy="146" r="19" fill="#bbf7d0" stroke="#34a97a" stroke-width="2"/>
+  <text x="432" y="152" text-anchor="middle" font-size="16" font-family="Consolas, monospace" fill="#1c2333">2</text>
+  <circle cx="302" cy="204" r="19" fill="#e8f0ff" stroke="#4f8cff" stroke-width="2"/>
+  <text x="302" y="210" text-anchor="middle" font-size="16" font-family="Consolas, monospace" fill="#1c2333">5</text>
+  <circle cx="354" cy="204" r="19" fill="#e8f0ff" stroke="#4f8cff" stroke-width="2"/>
+  <text x="354" y="210" text-anchor="middle" font-size="16" font-family="Consolas, monospace" fill="#1c2333">9</text>
+  <text x="625" y="36" text-anchor="middle" font-size="15" font-weight="600" fill="#1c2333">3</text>
+  <line x1="625" y1="102" x2="573" y2="132" stroke="#9aa3b5" stroke-width="2" stroke-linecap="round"/>
+  <line x1="625" y1="102" x2="677" y2="132" stroke="#9aa3b5" stroke-width="2" stroke-linecap="round"/>
+  <line x1="573" y1="160" x2="547" y2="190" stroke="#9aa3b5" stroke-width="2" stroke-linecap="round"/>
+  <line x1="573" y1="160" x2="599" y2="190" stroke="#9aa3b5" stroke-width="2" stroke-linecap="round"/>
+  <circle cx="625" cy="88" r="19" fill="#e8f0ff" stroke="#4f8cff" stroke-width="2"/>
+  <text x="625" y="94" text-anchor="middle" font-size="16" font-family="Consolas, monospace" fill="#1c2333">2</text>
+  <circle cx="573" cy="146" r="19" fill="#e8f0ff" stroke="#4f8cff" stroke-width="2"/>
+  <text x="573" y="152" text-anchor="middle" font-size="16" font-family="Consolas, monospace" fill="#1c2333">3</text>
+  <circle cx="677" cy="146" r="19" fill="#fff7e6" stroke="#d97706" stroke-width="2"/>
+  <text x="677" y="152" text-anchor="middle" font-size="16" font-family="Consolas, monospace" fill="#1c2333">8</text>
+  <circle cx="547" cy="204" r="19" fill="#e8f0ff" stroke="#4f8cff" stroke-width="2"/>
+  <text x="547" y="210" text-anchor="middle" font-size="16" font-family="Consolas, monospace" fill="#1c2333">5</text>
+  <circle cx="599" cy="204" r="19" fill="#e8f0ff" stroke="#4f8cff" stroke-width="2"/>
+  <text x="599" y="210" text-anchor="middle" font-size="16" font-family="Consolas, monospace" fill="#1c2333">9</text>
 </svg>
