@@ -15,7 +15,7 @@
 | Файл | О чём |
 |------|-------|
 | [`VariablesAndMemory.md`](VariablesAndMemory.md) | Как отличить переменную от значения, кадр метода, слоты, стек операндов, куча |
-| [`ComparableAndComparator.md`](ComparableAndComparator.md) | Два интерфейса порядка, `comparing` и ключ сравнения, `thenComparing`, согласованность с `equals` |
+| [`ComparableAndComparator.md`](ComparableAndComparator.md) | Два интерфейса порядка, `comparing` и ключ сортировки, `thenComparing`, согласованность с `equals` |
 | [`Int.md`](Int.md) | Диапазон и биты, дополнительный код, переполнение и `Math.*Exact`, отрицательный остаток |
 | [`Double.md`](Double.md) | Почему `0.1` не представима точно, сравнение через эпсилон, `NaN` и минус ноль, деньги |
 | [`Rounding.md`](Rounding.md) | `floor`, `ceil`, `round`, `rint` и усечение `(int)`; края типов; `BigDecimal` и деньги |
