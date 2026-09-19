@@ -820,6 +820,25 @@ java "-Dfile.encoding=UTF-8" "-Dstdout.encoding=UTF-8" -cp out\claudecheck block
 Каталог `out\` уже в .gitignore, поэтому `out\claudecheck` можно смело удалять
 после прогона.
 
+БЛОК 6 ТРЕБУЕТ БИБЛИОТЕКИ АННОТАЦИЙ (19.09). В `TreeNode` поля и параметры
+помечены `@Nullable` из `org.jetbrains.annotations` — это правка Lela. Без этой
+библиотеки `javac` падает с «package org.jetbrains.annotations does not exist»,
+поэтому её путь надо класть в classpath и при компиляции, и при запуске. Путь
+прописан в `algo-roadmap.iml`, сейчас это
+`C:\Users\Ola\.m2\repository\org\jetbrains\annotations\26.0.2\annotations-26.0.2.jar`.
+Команды для блока 6 (одиночные кавычки у пути и двойные у составного classpath
+обязательны, см. грабли ниже):
+```
+$ann = 'C:\Users\Ola\.m2\repository\org\jetbrains\annotations\26.0.2\annotations-26.0.2.jar'
+javac -encoding UTF-8 -cp $ann -d out\claudecheck src\block06_trees_graphs\*.java
+java "-Dfile.encoding=UTF-8" "-Dstdout.encoding=UTF-8" -cp "out\claudecheck;$ann" block06_trees_graphs.TreeNotationPractice
+```
+Команда с `$ann` не проходит через `powershell -Command "..."` одной строкой:
+переменная теряется на уровне обёртки. Запускать в постоянной оболочке
+(`start_process` плюс `interact_with_process`) либо подставлять путь целиком.
+В IDEA библиотека прописана в модуле, поэтому там сборка идёт без флагов;
+свежий клон её не получит, так как `algo-roadmap.iml` выведен из-под гита.
+
 Две грабли PowerShell, обе проверены на практике:
 - флаги вида `-Dfile.encoding=UTF-8` ОБЯЗАТЕЛЬНО брать в кавычки, иначе PowerShell
   разрезает строку и получается `Could not find or load main class .encoding=UTF-8`;
