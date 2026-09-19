@@ -1,7 +1,6 @@
 package block06_trees_graphs;
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.function.BooleanSupplier;
 
 /**
@@ -41,8 +40,41 @@ public class TreeNotationPractice {
      * @return корень собранного дерева или {@code null} для пустого дерева
      */
     public static TreeNode fromLevelOrder(Integer... values) {
-        // TODO написать самой
-        return null;
+        if (values.length == 0 || values[0] == null) {
+            return null;
+        }
+// создали узел, а потомков зададим при извлечении из очереди
+        TreeNode root = new TreeNode(values[0]);
+//        неограниченная
+        Queue<TreeNode> nodesToVisit = new ArrayDeque<>();
+// нам не нужны исключения, которые мог бы выбрасывать add, так как очередь неограниченная,
+// поэтому юзаем offer
+        nodesToVisit.offer(root);
+        int positionInArray = 1;
+
+        while (positionInArray < values.length) {
+            //  Throws NoSuchElementException – if this queue is empty
+            TreeNode parent = nodesToVisit.remove();
+
+            if (values[positionInArray] != null) {
+// создали узел, а потомков зададим потом
+                TreeNode leftChild = new TreeNode(values[positionInArray]);
+                parent.left = leftChild;
+                nodesToVisit.offer(leftChild);
+            }
+            positionInArray++;
+
+            if (positionInArray < values.length) {
+                if (values[positionInArray] != null) {
+                    TreeNode rightChild = new TreeNode(values[positionInArray]);
+                    parent.right = rightChild;
+                    nodesToVisit.offer(rightChild);
+                }
+                positionInArray++;
+            }
+        }
+
+        return root;
     }
 
     /**
@@ -60,8 +92,42 @@ public class TreeNotationPractice {
      * @return запись дерева по уровням без хвостовых {@code null}
      */
     public static List<Integer> toLevelOrder(TreeNode root) {
-        // TODO написать самой
-        return null;
+        if (root == null) {
+            return Collections.emptyList();
+        }
+
+        List<Integer> result = new ArrayList<>();
+//        ArrayDeque не позволяет хранить null
+        Queue<TreeNode> nodesToVisit = new ArrayDeque<>();
+        result.add(root.val);
+        nodesToVisit.offer(root);
+
+        while (!nodesToVisit.isEmpty()) {
+            TreeNode parent = nodesToVisit.remove();
+            TreeNode leftChild = parent.left;
+            if (leftChild != null) {
+                nodesToVisit.add(leftChild);
+                result.add(leftChild.val);
+            } else {
+                result.add(null);
+            }
+
+            TreeNode rightChild = parent.right;
+            if (rightChild != null) {
+                result.add(rightChild.val);
+                nodesToVisit.offer(rightChild);
+            } else {
+                result.add(null);
+            }
+
+        }
+
+        int end = result.size() - 1;
+        while (result.get(end) == null) {
+            end--;
+        }
+
+        return result.subList(0, end + 1);
     }
 
     public static void main(String[] args) {
@@ -81,9 +147,9 @@ public class TreeNotationPractice {
          * бы незамеченной.
          */
         check(() -> fromLevelOrder() == null,
-              "fromLevelOrder: пустая запись даёт пустое дерево");
+                "fromLevelOrder: пустая запись даёт пустое дерево");
         check(() -> fromLevelOrder((Integer) null) == null,
-              "fromLevelOrder: [null] даёт пустое дерево");
+                "fromLevelOrder: [null] даёт пустое дерево");
 
         check(() -> {
             TreeNode single = fromLevelOrder(7);
@@ -133,7 +199,7 @@ public class TreeNotationPractice {
             brokenRecordRejected = true;
         }
         check(brokenRecordRejected,
-              "fromLevelOrder: [1, null, null, 5] — раздавать значение некому, вылетело исключение");
+                "fromLevelOrder: [1, null, null, 5] — раздавать значение некому, вылетело исключение");
 
         /*
          * Случаи, которые закрывают тесты toLevelOrder:
@@ -147,17 +213,17 @@ public class TreeNotationPractice {
          * методом fromLevelOrder — по той же причине, что и выше.
          */
         check(() -> toLevelOrder(null).isEmpty(),
-              "toLevelOrder: пустое дерево даёт пустой список");
+                "toLevelOrder: пустое дерево даёт пустой список");
         check(() -> toLevelOrder(new TreeNode(7)).equals(List.of(7)),
-              "toLevelOrder: один узел — хвостовые null отброшены");
+                "toLevelOrder: один узел — хвостовые null отброшены");
         check(() -> toLevelOrder(new TreeNode(1, new TreeNode(2), null)).equals(List.of(1, 2)),
-              "toLevelOrder: есть только левый потомок — запись [1, 2] без хвостового null");
+                "toLevelOrder: есть только левый потомок — запись [1, 2] без хвостового null");
         check(() -> toLevelOrder(new TreeNode(1, null, new TreeNode(2))).equals(Arrays.asList(1, null, 2)),
-              "toLevelOrder: есть только правый потомок — левый null остался в записи");
+                "toLevelOrder: есть только правый потомок — левый null остался в записи");
         check(() -> toLevelOrder(new TreeNode(1, new TreeNode(2), new TreeNode(3))).equals(List.of(1, 2, 3)),
-              "toLevelOrder: оба потомка — запись [1, 2, 3]");
+                "toLevelOrder: оба потомка — запись [1, 2, 3]");
         check(() -> toLevelOrder(TreeNode.chainOfLength(3)).equals(Arrays.asList(0, null, 1, null, 2)),
-              "toLevelOrder: цепочка из трёх узлов — [0, null, 1, null, 2]");
+                "toLevelOrder: цепочка из трёх узлов — [0, null, 1, null, 2]");
 
         /*
          * Круги: запись → дерево → запись → дерево → … Каждый круг сверяется
@@ -165,13 +231,13 @@ public class TreeNotationPractice {
          * незаметно на пятом круге не получится.
          */
         Integer[][] levelOrderRecords = {
-            {3, 9, 20, null, null, 15, 7},
-            {1, null, 2, null, 3},
-            {1, 2, 3, 4, null, null, null, 5},
-            {1, 2, null, 3, null, 4},
-            {7},
-            {1, 2},
-            {1, null, 2},
+                {3, 9, 20, null, null, 15, 7},
+                {1, null, 2, null, 3},
+                {1, 2, 3, 4, null, null, null, 5},
+                {1, 2, null, 3, null, 4},
+                {7},
+                {1, 2},
+                {1, null, 2},
         };
         final int cycleCount = 5;
         for (Integer[] levelOrderRecord : levelOrderRecords) {
