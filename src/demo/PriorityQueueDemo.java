@@ -32,6 +32,7 @@ public class PriorityQueueDemo {
         equalPrioritiesNeedSecondKey();
         threeLargestPayments();
         mergeSortedStatements();
+        queueIsUnbounded();
         nullIsNotAllowed();
     }
 
@@ -155,6 +156,37 @@ public class PriorityQueueDemo {
         System.out.println("слияние трёх выписок                : " + merged);
         check(merged.equals(List.of(1, 2, 3, 5, 6, 7, 40, 80, 90)), "слияние отсортировано");
         check(merged.size() == 9, "ни один элемент не потерян");
+    }
+
+    /*
+     * Очередь неограниченная: предел числа элементов ей не задаётся, а число
+     * в конструкторе — начальная ёмкость массива. Поэтому offer всегда
+     * возвращает true, а add не бросает IllegalStateException.
+     */
+    private static void queueIsUnbounded() {
+        PriorityQueue<Integer> queue = new PriorityQueue<>(2);
+        StringBuilder offerAnswers = new StringBuilder();
+        for (int value = 0; value < 5; value++) {
+            offerAnswers.append(queue.offer(value)).append(' ');
+        }
+        String answers = offerAnswers.toString().trim();
+        System.out.println("пять offer при начальной ёмкости 2 : " + answers + ", размер " + queue.size());
+        check(answers.equals("true true true true true") && queue.size() == 5,
+              "начальная ёмкость 2 не предел: все пять offer вернули true");
+
+        boolean overflowThrown = false;
+        try {
+            for (int value = 0; value < 1000; value++) {
+                queue.add(value);
+            }
+        } catch (IllegalStateException overflow) {
+            overflowThrown = true;
+        }
+        System.out.println("тысяча add подряд                  : "
+                + (overflowThrown ? "IllegalStateException" : "исключения нет")
+                + ", размер " + queue.size());
+        check(!overflowThrown && queue.size() == 1005,
+              "add не бросает IllegalStateException: переполниться очередь не может");
     }
 
     /*
