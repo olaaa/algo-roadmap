@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 764" width="480" height="764" font-family="system-ui, -apple-system, Segoe UI, sans-serif">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 786" width="680" height="786" font-family="system-ui, -apple-system, Segoe UI, sans-serif">
   <defs>
     <marker id="arrowPath" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
       <path d="M2 1L8 5L2 9" fill="none" stroke="#d97706" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
@@ -7,10 +7,18 @@
       <path d="M2 1L8 5L2 9" fill="none" stroke="#9aa3b5" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
     </marker>
   </defs>
-  <rect width="480" height="764" fill="#fbfcfe"/>
+  <rect width="680" height="786" fill="#fbfcfe"/>
+
+  <!-- легенда -->
+  <g font-size="13" fill="#1c2333">
+    <text x="486" y="26">Искомое — то, что ищем.</text>
+    <text x="486" y="44">Текущее — ключ на</text>
+    <text x="486" y="62">странице, с которым</text>
+    <text x="486" y="80">сравниваем искомое.</text>
+  </g>
 
   <!-- индекс -->
-  <rect x="10" y="12" width="460" height="488" rx="10" fill="none" stroke="#4f8cff" stroke-width="2" stroke-dasharray="6 5"/>
+  <rect x="10" y="12" width="460" height="510" rx="10" fill="none" stroke="#4f8cff" stroke-width="2" stroke-dasharray="6 5"/>
   <text x="24" y="36" font-size="14" font-weight="600" fill="#1c2333">индекс</text>
 
   <!-- 1: метастраница -->
@@ -22,8 +30,14 @@
   <text x="240" y="110" text-anchor="middle" font-size="14" font-family="Consolas, monospace" fill="#1c2333">root = 3</text>
   <line x1="240" y1="120" x2="240" y2="150" stroke="#d97706" stroke-width="3" marker-end="url(#arrowPath)"/>
 
+  <g font-size="13" fill="#1c2333">
+    <text x="486" y="104">1. Стр. 0 — метастраница:</text>
+    <text x="486" y="122">номер корня, 3. Обычно</text>
+    <text x="486" y="140">берётся из памяти.</text>
+  </g>
+
   <!-- 2: корень -->
-  <rect x="30" y="154" width="420" height="98" rx="8" fill="#e8f0ff" stroke="#4f8cff" stroke-width="1.5"/>
+  <rect x="30" y="154" width="420" height="120" rx="8" fill="#e8f0ff" stroke="#4f8cff" stroke-width="1.5"/>
   <circle cx="54" cy="176" r="12" fill="#fff7e6" stroke="#d97706" stroke-width="1.5"/>
   <text x="54" y="181" text-anchor="middle" font-size="14" font-weight="600" fill="#7a4a06">2</text>
   <text x="240" y="176" text-anchor="middle" font-size="14" font-weight="600" fill="#1c2333">стр. 3</text>
@@ -34,89 +48,121 @@
   <text x="240" y="229" text-anchor="middle" font-size="14" fill="#1c2333">20 · стр. 2</text>
   <rect x="312" y="208" width="126" height="32" rx="8" fill="#f1f3f7" stroke="#9aa3b5" stroke-width="1"/>
   <text x="375" y="229" text-anchor="middle" font-size="14" fill="#1c2333">40 · стр. 4</text>
+  <text x="240" y="262" text-anchor="middle" font-size="13" fill="#1c2333">текущее: 20</text>
+  <text x="375" y="262" text-anchor="middle" font-size="13" fill="#1c2333">текущее: 40</text>
+
+  <g font-size="13" fill="#1c2333">
+    <text x="486" y="178">2. Корень, стр. 3.</text>
+    <text x="486" y="196">Искомое 31 сравниваем</text>
+    <text x="486" y="214">с текущими ключами:</text>
+    <text x="486" y="232">31 ≥ 20 и 31 &lt; 40,</text>
+    <text x="486" y="250">значит, идём в стр. 2.</text>
+  </g>
 
   <!-- корень → листья -->
-  <line x1="105" y1="252" x2="94" y2="300" stroke="#9aa3b5" stroke-width="2" marker-end="url(#arrowGray)"/>
-  <line x1="240" y1="252" x2="240" y2="300" stroke="#d97706" stroke-width="3" marker-end="url(#arrowPath)"/>
-  <line x1="375" y1="252" x2="386" y2="300" stroke="#9aa3b5" stroke-width="2" marker-end="url(#arrowGray)"/>
-  <circle cx="208" cy="278" r="12" fill="#fff7e6" stroke="#d97706" stroke-width="1.5"/>
-  <text x="208" y="283" text-anchor="middle" font-size="14" font-weight="600" fill="#7a4a06">3</text>
+  <line x1="105" y1="274" x2="94" y2="322" stroke="#9aa3b5" stroke-width="2" marker-end="url(#arrowGray)"/>
+  <line x1="240" y1="274" x2="240" y2="322" stroke="#d97706" stroke-width="3" marker-end="url(#arrowPath)"/>
+  <line x1="375" y1="274" x2="386" y2="322" stroke="#9aa3b5" stroke-width="2" marker-end="url(#arrowGray)"/>
+  <circle cx="208" cy="300" r="12" fill="#fff7e6" stroke="#d97706" stroke-width="1.5"/>
+  <text x="208" y="305" text-anchor="middle" font-size="14" font-weight="600" fill="#7a4a06">3</text>
 
   <!-- листья -->
-  <rect x="25" y="304" width="134" height="184" rx="8" fill="#e8f0ff" stroke="#4f8cff" stroke-width="1.5"/>
-  <text x="92" y="326" text-anchor="middle" font-size="14" font-weight="600" fill="#1c2333">стр. 1</text>
-  <text x="92" y="346" text-anchor="middle" font-size="14" fill="#1c2333">лист</text>
-  <rect x="35" y="356" width="114" height="26" rx="8" fill="#f1f3f7" stroke="#9aa3b5" stroke-width="1"/>
-  <text x="92" y="374" text-anchor="middle" font-size="14" fill="#1c2333">5 · (1,2)</text>
-  <rect x="35" y="388" width="114" height="26" rx="8" fill="#f1f3f7" stroke="#9aa3b5" stroke-width="1"/>
-  <text x="92" y="406" text-anchor="middle" font-size="14" fill="#1c2333">12 · (0,1)</text>
-  <rect x="35" y="452" width="114" height="26" rx="8" fill="none" stroke="#4f8cff" stroke-width="1.5" stroke-dasharray="4 3"/>
-  <text x="92" y="470" text-anchor="middle" font-size="14" fill="#1c2333">20</text>
+  <rect x="25" y="326" width="134" height="184" rx="8" fill="#e8f0ff" stroke="#4f8cff" stroke-width="1.5"/>
+  <text x="92" y="348" text-anchor="middle" font-size="14" font-weight="600" fill="#1c2333">стр. 1</text>
+  <text x="92" y="368" text-anchor="middle" font-size="14" fill="#1c2333">лист</text>
+  <rect x="35" y="378" width="114" height="26" rx="8" fill="#f1f3f7" stroke="#9aa3b5" stroke-width="1"/>
+  <text x="92" y="396" text-anchor="middle" font-size="14" fill="#1c2333">5 · (1,2)</text>
+  <rect x="35" y="410" width="114" height="26" rx="8" fill="#f1f3f7" stroke="#9aa3b5" stroke-width="1"/>
+  <text x="92" y="428" text-anchor="middle" font-size="14" fill="#1c2333">12 · (0,1)</text>
+  <rect x="35" y="474" width="114" height="26" rx="8" fill="none" stroke="#4f8cff" stroke-width="1.5" stroke-dasharray="4 3"/>
+  <text x="92" y="492" text-anchor="middle" font-size="14" fill="#1c2333">20</text>
 
-  <rect x="173" y="304" width="134" height="184" rx="8" fill="#e8f0ff" stroke="#4f8cff" stroke-width="2"/>
-  <text x="240" y="326" text-anchor="middle" font-size="14" font-weight="600" fill="#1c2333">стр. 2</text>
-  <text x="240" y="346" text-anchor="middle" font-size="14" fill="#1c2333">лист</text>
-  <rect x="183" y="356" width="114" height="26" rx="8" fill="#f1f3f7" stroke="#9aa3b5" stroke-width="1"/>
-  <text x="240" y="374" text-anchor="middle" font-size="14" fill="#1c2333">20 · (2,1)</text>
-  <rect x="183" y="388" width="114" height="26" rx="8" fill="#fff7e6" stroke="#d97706" stroke-width="2"/>
-  <text x="240" y="406" text-anchor="middle" font-size="14" fill="#1c2333">31 · (0,2)</text>
-  <rect x="183" y="420" width="114" height="26" rx="8" fill="#fff7e6" stroke="#d97706" stroke-width="2"/>
-  <text x="240" y="438" text-anchor="middle" font-size="14" fill="#1c2333">31 · (2,2)</text>
-  <rect x="183" y="452" width="114" height="26" rx="8" fill="none" stroke="#4f8cff" stroke-width="1.5" stroke-dasharray="4 3"/>
-  <text x="240" y="470" text-anchor="middle" font-size="14" fill="#1c2333">40</text>
+  <rect x="173" y="326" width="134" height="184" rx="8" fill="#e8f0ff" stroke="#4f8cff" stroke-width="2"/>
+  <text x="240" y="348" text-anchor="middle" font-size="14" font-weight="600" fill="#1c2333">стр. 2</text>
+  <text x="240" y="368" text-anchor="middle" font-size="14" fill="#1c2333">лист</text>
+  <rect x="183" y="378" width="114" height="26" rx="8" fill="#f1f3f7" stroke="#9aa3b5" stroke-width="1"/>
+  <text x="240" y="396" text-anchor="middle" font-size="14" fill="#1c2333">20 · (2,1)</text>
+  <rect x="183" y="410" width="114" height="26" rx="8" fill="#fff7e6" stroke="#d97706" stroke-width="2"/>
+  <text x="240" y="428" text-anchor="middle" font-size="14" fill="#1c2333">31 · (0,2)</text>
+  <rect x="183" y="442" width="114" height="26" rx="8" fill="#fff7e6" stroke="#d97706" stroke-width="2"/>
+  <text x="240" y="460" text-anchor="middle" font-size="14" fill="#1c2333">31 · (2,2)</text>
+  <rect x="183" y="474" width="114" height="26" rx="8" fill="none" stroke="#4f8cff" stroke-width="1.5" stroke-dasharray="4 3"/>
+  <text x="240" y="492" text-anchor="middle" font-size="14" fill="#1c2333">40</text>
 
-  <rect x="321" y="304" width="134" height="184" rx="8" fill="#e8f0ff" stroke="#4f8cff" stroke-width="1.5"/>
-  <text x="388" y="326" text-anchor="middle" font-size="14" font-weight="600" fill="#1c2333">стр. 4</text>
-  <text x="388" y="346" text-anchor="middle" font-size="14" fill="#1c2333">лист</text>
-  <rect x="331" y="356" width="114" height="26" rx="8" fill="#f1f3f7" stroke="#9aa3b5" stroke-width="1"/>
-  <text x="388" y="374" text-anchor="middle" font-size="14" fill="#1c2333">40 · (1,1)</text>
-  <rect x="331" y="388" width="114" height="26" rx="8" fill="#f1f3f7" stroke="#9aa3b5" stroke-width="1"/>
-  <text x="388" y="406" text-anchor="middle" font-size="14" fill="#1c2333">57 · (1,3)</text>
+  <rect x="321" y="326" width="134" height="184" rx="8" fill="#e8f0ff" stroke="#4f8cff" stroke-width="1.5"/>
+  <text x="388" y="348" text-anchor="middle" font-size="14" font-weight="600" fill="#1c2333">стр. 4</text>
+  <text x="388" y="368" text-anchor="middle" font-size="14" fill="#1c2333">лист</text>
+  <rect x="331" y="378" width="114" height="26" rx="8" fill="#f1f3f7" stroke="#9aa3b5" stroke-width="1"/>
+  <text x="388" y="396" text-anchor="middle" font-size="14" fill="#1c2333">40 · (1,1)</text>
+  <rect x="331" y="410" width="114" height="26" rx="8" fill="#f1f3f7" stroke="#9aa3b5" stroke-width="1"/>
+  <text x="388" y="428" text-anchor="middle" font-size="14" fill="#1c2333">57 · (1,3)</text>
+
+  <g font-size="13" fill="#1c2333">
+    <text x="486" y="346">3. Лист, стр. 2.</text>
+    <text x="486" y="364">Текущее 20 &lt; 31 — дальше.</text>
+    <text x="486" y="382">Текущее 31 = искомому 31:</text>
+    <text x="486" y="400">берём TID (0,2) и (2,2).</text>
+    <text x="486" y="418">Граница 40 &gt; 31 —</text>
+    <text x="486" y="436">в стр. 4 не идём.</text>
+    <text x="486" y="466">Запись листа: ключ и TID</text>
+    <text x="486" y="484">(страница, запись).</text>
+    <text x="486" y="502">Пунктир — верхняя</text>
+    <text x="486" y="520">граница страницы.</text>
+  </g>
 
   <!-- TID → таблица -->
-  <path d="M215 488 L215 518 L92 518 L92 580" fill="none" stroke="#d97706" stroke-width="3" marker-end="url(#arrowPath)"/>
-  <path d="M265 488 L265 532 L388 532 L388 580" fill="none" stroke="#d97706" stroke-width="3" marker-end="url(#arrowPath)"/>
+  <path d="M215 510 L215 540 L92 540 L92 602" fill="none" stroke="#d97706" stroke-width="3" marker-end="url(#arrowPath)"/>
+  <path d="M265 510 L265 554 L388 554 L388 602" fill="none" stroke="#d97706" stroke-width="3" marker-end="url(#arrowPath)"/>
 
   <!-- таблица -->
-  <rect x="10" y="552" width="460" height="202" rx="10" fill="none" stroke="#1d9e75" stroke-width="2" stroke-dasharray="6 5"/>
-  <text x="240" y="574" text-anchor="middle" font-size="14" font-weight="600" fill="#1c2333">таблица</text>
-  <circle cx="446" cy="570" r="12" fill="#fff7e6" stroke="#d97706" stroke-width="1.5"/>
-  <text x="446" y="575" text-anchor="middle" font-size="14" font-weight="600" fill="#7a4a06">4</text>
+  <rect x="10" y="574" width="460" height="202" rx="10" fill="none" stroke="#1d9e75" stroke-width="2" stroke-dasharray="6 5"/>
+  <text x="240" y="596" text-anchor="middle" font-size="14" font-weight="600" fill="#1c2333">таблица</text>
+  <circle cx="446" cy="592" r="12" fill="#fff7e6" stroke="#d97706" stroke-width="1.5"/>
+  <text x="446" y="597" text-anchor="middle" font-size="14" font-weight="600" fill="#7a4a06">4</text>
 
-  <rect x="25" y="584" width="134" height="160" rx="8" fill="#e7f6ef" stroke="#1d9e75" stroke-width="1.5"/>
-  <text x="92" y="606" text-anchor="middle" font-size="14" font-weight="600" fill="#1c2333">стр. 0</text>
-  <rect x="35" y="618" width="28" height="26" rx="6" fill="#f1f3f7" stroke="#9aa3b5" stroke-width="1"/>
-  <text x="49" y="636" text-anchor="middle" font-size="14" fill="#1c2333">1</text>
-  <rect x="69" y="618" width="80" height="26" rx="8" fill="#f1f3f7" stroke="#9aa3b5" stroke-width="1"/>
-  <text x="109" y="636" text-anchor="middle" font-size="14" fill="#1c2333">12</text>
-  <rect x="35" y="650" width="28" height="26" rx="6" fill="#fff7e6" stroke="#d97706" stroke-width="2"/>
-  <text x="49" y="668" text-anchor="middle" font-size="14" fill="#1c2333">2</text>
-  <rect x="69" y="650" width="80" height="26" rx="8" fill="#fff7e6" stroke="#d97706" stroke-width="2"/>
-  <text x="109" y="668" text-anchor="middle" font-size="14" fill="#1c2333">31</text>
+  <rect x="25" y="606" width="134" height="160" rx="8" fill="#e7f6ef" stroke="#1d9e75" stroke-width="1.5"/>
+  <text x="92" y="628" text-anchor="middle" font-size="14" font-weight="600" fill="#1c2333">стр. 0</text>
+  <rect x="35" y="640" width="28" height="26" rx="6" fill="#f1f3f7" stroke="#9aa3b5" stroke-width="1"/>
+  <text x="49" y="658" text-anchor="middle" font-size="14" fill="#1c2333">1</text>
+  <rect x="69" y="640" width="80" height="26" rx="8" fill="#f1f3f7" stroke="#9aa3b5" stroke-width="1"/>
+  <text x="109" y="658" text-anchor="middle" font-size="14" fill="#1c2333">12</text>
+  <rect x="35" y="672" width="28" height="26" rx="6" fill="#fff7e6" stroke="#d97706" stroke-width="2"/>
+  <text x="49" y="690" text-anchor="middle" font-size="14" fill="#1c2333">2</text>
+  <rect x="69" y="672" width="80" height="26" rx="8" fill="#fff7e6" stroke="#d97706" stroke-width="2"/>
+  <text x="109" y="690" text-anchor="middle" font-size="14" fill="#1c2333">31</text>
 
-  <rect x="173" y="584" width="134" height="160" rx="8" fill="#e7f6ef" stroke="#1d9e75" stroke-width="1.5"/>
-  <text x="240" y="606" text-anchor="middle" font-size="14" font-weight="600" fill="#1c2333">стр. 1</text>
-  <rect x="183" y="618" width="28" height="26" rx="6" fill="#f1f3f7" stroke="#9aa3b5" stroke-width="1"/>
-  <text x="197" y="636" text-anchor="middle" font-size="14" fill="#1c2333">1</text>
-  <rect x="217" y="618" width="80" height="26" rx="8" fill="#f1f3f7" stroke="#9aa3b5" stroke-width="1"/>
-  <text x="257" y="636" text-anchor="middle" font-size="14" fill="#1c2333">40</text>
-  <rect x="183" y="650" width="28" height="26" rx="6" fill="#f1f3f7" stroke="#9aa3b5" stroke-width="1"/>
-  <text x="197" y="668" text-anchor="middle" font-size="14" fill="#1c2333">2</text>
-  <rect x="217" y="650" width="80" height="26" rx="8" fill="#f1f3f7" stroke="#9aa3b5" stroke-width="1"/>
-  <text x="257" y="668" text-anchor="middle" font-size="14" fill="#1c2333">5</text>
-  <rect x="183" y="682" width="28" height="26" rx="6" fill="#f1f3f7" stroke="#9aa3b5" stroke-width="1"/>
-  <text x="197" y="700" text-anchor="middle" font-size="14" fill="#1c2333">3</text>
-  <rect x="217" y="682" width="80" height="26" rx="8" fill="#f1f3f7" stroke="#9aa3b5" stroke-width="1"/>
-  <text x="257" y="700" text-anchor="middle" font-size="14" fill="#1c2333">57</text>
+  <rect x="173" y="606" width="134" height="160" rx="8" fill="#e7f6ef" stroke="#1d9e75" stroke-width="1.5"/>
+  <text x="240" y="628" text-anchor="middle" font-size="14" font-weight="600" fill="#1c2333">стр. 1</text>
+  <rect x="183" y="640" width="28" height="26" rx="6" fill="#f1f3f7" stroke="#9aa3b5" stroke-width="1"/>
+  <text x="197" y="658" text-anchor="middle" font-size="14" fill="#1c2333">1</text>
+  <rect x="217" y="640" width="80" height="26" rx="8" fill="#f1f3f7" stroke="#9aa3b5" stroke-width="1"/>
+  <text x="257" y="658" text-anchor="middle" font-size="14" fill="#1c2333">40</text>
+  <rect x="183" y="672" width="28" height="26" rx="6" fill="#f1f3f7" stroke="#9aa3b5" stroke-width="1"/>
+  <text x="197" y="690" text-anchor="middle" font-size="14" fill="#1c2333">2</text>
+  <rect x="217" y="672" width="80" height="26" rx="8" fill="#f1f3f7" stroke="#9aa3b5" stroke-width="1"/>
+  <text x="257" y="690" text-anchor="middle" font-size="14" fill="#1c2333">5</text>
+  <rect x="183" y="704" width="28" height="26" rx="6" fill="#f1f3f7" stroke="#9aa3b5" stroke-width="1"/>
+  <text x="197" y="722" text-anchor="middle" font-size="14" fill="#1c2333">3</text>
+  <rect x="217" y="704" width="80" height="26" rx="8" fill="#f1f3f7" stroke="#9aa3b5" stroke-width="1"/>
+  <text x="257" y="722" text-anchor="middle" font-size="14" fill="#1c2333">57</text>
 
-  <rect x="321" y="584" width="134" height="160" rx="8" fill="#e7f6ef" stroke="#1d9e75" stroke-width="1.5"/>
-  <text x="388" y="606" text-anchor="middle" font-size="14" font-weight="600" fill="#1c2333">стр. 2</text>
-  <rect x="331" y="618" width="28" height="26" rx="6" fill="#f1f3f7" stroke="#9aa3b5" stroke-width="1"/>
-  <text x="345" y="636" text-anchor="middle" font-size="14" fill="#1c2333">1</text>
-  <rect x="365" y="618" width="80" height="26" rx="8" fill="#f1f3f7" stroke="#9aa3b5" stroke-width="1"/>
-  <text x="405" y="636" text-anchor="middle" font-size="14" fill="#1c2333">20</text>
-  <rect x="331" y="650" width="28" height="26" rx="6" fill="#fff7e6" stroke="#d97706" stroke-width="2"/>
-  <text x="345" y="668" text-anchor="middle" font-size="14" fill="#1c2333">2</text>
-  <rect x="365" y="650" width="80" height="26" rx="8" fill="#fff7e6" stroke="#d97706" stroke-width="2"/>
-  <text x="405" y="668" text-anchor="middle" font-size="14" fill="#1c2333">31</text>
+  <rect x="321" y="606" width="134" height="160" rx="8" fill="#e7f6ef" stroke="#1d9e75" stroke-width="1.5"/>
+  <text x="388" y="628" text-anchor="middle" font-size="14" font-weight="600" fill="#1c2333">стр. 2</text>
+  <rect x="331" y="640" width="28" height="26" rx="6" fill="#f1f3f7" stroke="#9aa3b5" stroke-width="1"/>
+  <text x="345" y="658" text-anchor="middle" font-size="14" fill="#1c2333">1</text>
+  <rect x="365" y="640" width="80" height="26" rx="8" fill="#f1f3f7" stroke="#9aa3b5" stroke-width="1"/>
+  <text x="405" y="658" text-anchor="middle" font-size="14" fill="#1c2333">20</text>
+  <rect x="331" y="672" width="28" height="26" rx="6" fill="#fff7e6" stroke="#d97706" stroke-width="2"/>
+  <text x="345" y="690" text-anchor="middle" font-size="14" fill="#1c2333">2</text>
+  <rect x="365" y="672" width="80" height="26" rx="8" fill="#fff7e6" stroke="#d97706" stroke-width="2"/>
+  <text x="405" y="690" text-anchor="middle" font-size="14" fill="#1c2333">31</text>
+
+  <g font-size="13" fill="#1c2333">
+    <text x="486" y="630">4. Таблица: по TID</text>
+    <text x="486" y="648">читаем стр. 0, запись 2,</text>
+    <text x="486" y="666">и стр. 2, запись 2.</text>
+    <text x="486" y="684">Проверяем видимость</text>
+    <text x="486" y="702">строки (MVCC) и отдаём</text>
+    <text x="486" y="720">её в результат.</text>
+  </g>
 </svg>
